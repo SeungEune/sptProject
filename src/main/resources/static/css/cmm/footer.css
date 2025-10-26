@@ -1,0 +1,15 @@
+@charset "utf-8";
+
+.footer{
+  margin: 1.5rem 0;
+}
+.address-box{
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+.address-box p{
+  color: var(--Gray-300);
+}

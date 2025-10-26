@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <header th:fragment="headerLayout" id="mainHeader" class="mainHeader">
+        <div id="headerWrapper">
+            <div class="util-menu">
+                <ul>
+<!--                    <li class="user"><a th:text="${session.LoginVO.getUserNm()}"><span>홍길동</span> 님</a></li>-->
+                    <li class="logout">
+                        <a th:href="@{/sys/login/logoutAction.do}">
+                            <span>로그아웃</span>
+                            <img src="/images/img/log-out.svg" alt="로그아웃"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인 페이지</title>
+    <link th:href="@{/css/common.css}" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <h1>전자정부 프레임워크 시스템</h1>
+            <div class="user-info">
+                <span class="welcome-msg">안녕하세요, <strong th:text="${loginVO.userNm}">사용자명</strong>님</span>
+                <a th:href="@{/login/logout.do}" class="logout-btn">로그아웃</a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="content-container">
+            <h2>메인 메뉴</h2>
+            
+            <nav class="main-menu">
+                <ul class="menu-list">
+                    <li class="menu-item">
+                        <a th:href="@{/cmm/fms/selectFileInfs.do}" class="menu-link">
+                            <div class="menu-icon">📁</div>
+                            <div class="menu-text">
+                                <h3>파일 관리</h3>
+                                <p>업로드된 파일들을 관리합니다.</p>
+                            </div>
+                        </a>
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <div class="menu-icon">⚙️</div>
+                            <div class="menu-text">
+                                <h3>시스템 관리</h3>
+                                <p>시스템 설정 및 관리 기능입니다.</p>
+                            </div>
+                        </a>
+                    </li>
+                    
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <div class="menu-icon">📊</div>
+                            <div class="menu-text">
+                                <h3>통계 및 리포트</h3>
+                                <p>시스템 사용 통계를 확인합니다.</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="user-details">
+                <h3>사용자 정보</h3>
+                <table class="info-table">
+                    <tr>
+                        <th>아이디</th>
+                        <td th:text="${loginVO.userId}">userid</td>
+                    </tr>
+                    <tr>
+                        <th>이름</th>
+                        <td th:text="${loginVO.userNm}">사용자명</td>
+                    </tr>
+                    <tr>
+                        <th>이메일</th>
+                        <td th:text="${loginVO.email}">email@example.com</td>
+                    </tr>
+                    <tr>
+                        <th>사용자 구분</th>
+                        <td th:text="${loginVO.userSe}">USR</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="main-footer">
+        <p>&copy; 2024 전자정부 프레임워크. All rights reserved.</p>
+    </footer>
+</body>
+</html>

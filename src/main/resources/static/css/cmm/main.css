@@ -1,0 +1,339 @@
+@charset "utf-8";
+
+.index-main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.index-main::after{
+  content: '';
+  display: block;
+  width: 100%;
+  height: 265px;
+  background-color: var(--Primary-100);
+  position: absolute;
+  top: -89.5px;
+  left: 0;
+  z-index: -1;
+}
+.main-wrap{
+  display: flex;
+  align-items: flex-start;
+  gap: 4.8rem;
+  width: 100%;
+  max-width: 1440px;
+  padding-top: 1.6rem;
+}
+.my-info .info-box{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.4rem;
+  width: 344px;
+  padding: 3.2rem;
+  background-color: var(--White);
+  border-radius: 3.2rem;
+  box-shadow: 0px 4px 10px rgba(0, 21.15, 140.99, 0.15);
+}
+.my-info .info-box .user-img{
+  width: 100px;
+  height: 100px;
+  background: url("../../images/img/profile.svg")no-repeat center;
+  background-size: 100%;
+}
+.my-info .info-box .user .name{
+  font-size: 2.4rem;
+  text-align: center;
+}
+.my-info .info-box .user .id{
+  color: var(--Primary);
+  font-weight: 600;
+  text-align: center;
+}
+
+.outline-btn-Gr.custom{
+  border-color: var(--Gray-200);
+  color: var(--font-default);
+  transition: all .2s ease-in-out;
+}
+.outline-btn-Gr.custom:hover,
+.outline-btn-Gr.custom:active,
+.outline-btn-Gr.custom:focus{
+  background-color: var(--Primary);
+  border-color: var(--Primary);
+  color: var(--White);
+}
+
+/*survey list*/
+.survey-list{
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  width: calc(100% - 344px - 48px);
+}
+.survey-list-top{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+}
+.survey-list-top > .keyword-search{
+  width: 320px;
+}
+.survey-list-top .sch-sort ul{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.survey-list-top .sch-sort li{
+  display: flex;
+  align-items: center;
+}
+.survey-list-top .sch-sort li:first-child::after{
+  content: '';
+  display: block;
+  width: 1px;
+  height: 15px;
+  margin-right: .5rem;
+  background-color: var(--Gray-500);
+}
+.survey-list-top .sch-sort li>label{
+  font-weight: 700;
+}
+.survey-list-top .sch-sort .select{
+  background-color: transparent;
+  border: none;
+  border-radius: unset;
+}
+.survey-list > .list ul{
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  width: 100%;
+}
+.survey-list > .list ul .list-item a{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.4rem;
+  padding: 2.4rem;
+  background-color: var(--White);
+  border-radius: 2.4rem;
+  box-shadow: 0px 4px 10px rgba(0, 21.15, 140.99, 0.10);
+  transition: all .2s ease-in-out;
+  outline: 2px solid transparent;
+}
+.survey-list > .list ul .list-item a:hover,
+.survey-list > .list ul .list-item a:active,
+.survey-list > .list ul .list-item a:focus{
+  outline: 2px solid var(--Primary-300);
+}
+.survey-list > .list ul .list-item .name-box{
+  width: calc(100% - 250px - 48px);
+}
+.survey-list > .list ul .list-item .name-box .title{
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.survey-list > .list ul .list-item .name-box .name{
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--Gray-600);
+}
+/*등록*/
+.sub-wrap{
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  width: 100%;
+  max-width: 1048px;
+}
+.sub-wrap .page-title{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2.4rem;
+  position: relative;
+}
+.sub-wrap .page-title .icon-button.back{
+  position: absolute;
+  top: -4.8rem;
+  left: 0;
+}
+.sub-wrap .page-title .button-box{
+  width: auto;
+}
+.sub-wrap .content{
+  display: none;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+.sub-wrap .content.on{
+  display: flex;
+}
+
+.tab-box ul{
+  display: flex;
+  gap: 1.6rem;
+}
+.tab-box ul li{
+  display: flex;
+}
+.tab-box ul li button{
+  padding: 1rem .5rem;
+  border-bottom: 3px solid transparent;
+}
+.tab-box ul li button.on{
+  border-color: var(--Primary-700);
+  color: var(--Primary-700);
+  font-weight: 700;
+}
+/*등록 - 기본정보*/
+.basic-infor .contents-section{
+  gap: 1.6rem;
+}
+.contents-section .item-box.period .item-box{
+  gap: .8rem;
+}
+.contents-section .item-box.period label{
+  color: var(--Gray-400);
+  font-size: 1.4rem;
+}
+/*등록 - 지역선택*/
+.select-region{
+  display: flex;
+  gap: 2.4rem;
+}
+.select-region .map-box{
+  width: 550px;
+  height: 370px;
+  border-radius: .6rem;
+  overflow: hidden;
+}
+.select-region .select-edit-box{
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  width: calc(100% - 550px - 2.4rem);
+}
+.select-edit-box .region-list{
+  height: calc(100% - 46px);
+  max-height: 310px;
+  padding: 2.4rem;
+  border-radius: 2.4rem;
+  background-color: #F7F9FC;
+}
+.select-edit-box .region-list ul{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  overflow-y: auto;
+}
+.select-edit-box .region-list ul li{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2.4rem;
+  padding: 1rem 1.6rem;
+  border: 2px solid #D8DFEB;
+  border-radius: 1.6rem;
+  background-color: var(--White);
+  font-size: 1.7rem;
+}
+.icon-button{
+  display: block;
+  width: 24px;
+  height: 24px;
+  text-indent: -99999px;
+}
+.icon-button.delete{
+  background: url("../../images/img/delete.svg")no-repeat center;
+  background-size: 100%;
+}
+.icon-button.back{
+  background: url("../../images/img/back.svg")no-repeat center;
+  background-size: 100%;
+}
+.select-region .button-box{
+  align-items: center;
+}
+.select-region .button-box>.primary-btn{
+  width: 100%;
+}
+/*등록 - 설문 편집*/
+.question-box{
+  display: flex;
+  flex-direction: column;
+  background-color: var(--White);
+  border-radius: 2.4rem;
+  box-shadow: 0px 4px 10px rgba(0, 21.15, 140.99, 0.10);
+}
+.question-box .q-content{
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 2.4rem;
+}
+.question-box .select.q-type{
+  width: 320px;
+}
+.item-box.answer-item .input-custom{
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.item-box.answer-item .input-custom .input-style{
+  padding-right: 4rem;
+}
+.item-box.answer-item .input-custom .icon-button.delete{
+  position: absolute;
+  top: 50%;
+  right: 1.6rem;
+  transform: translateY(-50%);
+}
+.button-box .add-answer-item{
+  padding: 1rem 1.2rem;
+  background-color: var(--Primary-100);
+  border-radius: 50px;
+  color: var(--Primary);
+  font-size: 1.4rem;
+}
+
+.question-box .q-button{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid var(--Gray-100);
+}
+.question-box .q-button button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: calc(100%);
+  padding: 2.4rem 3.2rem;
+}
+.question-box .q-button button::before{
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.question-box .q-button .add-question::before{
+  background: url("../../images/img/plus.svg")no-repeat center;
+  background-size: 100%;
+}
+.question-box .q-button .delete-question::before{
+  background: url("../../images/img/trash.svg")no-repeat center;
+  background-size: 100%;
+}
+.vertical-bar{
+  width: 1px;
+  height: 3.2rem;
+  background-color: var(--Gray-100);
+}

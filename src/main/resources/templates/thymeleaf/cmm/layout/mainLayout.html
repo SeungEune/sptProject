@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html th:fragment="layout (title, contentLink, script, content)" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 콘텐츠별 title -->
+    <title>위치기반 설문 서비스</title>
+
+    <!-- 공통 meta -->
+    <link th:replace="~{cmm/meta :: metaLayout}">
+
+    <!-- 공통 script -->
+    <link th:replace="~{cmm/script :: script}">
+
+    <!-- 공통 css -->
+    <link th:replace="~{cmm/maincss :: css}">
+
+    <!-- 각 컨테츠 별 script -->
+    <th:block th:if="${script}">
+        <script th:replace="${script}"></script>
+    </th:block>
+
+    <!-- 컨텐츠별 link -->
+    <th:block th:if="${contentLink}">
+        <link th:replace="${contentLink}"/>
+    </th:block>
+</head>
+<body>
+<!-- header -->
+<div th:replace="~{cmm/header :: headerLayout}">
+    <p>header<p>
+</div>
+
+<!-- contents -->
+<th:block th:replace="${content}">
+    <p>contents</p>
+</th:block>
+
+<!-- footer -->
+<div th:replace="~{cmm/footer :: footerLayout}">
+    <p>footerLayout<p>
+</div>
+
+<!-- loading -->
+<div th:replace="~{cmm/loading :: loadingLayout}"></div>
+
+</body>
+</html>

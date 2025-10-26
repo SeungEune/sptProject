@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="loginDAO">
+
+	<!-- 일반 로그인 -->
+	<select id="actionLogin" resultType="biz.login.vo.LoginVO">
+		<!-- 일반회원 -->
+		<if test="userSe == &quot;GNR&quot;">
+			
+			SELECT mber_id AS userId
+			     , mber_nm AS userNm
+			     , ihidNum AS ihidNum
+			     , password AS password
+			     , mber_email_adres AS email
+			     , 'GNR' AS userSe
+			     , '-' AS orgnztId
+			     , esntl_id AS uniqId
+			  FROM LETTNGNRLMBER
+			 WHERE mber_id = #{userId}
+			   AND password = #{password}
+			   AND mber_sttus = 'P'
+			
+		</if>
+		<!-- 기업회원 -->
+		<if test="userSe == &quot;ENT&quot;">
+			
+			SELECT entrprsmber_id AS userId
+			     , cmpny_nm AS userNm
+			     , entrprs_mber_password AS password
+			     , bizrno AS ihidNum
+			     , applcnt_email_adres AS email
+			     , 'ENT' AS userSe
+			     , '-' AS orgnztId
+			     , esntl_id AS uniqId
+			  FROM LETTNENTRPRSMBER
+			 WHERE entrprsmber_id = #{userId}
+			   AND entrprs_mber_password = #{password}
+			   AND entrprs_mber_sttus = 'P'
+			
+		</if>
+		<!-- 업무사용자 -->
+		<if test="userSe == &quot;USR&quot;">
+			
+			SELECT emplyr_id AS userId
+			     , user_nm AS userNm
+			     , password AS password
+			     , ihidnum AS ihidNum
+			     , email_adres AS email
+			     , 'USR' AS userSe
+			     , orgnzt_id AS orgnztId
+			     , esntl_id AS uniqId
+			  FROM LETTNEMPLYRINFO
+			 WHERE emplyr_id = #{userId}
+			   AND password = #{password}
+			   AND emplyr_sttus_code = 'P'
+			
+		</if>
+	</select>
+</mapper>
