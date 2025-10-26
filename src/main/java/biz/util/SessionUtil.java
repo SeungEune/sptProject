@@ -30,8 +30,18 @@ public class SessionUtil {
      * @return 관리자 사용자면 true, 아니면 false를 리턴한다.
      */
     public static boolean isAdminUser() {
-        String userSe = SessionUtil.getUserSe();
-        return userSe != null && userSe.equals("ADM");
+        String roleCd = SessionUtil.getUserRoleCd();
+        return roleCd != null && roleCd.equals("ADMIN");
+    }
+    
+    /**
+     * 사용자의 역할 코드를 조회한다.
+     *
+     * @return 사용자의 역할 코드
+     */
+    public static String getUserRoleCd() {
+        LoginVO loginUser = SessionUtil.getLoginUser();
+        return loginUser != null ? loginUser.getRoleCd() : null;
     }
     
     /**
@@ -90,20 +100,5 @@ public class SessionUtil {
      */
     public static LoginVO getLoginUser() {
         return (LoginVO) getAttribute("LoginVO");
-    }
-
-    public static String getUserId() {
-        LoginVO loginVO = getLoginUser();
-        return loginVO != null ? loginVO.getUserId() : null;
-    }
-
-    public static String getUserSe() {
-        LoginVO loginVO = getLoginUser();
-        return loginVO != null ? loginVO.getUserSe() : null;
-    }
-
-    public static String getUserNm() {
-        LoginVO loginVO = getLoginUser();
-        return loginVO != null ? loginVO.getUserNm() : null;
     }
 }

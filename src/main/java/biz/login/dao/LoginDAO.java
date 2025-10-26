@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
  *  -------    --------    ---------------------------
  *  2009.03.06  박지욱          최초 생성
  *  2011.08.31  JJY            경량환경 템플릿 커스터마이징버전 생성
+ *  2024.12.20  시스템          신규 DB 스키마 적용
  *
  *  </pre>
  */
@@ -61,5 +62,51 @@ public class LoginDAO extends EgovAbstractMapper {
 	 */
 	public void updatePassword(LoginVO vo) throws Exception {
 		update("loginDAO.updatePassword", vo);
+	}
+
+	/**
+	 * 로그인 실패 횟수를 증가시킨다.
+	 * @param vo LoginVO
+	 * @exception Exception
+	 */
+	public void updateLoginFail(LoginVO vo) throws Exception {
+		update("loginDAO.updateLoginFail", vo);
+	}
+
+	/**
+	 * 계정을 잠금 처리한다.
+	 * @param vo LoginVO
+	 * @exception Exception
+	 */
+	public void updateAccountLock(LoginVO vo) throws Exception {
+		update("loginDAO.updateAccountLock", vo);
+	}
+
+	/**
+	 * 로그인 성공 처리를 한다.
+	 * @param vo LoginVO
+	 * @exception Exception
+	 */
+	public void updateLoginSuccess(LoginVO vo) throws Exception {
+		update("loginDAO.updateLoginSuccess", vo);
+	}
+
+	/**
+	 * 로그인 이력을 기록한다.
+	 * @param vo LoginVO
+	 * @exception Exception
+	 */
+	public void insertLoginHistory(LoginVO vo) throws Exception {
+		insert("loginDAO.insertLoginHistory", vo);
+	}
+
+	/**
+	 * 사용자 정보를 조회한다.
+	 * @param vo LoginVO
+	 * @return LoginVO
+	 * @exception Exception
+	 */
+	public LoginVO selectUserInfo(LoginVO vo) throws Exception {
+		return (LoginVO) selectOne("loginDAO.selectUserInfo", vo);
 	}
 }
