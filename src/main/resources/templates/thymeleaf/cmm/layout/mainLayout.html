@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html th:fragment="layout (title, contentLink, script, content)" xmlns:th="http://www.thymeleaf.org">
+<html th:fragment="layout (content)" xmlns:th="http://www.thymeleaf.org">
 <head>
     <!-- 콘텐츠별 title -->
-    <title>위치기반 설문 서비스</title>
+    <title>SpatialtT 인트라넷</title>
 
     <!-- 공통 meta -->
     <link th:replace="~{cmm/meta :: metaLayout}">
@@ -11,17 +11,12 @@
     <link th:replace="~{cmm/script :: script}">
 
     <!-- 공통 css -->
-    <link th:replace="~{cmm/maincss :: css}">
-
-    <!-- 각 컨테츠 별 script -->
-    <th:block th:if="${script}">
-        <script th:replace="${script}"></script>
-    </th:block>
-
-    <!-- 컨텐츠별 link -->
-    <th:block th:if="${contentLink}">
-        <link th:replace="${contentLink}"/>
-    </th:block>
+    <link type="text/css" rel="stylesheet" th:href="@{/css/reset.css}" >
+    <link type="text/css" rel="stylesheet" th:href="@{/css/common.css}" >
+    <link type="text/css" rel="stylesheet" th:href="@{/css/components.css}" >
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/main.css}" >
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/header.css}" >
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/footer.css}" >
 </head>
 <body>
 <!-- header -->

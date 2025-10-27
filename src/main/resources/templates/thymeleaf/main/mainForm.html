@@ -1,23 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메인 페이지</title>
-    <link th:href="@{/css/common.css}" rel="stylesheet">
-    <link th:href="@{/css/main.css}" rel="stylesheet">
-</head>
+<html th:replace="~{cmm/layout/mainLayout :: layout(~{::main})}"
+      xmlns:th="http://www.thymeleaf.org">
 <body>
-    <header class="main-header">
-        <div class="header-content">
-            <h1>전자정부 프레임워크 시스템</h1>
-            <div class="user-info">
-                <span class="welcome-msg">안녕하세요, <strong th:text="${loginVO.userNm}">사용자명</strong>님</span>
-                <a th:href="@{/login/logout.do}" class="logout-btn">로그아웃</a>
-            </div>
-        </div>
-    </header>
-    
     <main class="main-content">
         <div class="content-container">
             <h2>메인 메뉴</h2>
@@ -83,9 +67,5 @@
             </div>
         </div>
     </main>
-    
-    <footer class="main-footer">
-        <p>&copy; 2024 전자정부 프레임워크. All rights reserved.</p>
-    </footer>
 </body>
 </html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html th:fragment="layout (contentLink, script ,content)" xmlns:th="http://www.thymeleaf.org">
+<html th:fragment="layout (contentLink, script, content, title)" xmlns:th="http://www.thymeleaf.org">
 <head>
     <!-- 콘텐츠별 title -->
-    <title>위치기반설문조사</title>
+    <title th:text="${title != null ? title : 'Spatialt 인트라넷'}">Spatialt 인트라넷</title>
 
     <!-- 공통 meta -->
     <link th:replace="~{cmm/meta :: metaLayout}">

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인</title>
-    <link th:href="@{/css/common.css}" rel="stylesheet">
-    <link th:href="@{/css/login.css}" rel="stylesheet">
+<html th:replace="~{cmm/layout/subLayout :: layout(~{::link}, null, ~{::login-content}, '로그인')}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="link">
+    <!-- 로그인 페이지 전용 CSS -->
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/login.css}">
 </head>
-<body>
+
+<body th:fragment="login-content">
     <div class="login-container">
         <div class="login-box">
             <h2>로그인</h2>

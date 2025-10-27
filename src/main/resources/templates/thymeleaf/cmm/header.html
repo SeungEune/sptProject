@@ -4,9 +4,14 @@
         <div id="headerWrapper">
             <div class="util-menu">
                 <ul>
-<!--                    <li class="user"><a th:text="${session.LoginVO.getUserNm()}"><span>홍길동</span> 님</a></li>-->
+                    <!-- 세션에서 사용자 정보 조회 -->
+                    <li class="user" th:if="${session.LoginVO}">
+                        <a th:text="${session.LoginVO.userNm} + ' 님'">
+                            <span th:text="${session.LoginVO.userNm}">홍길동</span> 님
+                        </a>
+                    </li>
                     <li class="logout">
-                        <a th:href="@{/sys/login/logoutAction.do}">
+                        <a th:href="@{/login/logout.do}">
                             <span>로그아웃</span>
                             <img src="/images/img/log-out.svg" alt="로그아웃"/>
                         </a>
