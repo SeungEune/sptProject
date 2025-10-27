@@ -10,7 +10,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         initNoticeWidget();
     });
-
+    
     /**
      * 공지사항 위젯 초기화
      */

@@ -24,20 +24,22 @@
     </th:block>
 </head>
 <body>
-
-    <!-- header
+    <!-- header -->
     <div th:replace="~{cmm/header :: headerLayout}">
         <p>header<p>
-    </div>-->
+    </div>
 
-    <!-- contents -->
+    <!-- TOC 사이드바 -->
+    <div th:replace="~{cmm/layout/tocLayout :: tocLayout}"></div>
+
     <th:block th:replace="${content}">
         <p>contents</p>
     </th:block>
 
-    <!-- footer
+    <!-- footer -->
     <div th:replace="~{cmm/footer :: footerLayout}">
         <p>footerLayout<p>
-    </div>-->
+    </div>
+
 </body>
 </html>
