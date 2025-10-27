@@ -1,13 +1,7 @@
 <!DOCTYPE html>
-<html th:replace="~{cmm/layout/subLayout :: layout(~{::link}, null, ~{::login-content}, '로그인')}"
+<html th:replace="~{cmm/layout/loginLayout :: layout(~{::content}, '로그인')}"
       xmlns:th="http://www.thymeleaf.org">
-
-<head th:fragment="link">
-    <!-- 로그인 페이지 전용 CSS -->
-    <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/login.css}">
-</head>
-
-<body th:fragment="login-content">
+<body th:fragment="content">
     <div class="login-container">
         <div class="login-box">
             <h2>로그인</h2>

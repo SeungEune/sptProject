@@ -1,153 +1,125 @@
 <!DOCTYPE html>
-<html th:replace="~{cmm/layout/mainLayout :: layout(~{::main})}"
+<html th:replace="~{cmm/layout/mainLayout :: layout(~{::content})}"
       xmlns:th="http://www.thymeleaf.org">
-<body>
-    <main class="main-content">
-        <div class="dashboard-container">
-            <!-- 사이드바 -->
-            <aside class="dashboard-sidebar">
-                <div class="sidebar-menu">
-                    <a href="/main/mainForm.do" class="sidebar-menu-item active">
-                        <i class="icon-home"></i>
-                        <span>대시보드</span>
-                    </a>
-                    <a href="/notice/noticeList.do" class="sidebar-menu-item">
-                        <i class="icon-notice"></i>
+<body th:fragment="content">
+    <!-- 헤더 -->
+    <div class="dashboard-header">
+        <h2>대시보드</h2>
+        <p class="subtitle">환영합니다, <span th:text="${loginVO.userNm}">사용자</span>님!</p>
+    </div>
+
+    <!-- 위젯 그리드 -->
+    <div class="widget-grid">
+        <!-- 사용자 정보 카드 -->
+        <div class="widget-card">
+            <div class="widget-card-header">
+                <div class="widget-card-title">
+                    <i>👤</i>
+                    <span>내 정보</span>
+                </div>
+            </div>
+            <div class="widget-card-body">
+                <div class="user-info-card">
+                    <div class="user-avatar" th:text="${loginVO.userNm != null ? #strings.substring(loginVO.userNm,0,1) : 'U'}">U</div>
+                    <div class="user-name" th:text="${loginVO.userNm}">사용자명</div>
+                    <div class="user-detail" th:text="${loginVO.deptNm}">부서명</div>
+                    <div class="user-detail" th:text="${loginVO.roleNm}">역할</div>
+                    <div class="user-detail" th:text="${loginVO.emailAdres}">이메일</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 공지사항 위젯 -->
+        <div class="widget-card">
+            <div class="widget-card-header">
+                <div class="widget-card-title">
+                    <i>📢</i>
+                    <span>공지사항</span>
+                </div>
+                <div class="widget-card-actions">
+                    <a href="/notice/noticeList.do" class="more-link">더보기 →</a>
+                </div>
+            </div>
+            <div class="widget-card-body">
+                <div class="notice-list" id="noticeList">
+                    <!-- 동적으로 로드되는 공지사항 -->
+                    <div class="widget-loading">
+                        <p>공지사항을 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 빠른 메뉴 -->
+        <div class="widget-card">
+            <div class="widget-card-header">
+                <div class="widget-card-title">
+                    <i>⚡</i>
+                    <span>빠른 메뉴</span>
+                </div>
+            </div>
+            <div class="widget-card-body">
+                <div class="quick-menu-grid">
+                    <a href="/notice/noticeList.do" class="quick-menu-item">
+                        <i>📢</i>
                         <span>공지사항</span>
                     </a>
-                    <a href="/office/officeEqpmnList.do" class="sidebar-menu-item">
-                        <i class="icon-office"></i>
-                        <span>사무실 관리</span>
+                    <a href="/office/officeEqpmnList.do" class="quick-menu-item">
+                        <i>🖥️</i>
+                        <span>장비 관리</span>
                     </a>
-                    <a href="/cmm/fms/selectFileInfs.do" class="sidebar-menu-item">
-                        <i class="icon-file"></i>
+                    <a href="/cmm/fms/selectFileInfs.do" class="quick-menu-item">
+                        <i>📁</i>
                         <span>파일 관리</span>
                     </a>
+                    <a href="#" class="quick-menu-item secondary">
+                        <i>⚙️</i>
+                        <span>설정</span>
+                    </a>
                 </div>
-            </aside>
+            </div>
+        </div>
+    </div>
 
-            <!-- 메인 콘텐츠 -->
-            <div class="dashboard-content">
-                <!-- 헤더 -->
-                <div class="dashboard-header">
-                    <h2>대시보드</h2>
-                    <p class="subtitle">환영합니다, <span th:text="${loginVO.userNm}">사용자</span>님!</p>
+    <!-- 추가 위젯 영역 (향후 확장용) -->
+    <div class="widget-grid">
+        <div class="widget-card">
+            <div class="widget-card-header">
+                <div class="widget-card-title">
+                    <i>📊</i>
+                    <span>통계</span>
                 </div>
-
-                <!-- 위젯 그리드 -->
-                <div class="widget-grid">
-                    <!-- 사용자 정보 카드 -->
-                    <div class="widget-card">
-                        <div class="widget-card-header">
-                            <div class="widget-card-title">
-                                <i>👤</i>
-                                <span>내 정보</span>
-                            </div>
-                        </div>
-                        <div class="widget-card-body">
-                            <div class="user-info-card">
-                                <div class="user-avatar" th:text="${loginVO.userNm != null ? #strings.substring(loginVO.userNm,0,1) : 'U'}">U</div>
-                                <div class="user-name" th:text="${loginVO.userNm}">사용자명</div>
-                                <div class="user-detail" th:text="${loginVO.deptNm}">부서명</div>
-                                <div class="user-detail" th:text="${loginVO.roleNm}">역할</div>
-                                <div class="user-detail" th:text="${loginVO.emailAdres}">이메일</div>
-                            </div>
+            </div>
+            <div class="widget-card-body">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-title">전체 사용자</div>
+                        <div class="stat-card-value">150</div>
+                        <div class="stat-card-change positive">
+                            <span>↑ 5명</span>
                         </div>
                     </div>
-
-                    <!-- 공지사항 위젯 -->
-                    <div class="widget-card">
-                        <div class="widget-card-header">
-                            <div class="widget-card-title">
-                                <i>📢</i>
-                                <span>공지사항</span>
-                            </div>
-                            <div class="widget-card-actions">
-                                <a href="/notice/noticeList.do" class="more-link">더보기 →</a>
-                            </div>
-                        </div>
-                        <div class="widget-card-body">
-                            <div class="notice-list" id="noticeList">
-                                <!-- 동적으로 로드되는 공지사항 -->
-                                <div class="widget-loading">
-                                    <p>공지사항을 불러오는 중...</p>
-                                </div>
-                            </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">등록된 장비</div>
+                        <div class="stat-card-value">45</div>
+                        <div class="stat-card-change">
+                            <span>정상</span>
                         </div>
                     </div>
-
-                    <!-- 빠른 메뉴 -->
-                    <div class="widget-card">
-                        <div class="widget-card-header">
-                            <div class="widget-card-title">
-                                <i>⚡</i>
-                                <span>빠른 메뉴</span>
-                            </div>
-                        </div>
-                        <div class="widget-card-body">
-                            <div class="quick-menu-grid">
-                                <a href="/notice/noticeList.do" class="quick-menu-item">
-                                    <i>📢</i>
-                                    <span>공지사항</span>
-                                </a>
-                                <a href="/office/officeEqpmnList.do" class="quick-menu-item">
-                                    <i>🖥️</i>
-                                    <span>장비 관리</span>
-                                </a>
-                                <a href="/cmm/fms/selectFileInfs.do" class="quick-menu-item">
-                                    <i>📁</i>
-                                    <span>파일 관리</span>
-                                </a>
-                                <a href="#" class="quick-menu-item secondary">
-                                    <i>⚙️</i>
-                                    <span>설정</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 추가 위젯 영역 (향후 확장용) -->
-                <div class="widget-grid">
-                    <div class="widget-card">
-                        <div class="widget-card-header">
-                            <div class="widget-card-title">
-                                <i>📊</i>
-                                <span>통계</span>
-                            </div>
-                        </div>
-                        <div class="widget-card-body">
-                            <div class="stat-grid">
-                                <div class="stat-card">
-                                    <div class="stat-card-title">전체 사용자</div>
-                                    <div class="stat-card-value">150</div>
-                                    <div class="stat-card-change positive">
-                                        <span>↑ 5명</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-card-title">등록된 장비</div>
-                                    <div class="stat-card-value">45</div>
-                                    <div class="stat-card-change">
-                                        <span>정상</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-card-title">공지사항</div>
-                                    <div class="stat-card-value">12</div>
-                                    <div class="stat-card-change positive">
-                                        <span>7일 내 3건</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">공지사항</div>
+                        <div class="stat-card-value">12</div>
+                        <div class="stat-card-change positive">
+                            <span>7일 내 3건</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
     <!-- JavaScript -->
     <script th:src="@{/js/main/dashboard.js}"></script>
+    <script th:src="@{/js/toc/toc.js}"></script>
 </body>
 </html>
