@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service("lunchService")
@@ -105,13 +104,74 @@ public class LunchServiceImpl implements LunchService {
 
 
     @Override
-    public List<Map<String, Object>> getLunchList(Map<String, Object> params) throws Exception {
-        // TODO: 조회 로직
-        return null;
+    public Map<String, Object> getLunchList(Map<String, Object> params) throws Exception {
+        log.info("점심/커피 내역 및 자동 정산 계산 - params={}", params);
+
+        // 기본 점심/커피 내역 조회
+        List<Map<String, Object>> rawList = lunchMapper.getLunchList(params);
+        if (rawList == null || rawList.isEmpty()) {
+            log.info("조회 결과 없음");
+            return Map.of("rawList", List.of(), "settlementList", List.of());
+        }
+
+        // 사용자별 합계 계산용 Map
+        Map<String, Integer> totalPaid = new HashMap<>(); // 실제 낸 금액
+        Map<String, Integer> totalOwed = new HashMap<>(); // 각자 부담금
+
+        // 각 내역 순회하며 누적합 계산
+        for (Map<String, Object> row : rawList) {
+            String payerId = String.valueOf(row.get("payer_id"));
+            int totalAmount = ((Number) row.get("total_amount")).intValue();
+
+            // 결제자가 낸 금액 합산
+            totalPaid.put(payerId, totalPaid.getOrDefault(payerId, 0) + totalAmount);
+
+            // 참여자 문자열
+            String participants = (String) row.get("participants");
+            if (participants != null && !participants.isEmpty()) {
+                String[] arr = participants.split(",");
+                for (String p : arr) {
+                    String[] kv = p.trim().split(":");
+                    if (kv.length == 2) {
+                        String userId = kv[0].trim();
+                        int amount = Integer.parseInt(kv[1].trim());
+                        totalOwed.put(userId, totalOwed.getOrDefault(userId, 0) + amount);
+                    }
+                }
+            }
+        }
+
+        // 자동 정산 요약 (balance = 낸 금액 - 부담금)
+        List<Map<String, Object>> settlementList = new ArrayList<>();
+        Set<String> allUsers = new HashSet<>();
+        allUsers.addAll(totalPaid.keySet());
+        allUsers.addAll(totalOwed.keySet());
+
+        for (String userId : allUsers) {
+            int paid = totalPaid.getOrDefault(userId, 0);
+            int owed = totalOwed.getOrDefault(userId, 0);
+            int balance = paid - owed;
+
+            Map<String, Object> s = new HashMap<>();
+            s.put("user_id", userId);
+            s.put("total_paid", paid);
+            s.put("total_owed", owed);
+            s.put("balance", balance);
+            settlementList.add(s);
+        }
+
+        // 결과 구성
+        Map<String, Object> result = new HashMap<>();
+        result.put("rawList", rawList);
+        result.put("settlementList", settlementList);
+
+        log.info("자동 정산 계산 완료 - {}건", rawList.size());
+        return result;
     }
 
+
     @Override
-    public Map<String, Object> getStatistics(Map<String, Object> params) throws Exception {
+    public List<Map<String, Object>> getStatistics(Map<String, Object> params) throws Exception {
         // TODO: 통계 로직
         return null;
     }

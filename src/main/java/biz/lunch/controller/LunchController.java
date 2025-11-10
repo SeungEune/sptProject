@@ -63,11 +63,12 @@ public class LunchController {
      */
     @GetMapping("/list.do")
     public String getLunchList(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
-        log.info("점심/커피 목록 조회: {}", params);
-        List<Map<String, Object>> list = lunchService.getLunchList(params);
-        model.addAttribute("lunchList", list);
+        Map<String, Object> result = lunchService.getLunchList(params);
+        model.addAttribute("lunchList", result.get("rawList"));
+        model.addAttribute("settlementList", result.get("settlementList"));
         return "lunch/list";
     }
+
 
     /**
      * 수정 처리
@@ -120,7 +121,7 @@ public class LunchController {
     @GetMapping("/statistics.do")
     public String getStatistics(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
         log.info("점심/커피 통계 조회: {}", params);
-        Map<String, Object> stats = lunchService.getStatistics(params);
+        List<Map<String, Object>> stats = lunchService.getStatistics(params);
         model.addAttribute("statistics", stats);
         return "lunch/statistics"; // 통계 화면
     }
