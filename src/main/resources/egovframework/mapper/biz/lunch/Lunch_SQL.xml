@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="biz.lunch.dao.LunchMapper">
+
+    <!-- 점심/커피 내역 등록 -->
+    <insert id="registerLunch" parameterType="map">
+        INSERT INTO lunch_master (
+        date, store_name, payer_id, total_amount, type, created_at
+        ) VALUES (
+        #{date}, #{store_name}, #{payer_id}, #{total_amount}, #{type}::lunch_type, NOW()
+        );
+
+        <foreach collection="participants" item="p" separator=";">
+            INSERT INTO lunch_participant (
+            lunch_id, user_id, individual_amount, is_paid
+            ) VALUES (
+            currval('public.lunch_master_lunch_id_seq'),
+            #{p.user_id}, #{p.individual_amount}, 'N'
+            )
+        </foreach>
+    </insert>
+
+    <!-- 점심/커피 내역 수정 -->
+    <update id="updateLunch" parameterType="map">
+        UPDATE lunch_master
+        SET store_name = #{store_name},
+            payer_id = #{payer_id},
+            date = #{date},
+            total_amount = #{total_amount},
+            type = #{type}::lunch_type
+        WHERE lunch_id = #{lunch_id};
+    </update>
+
+    <!-- 기존 참여자 전체 삭제 -->
+    <delete id="deleteParticipantsByLunchId" parameterType="int">
+        DELETE FROM lunch_participant
+        WHERE lunch_id = #{lunch_id};
+    </delete>
+
+    <!-- 새로운 참여자 등록 -->
+    <insert id="insertParticipants_Batch" parameterType="map">
+        INSERT INTO lunch_participant (
+        lunch_id, user_id, individual_amount, is_paid
+        ) VALUES
+        <foreach collection="participants" item="p" separator=",">
+            (#{lunch_id}, #{p.user_id}, #{p.individual_amount}, 'N')
+        </foreach>
+    </insert>
+
+    <!-- 점심/커피 내역 삭제 -->
+    <delete id="deleteLunch" parameterType="int">
+        DELETE FROM lunch_participant WHERE lunch_id = #{id};
+        DELETE FROM lunch_master WHERE lunch_id = #{id};
+    </delete>
+
+    <!-- 점심/커피 내역 조회 -->
+    <select id="getLunchList" parameterType="map" resultType="map">
+        SELECT
+        m.lunch_id,
+        m.date,
+        m.store_name,
+        m.total_amount,
+        m.type,
+        m.payer_id,
+        u.user_nm AS payer_name,
+        STRING_AGG(p.user_id || ':' || p.individual_amount, ', ') AS participants,
+        SUM(p.individual_amount) AS total_participant_amount
+        FROM lunch_master m
+        JOIN tb_user u ON m.payer_id = u.user_id
+        LEFT JOIN lunch_participant p ON m.lunch_id = p.lunch_id
+        WHERE 1=1
+        <if test="type != null and type != ''">
+            AND m.type = #{type}::lunch_type
+        </if>
+        <if test="start_date != null">
+            AND m.date &gt;= #{start_date}
+        </if>
+        <if test="end_date != null">
+            AND m.date &lt;= #{end_date}
+        </if>
+        GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
+        ORDER BY m.date DESC;
+    </select>
+
+    <!-- 사용자별/월별 통계 조회 -->
+    <select id="getStatistics" parameterType="map" resultType="map">
+        SELECT
+        s.user_id,
+        u.user_nm,
+        s.month,
+        s.type,
+        s.total_paid,
+        s.total_owed,
+        s.balance,
+        u2.user_nm AS representative_payer
+        FROM lunch_summary s
+        JOIN tb_user u ON s.user_id = u.user_id
+        LEFT JOIN tb_user u2 ON s.representative_payer_id = u2.user_id
+        <where>
+            <if test="month != null">
+                s.month = #{month}
+            </if>
+            <if test="type != null and type != ''">
+                AND s.type = #{type}::lunch_type
+            </if>
+        </where>
+        ORDER BY s.balance DESC;
+    </select>
+
+    <!-- 정산 완료 처리 -->
+    <update id="completeSettlement" parameterType="map">
+        UPDATE lunch_participant
+        SET is_paid = 'Y',
+            paid_at = NOW()
+        WHERE lunch_id = #{lunch_id}
+          AND user_id = #{user_id};
+    </update>
+
+</mapper>

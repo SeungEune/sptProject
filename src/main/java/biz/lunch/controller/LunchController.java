@@ -27,7 +27,7 @@ public class LunchController {
 
     @PostMapping("/register.do")
     public String registerLunch(@RequestParam Map<String, Object> params) throws Exception {
-        log.info("▶ 점심/커피 등록 요청: {}", params);
+        log.info("점심/커피 등록 요청: {}", params);
         lunchService.registerLunch(params);
         return "redirect:/lunch/list.do"; // 등록 후 목록 이동
     }
@@ -37,7 +37,7 @@ public class LunchController {
      */
     @GetMapping("/list.do")
     public String getLunchList(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
-        log.info("▶ 점심/커피 목록 조회: {}", params);
+        log.info("점심/커피 목록 조회: {}", params);
         List<Map<String, Object>> list = lunchService.getLunchList(params);
         model.addAttribute("lunchList", list);
         return "lunch/list";
@@ -45,14 +45,14 @@ public class LunchController {
 
     @PostMapping("/update.do")
     public String updateLunch(@RequestParam Map<String, Object> params) throws Exception {
-        log.info("▶ 점심/커피 수정 요청: {}", params);
+        log.info("점심/커피 수정 요청: {}", params);
         lunchService.updateLunch(params);
         return "redirect:/lunch/list.do";
     }
 
     @PostMapping("/delete.do")
     public String deleteLunch(@RequestParam("lunch_id") int lunchId) throws Exception {
-        log.info("▶ 점심/커피 삭제 요청: lunch_id={}", lunchId);
+        log.info("점심/커피 삭제 요청: lunch_id={}", lunchId);
         lunchService.deleteLunch(lunchId);
         return "redirect:/lunch/list.do";
     }
@@ -62,7 +62,7 @@ public class LunchController {
      *  */
     @GetMapping("/statistics.do")
     public String getStatistics(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
-        log.info("▶ 점심/커피 통계 조회: {}", params);
+        log.info("점심/커피 통계 조회: {}", params);
         Map<String, Object> stats = lunchService.getStatistics(params);
         model.addAttribute("statistics", stats);
         return "lunch/statistics"; // 통계 화면
@@ -73,7 +73,7 @@ public class LunchController {
      *  */
     @PostMapping("/completeSettlement.do")
     public String completeSettlement(@RequestParam Map<String, Object> params) throws Exception {
-        log.info("▶ 정산 완료 처리 요청: {}", params);
+        log.info("정산 완료 처리 요청: {}", params);
         lunchService.completeSettlement(params);
         return "redirect:/lunch/list.do";
     }
