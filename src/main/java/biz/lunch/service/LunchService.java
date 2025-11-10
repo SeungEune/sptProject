@@ -12,7 +12,7 @@ public interface LunchService {
     //점심/커피 내역 수정
     int updateLunch(Map<String, Object> params) throws Exception;
     //점심/커피 내역 삭제
-    int deleteLunch(int id) throws Exception;
+    int deleteLunch(int lunchId) throws Exception;
     //점심/커피 내역 목록 조회
     List<Map<String, Object>> getLunchList(Map<String, Object> params) throws Exception;
     //사용자별/월별 통계 조회

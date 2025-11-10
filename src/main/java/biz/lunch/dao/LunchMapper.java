@@ -1,5 +1,6 @@
 package biz.lunch.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 
 import java.util.List;
@@ -13,16 +14,18 @@ public interface LunchMapper {
     int registerLunch(Map<String, Object> params) throws Exception;
 
     int updateLunch(Map<String, Object> params) throws Exception;
-    //수정 시 해당 내역의 참여자 목록 초기화
-    int deleteParticipantsByLunchId(int lunchId) throws Exception;
-    // 수정된 참여자 정보를 일괄 등록
-    int insertParticipants_Batch(Map<String, Object> params) throws Exception;
 
-    int deleteLunch(int id) throws Exception;
+    //수정 시 해당 내역의 참여자 목록 초기화
+    int deleteParticipantsByLunchId(@Param("lunchId") int lunchId) throws Exception;
+
+    // 수정된 참여자 정보를 일괄 등록
+    int insertParticipantsBatch(Map<String, Object> params) throws Exception;
 
     List<Map<String, Object>> getLunchList(Map<String, Object> params) throws Exception;
 
     Map<String, Object> getStatistics(Map<String, Object> params) throws Exception;
 
     int completeSettlement(Map<String, Object> params) throws Exception;
+
+    int deleteLunch(@Param("lunchId") int lunchId);
 }

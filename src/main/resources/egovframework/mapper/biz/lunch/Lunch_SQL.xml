@@ -4,55 +4,47 @@
 
 <mapper namespace="biz.lunch.dao.LunchMapper">
 
-    <!-- 점심/커피 내역 등록 -->
-    <insert id="registerLunch" parameterType="map">
+    <!-- 점심/커피 내역 등록 (ServiceImpl에서 참여자 별도 등록) -->
+    <insert id="registerLunch" parameterType="map"
+            useGeneratedKeys="true" keyProperty="lunchId" keyColumn="lunch_id">
         INSERT INTO lunch_master (
-        date, store_name, payer_id, total_amount, type, created_at
+            date, store_name, payer_id, total_amount, type, created_at
         ) VALUES (
-        #{date}, #{store_name}, #{payer_id}, #{total_amount}, #{type}, NOW()
-        );
-
-        <foreach collection="participants" item="p" separator=";">
-            INSERT INTO lunch_participant (
-            lunch_id, user_id, individual_amount, is_paid
-            ) VALUES (
-            currval('public.lunch_master_lunch_id_seq'),
-            #{p.user_id}, #{p.individual_amount}, 'N'
-            )
-        </foreach>
+                     #{date}, #{storeName}, #{payerId}, #{totalAmount}, #{type}, NOW()
+                 )
     </insert>
 
     <!-- 점심/커피 내역 수정 -->
     <update id="updateLunch" parameterType="map">
         UPDATE lunch_master
-        SET store_name = #{store_name},
-            payer_id = #{payer_id},
+        SET store_name = #{storeName},
+            payer_id = #{payerId},
             date = #{date},
-            total_amount = #{total_amount},
+            total_amount = #{totalAmount},
             type = #{type}
-        WHERE lunch_id = #{lunch_id};
+        WHERE lunch_id = #{lunchId};
     </update>
 
     <!-- 기존 참여자 전체 삭제 -->
     <delete id="deleteParticipantsByLunchId" parameterType="int">
         DELETE FROM lunch_participant
-        WHERE lunch_id = #{lunch_id};
+        WHERE lunch_id = #{lunchId};
     </delete>
 
-    <!-- 새로운 참여자 등록 -->
-    <insert id="insertParticipants_Batch" parameterType="map">
+    <!-- 새로운 참여자 등록 (일괄 등록 처리) -->
+    <insert id="insertParticipantsBatch" parameterType="map">
         INSERT INTO lunch_participant (
         lunch_id, user_id, individual_amount, is_paid
         ) VALUES
         <foreach collection="participants" item="p" separator=",">
-            (#{lunch_id}, #{p.user_id}, #{p.individual_amount}, 'N')
+            (#{lunchId}, #{p.userId}, #{p.individualAmount}, 'N')
         </foreach>
     </insert>
 
-    <!-- 점심/커피 내역 삭제 -->
+    <!-- 점심/커피 내역 삭제 (CASCADE에 의해 참여자 자동 삭제됨) -->
     <delete id="deleteLunch" parameterType="int">
-        DELETE FROM lunch_participant WHERE lunch_id = #{id};
-        DELETE FROM lunch_master WHERE lunch_id = #{id};
+        DELETE FROM lunch_master
+        WHERE lunch_id = #{lunchId};
     </delete>
 
     <!-- 점심/커피 내역 조회 -->
@@ -74,11 +66,11 @@
         <if test="type != null and type != ''">
             AND m.type = #{type}
         </if>
-        <if test="start_date != null">
-            AND m.date &gt;= #{start_date}
+        <if test="startDate != null">
+            AND m.date &gt;= #{startDate}
         </if>
-        <if test="end_date != null">
-            AND m.date &lt;= #{end_date}
+        <if test="endDate != null">
+            AND m.date &lt;= #{endDate}
         </if>
         GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
         ORDER BY m.date DESC;
@@ -90,7 +82,6 @@
         s.user_id,
         u.user_nm,
         s.month,
-        s.type,
         s.total_paid,
         s.total_owed,
         s.balance,
@@ -102,20 +93,17 @@
             <if test="month != null">
                 s.month = #{month}
             </if>
-            <if test="type != null and type != ''">
-                AND s.type = #{type}
-            </if>
         </where>
         ORDER BY s.balance DESC;
     </select>
 
-    <!-- 정산 완료 처리 -->
+    <!-- 월별 정산 완료 처리 (DB에 status, paid_at 존재 시 작동) -->
     <update id="completeSettlement" parameterType="map">
-        UPDATE lunch_participant
-        SET is_paid = 'Y',
+        UPDATE lunch_summary
+        SET status = 'PAID',
             paid_at = NOW()
-        WHERE lunch_id = #{lunch_id}
-          AND user_id = #{user_id};
+        WHERE month = #{month}
+          AND user_id = #{userId};
     </update>
 
 </mapper>

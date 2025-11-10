@@ -6,8 +6,10 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +42,7 @@ import org.springframework.jdbc.support.lob.DefaultLobHandler;
 @PropertySources({
 	@PropertySource("classpath:/application.properties")
 })
+@MapperScan(basePackages = {"egovframework", "biz"}, annotationClass = Mapper.class)
 public class EgovConfigAppMapper {
 	@Autowired
 	DataSource dataSource;
