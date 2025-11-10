@@ -106,4 +106,58 @@
           AND user_id = #{userId};
     </update>
 
+    <!-- 요약 테이블 자동 갱신 -->
+    <insert id="updateSummaryAfterChange" parameterType="map">
+        WITH
+        -- (A) 기존 월 데이터 삭제
+            deleted AS (
+        DELETE FROM lunch_summary WHERE month = #{month} RETURNING 1
+            ),
+            -- (B) 사용자별 총 부담금
+            T_OWED AS (
+        SELECT
+            p.user_id,
+            SUM(p.individual_amount) AS total_owed
+        FROM lunch_participant p
+            JOIN lunch_master m ON p.lunch_id = m.lunch_id
+        WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
+        GROUP BY p.user_id
+            ),
+            -- (C) 사용자별 총 결제금
+            T_PAID AS (
+        SELECT
+            m.payer_id AS user_id,
+            SUM(m.total_amount) AS total_paid
+        FROM lunch_master m
+        WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
+        GROUP BY m.payer_id
+            ),
+            -- (D) 이 달의 대표 정산자
+            T_REP AS (
+        SELECT payer_id
+        FROM lunch_master
+        WHERE TO_CHAR(date, 'YYYY-MM') = #{month}
+        GROUP BY payer_id
+        ORDER BY SUM(total_amount) DESC
+            LIMIT 1
+            )
+        INSERT INTO lunch_summary (user_id, month, total_paid, total_owed, representative_payer_id)
+        SELECT
+            COALESCE(p.user_id, o.user_id) AS user_id,
+            #{month} AS month,
+        COALESCE(p.total_paid, 0) AS total_paid,
+        COALESCE(o.total_owed, 0) AS total_owed,
+        (SELECT payer_id FROM T_REP) AS representative_payer_id
+        FROM T_PAID p
+            FULL OUTER JOIN T_OWED o ON p.user_id = o.user_id;
+    </insert>
+
+    <select id="getLunchDateById" parameterType="int" resultType="String">
+        SELECT date
+        FROM lunch_master
+        WHERE lunch_id = #{lunchId}
+    </select>
+
+
+
 </mapper>

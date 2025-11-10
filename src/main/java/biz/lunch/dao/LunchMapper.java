@@ -23,9 +23,15 @@ public interface LunchMapper {
 
     List<Map<String, Object>> getLunchList(Map<String, Object> params) throws Exception;
 
-    Map<String, Object> getStatistics(Map<String, Object> params) throws Exception;
+    List<Map<String, Object>> getStatistics(Map<String, Object> params) throws Exception;
 
     int completeSettlement(Map<String, Object> params) throws Exception;
 
     int deleteLunch(@Param("lunchId") int lunchId);
+
+    int updateSummaryAfterChange(Map<String, Object> params) throws Exception;
+
+    String getLunchDateById(@Param("lunchId") int lunchId) throws Exception;
+
+
 }

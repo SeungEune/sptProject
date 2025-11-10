@@ -14,7 +14,7 @@ public interface LunchService {
     //점심/커피 내역 삭제
     int deleteLunch(int lunchId) throws Exception;
     //점심/커피 내역 목록 조회
-    Map<String, Object> getLunchList(Map<String, Object> params) throws Exception;
+    List<Map<String, Object>> getLunchList(Map<String, Object> params) throws Exception;
     //사용자별/월별 통계 조회
     List<Map<String, Object>> getStatistics(Map<String, Object> params) throws Exception;
     //정산 완료 처리

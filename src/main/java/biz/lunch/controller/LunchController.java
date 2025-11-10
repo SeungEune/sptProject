@@ -30,7 +30,6 @@ public class LunchController {
     @PostMapping("/register.do")
     public String registerLunch(HttpServletRequest request) throws Exception {
 
-        // 1. Service가 요구하는 Map을 수동으로 조립
         Map<String, Object> params = new HashMap<>();
         params.put("storeName", request.getParameter("storeName"));
         params.put("payerId", request.getParameter("payerId"));
@@ -38,7 +37,7 @@ public class LunchController {
         params.put("totalAmount", request.getParameter("totalAmount"));
         params.put("type", request.getParameter("type"));
 
-        // 2. 참여자 리스트 수동 조립
+        // 참여자 리스트
         List<Map<String, Object>> participants = new ArrayList<>();
         String[] userIds = request.getParameterValues("participantUserIds");
         String[] amounts = request.getParameterValues("participantAmounts");
@@ -55,7 +54,7 @@ public class LunchController {
 
         log.info("점심/커피 등록 요청 (Form): {}", params);
         lunchService.registerLunch(params);
-        return "redirect:/lunch/list.do"; // 등록 후 목록 이동
+        return "redirect:/lunch/list.do"; //
     }
 
     /**
@@ -63,9 +62,16 @@ public class LunchController {
      */
     @GetMapping("/list.do")
     public String getLunchList(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
-        Map<String, Object> result = lunchService.getLunchList(params);
-        model.addAttribute("lunchList", result.get("rawList"));
-        model.addAttribute("settlementList", result.get("settlementList"));
+        log.info("점심/커피 목록 조회: {}", params);
+
+        List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
+        List<Map<String, Object>> summaryList = lunchService.getStatistics(params);
+
+        // 데이터를 Model에 추가
+        model.addAttribute("lunchList", lunchList);   // 상단 목록
+        model.addAttribute("summaryList", summaryList); // 하단 요약
+        model.addAttribute("params", params);       // 검색 조건 유지를 위해
+
         return "lunch/list";
     }
 
@@ -76,7 +82,6 @@ public class LunchController {
     @PostMapping("/update.do")
     public String updateLunch(HttpServletRequest request) throws Exception {
 
-        // 1. 컨트롤러에서 Service가 요구하는 Map을 수동으로 조립
         Map<String, Object> params = new HashMap<>();
         params.put("lunchId", request.getParameter("lunchId")); // 수정 시 lunchId 필수
         params.put("storeName", request.getParameter("storeName"));
@@ -85,7 +90,7 @@ public class LunchController {
         params.put("totalAmount", request.getParameter("totalAmount"));
         params.put("type", request.getParameter("type"));
 
-        // 2. 참여자 리스트 수동 조립
+        // 참여자 리스트
         List<Map<String, Object>> participants = new ArrayList<>();
         String[] userIds = request.getParameterValues("participantUserIds");
         String[] amounts = request.getParameterValues("participantAmounts");
@@ -98,7 +103,8 @@ public class LunchController {
                 participants.add(p);
             }
         }
-        params.put("participants", participants); // Service가 기대하는 key
+        // Service가 기대하는 key
+        params.put("participants", participants);
 
         log.info("점심/커피 수정 요청 (Form): {}", params);
         lunchService.updateLunch(params);
@@ -121,9 +127,16 @@ public class LunchController {
     @GetMapping("/statistics.do")
     public String getStatistics(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
         log.info("점심/커피 통계 조회: {}", params);
-        List<Map<String, Object>> stats = lunchService.getStatistics(params);
-        model.addAttribute("statistics", stats);
-        return "lunch/statistics"; // 통계 화면
+
+        List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
+        List<Map<String, Object>> summaryList = lunchService.getStatistics(params);
+
+        // 데이터를 Model에 추가
+        model.addAttribute("lunchList", lunchList); // 일자별 지출 그래프
+        model.addAttribute("summaryList", summaryList); // 사용자별 통계 그래프
+        model.addAttribute("params", params);
+
+        return "lunch/statistics";
     }
 
     /**
