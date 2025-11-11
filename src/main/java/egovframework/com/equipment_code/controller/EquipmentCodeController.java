@@ -22,7 +22,7 @@ public class EquipmentCodeController {
     @GetMapping("/list.do")
     public String getEquipmentCodes(Model model) {
         List<EquipmentCodeResponse> codes = equipmentCodeService.getCodes();
-        model.addAttribute("equipmentCodes", codes);
+        model.addAttribute("equipmentCode", codes);
         return "equipmentCode/list";
     }
 
@@ -31,7 +31,7 @@ public class EquipmentCodeController {
     public String getEquipmentCode(@RequestParam("codeId") Long codeId, Model model) {
         EquipmentCodeResponse code = equipmentCodeService.getEquipmentCode(codeId);
         model.addAttribute("equipmentCode", code);
-        return  "equipmentCode/view";
+        return "equipmentCode/view";
     }
 
     @GetMapping("/insert.do")
@@ -70,7 +70,7 @@ public class EquipmentCodeController {
     // 장비 필터 조회
     @GetMapping("/filterView.do")
     public String getFilteredCode(Model model, @RequestParam("names") List<String> names) {
-
+        model.addAttribute("equipmentCode",equipmentCodeService.getFilteredCode(names));
         return "equipmentCode/filterView";
     }
 }
