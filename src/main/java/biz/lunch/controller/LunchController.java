@@ -33,7 +33,7 @@ public class LunchController {
         List<Map<String, Object>> userList = lunchService.getUserList();
         model.addAttribute("userList", userList);
 
-        return "lunch/register"; // templates/lunch/register.html
+        return "lunch/register";
     }
 
     @PostMapping("/register.do")
