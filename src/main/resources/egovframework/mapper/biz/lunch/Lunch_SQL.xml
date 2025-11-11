@@ -107,14 +107,20 @@
         ORDER BY s.balance DESC;
     </select>
 
-    <!-- 월별 정산 완료 처리 (DB에 status, paid_at 존재 시 작동) -->
+    <!-- 월별 정산 완료 처리 -->
     <update id="completeSettlement" parameterType="map">
-        UPDATE lunch_summary
-        SET status = 'PAID',
+        UPDATE lunch_participant
+        SET is_paid = 'Y',
             paid_at = NOW()
-        WHERE month = #{month}
-          AND user_id = #{userId};
+        WHERE user_id = #{userId}
+          AND lunch_id IN (
+            SELECT lm.lunch_id
+            FROM lunch_master lm
+            WHERE TO_CHAR(lm.date, 'YYYY-MM') = #{month}
+        )
+          AND is_paid = 'N';
     </update>
+
 
     <!-- 요약 테이블 자동 갱신 -->
     <insert id="updateSummaryAfterChange" parameterType="map">
