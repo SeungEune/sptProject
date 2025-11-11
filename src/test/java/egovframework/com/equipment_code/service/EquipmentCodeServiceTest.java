@@ -3,6 +3,7 @@ package egovframework.com.equipment_code.service;
 import egovframework.com.equipment.dao.EquipmentDAO;
 import egovframework.com.equipment_code.dao.EquipmentCodeDAO;
 import egovframework.com.equipment_code.dto.EquipmentCodeRequest;
+import egovframework.com.equipment_code.dto.EquipmentCodeResponse;
 import egovframework.com.equipment_code.dto.EquipmentCodeUpdate;
 import egovframework.com.equipment_code.vo.EquipmentCodeVO;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -63,6 +67,15 @@ public class EquipmentCodeServiceTest {
         assertThat(equipmentCodeDAO.findAll().size()).isEqualTo(1);
     }
 
+    @Test
+    void 장비_분류_필터_조회를_성공한다(){
+        List<String> names = new ArrayList<String>();
+        names.add("모니터");
+        names.add("키보드");
+        assertThat(equipmentCodeService.getFilteredCode(names).size()).isEqualTo(2);
+//        List<EquipmentCodeResponse> responses= equipmentCodeService.getFilteredCode(names);
+    }
+
     private EquipmentCodeVO createEquipmentCodeVO(String code, String name) {
         return new EquipmentCodeVO().create(createRequest(code, name));
     }
@@ -81,5 +94,7 @@ public class EquipmentCodeServiceTest {
                 .name(name)
                 .build();
     }
+
+
 
 }
