@@ -49,6 +49,18 @@ public class LunchServiceImpl implements LunchService {
     public int registerLunch(Map<String, Object> params) throws Exception {
         log.info("점심/커피 내역 등록 - params={}", params);
 
+        int totalAmount = 0;
+        if (params.containsKey("participants")) {
+            List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
+            if (participants != null) {
+                for (Map<String, Object> p : participants) {
+                    // 컨트롤러에서 문자열로 넘어왔으므로 숫자로 변환
+                    totalAmount += Integer.parseInt(p.get("individualAmount").toString());
+                }
+            }
+        }
+        params.put("totalAmount", totalAmount);
+
         int masterResult = lunchMapper.registerLunch(params);
         if (masterResult > 0 && params.containsKey("lunchId")) {
 
@@ -73,7 +85,17 @@ public class LunchServiceImpl implements LunchService {
     @Transactional(rollbackFor = Exception.class)
     public int updateLunch(Map<String, Object> params) throws Exception {
         log.info("점심/커피 내역 수정 - params={}", params);
-
+        int totalAmount = 0;
+        if (params.containsKey("participants")) {
+            List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
+            if (participants != null) {
+                for (Map<String, Object> p : participants) {
+                    // 컨트롤러에서 문자열로 넘어왔으므로 숫자로 변환
+                    totalAmount += Integer.parseInt(p.get("individualAmount").toString());
+                }
+            }
+        }
+        params.put("totalAmount", totalAmount);
         int result = lunchMapper.updateLunch(params);
         int lunchId = Integer.parseInt(params.get("lunchId").toString());
 

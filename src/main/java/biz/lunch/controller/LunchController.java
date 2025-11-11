@@ -43,7 +43,6 @@ public class LunchController {
         params.put("storeName", request.getParameter("storeName"));
         params.put("payerId", request.getParameter("payerId"));
         params.put("date", request.getParameter("date"));
-        params.put("totalAmount", request.getParameter("totalAmount"));
         params.put("type", request.getParameter("type"));
 
         // 참여자 리스트
@@ -96,7 +95,6 @@ public class LunchController {
         params.put("storeName", request.getParameter("storeName"));
         params.put("payerId", request.getParameter("payerId"));
         params.put("date", request.getParameter("date"));
-        params.put("totalAmount", request.getParameter("totalAmount"));
         params.put("type", request.getParameter("type"));
 
         // 참여자 리스트
