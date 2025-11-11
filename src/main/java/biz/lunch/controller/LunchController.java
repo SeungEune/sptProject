@@ -123,7 +123,7 @@ public class LunchController {
      */
     @PostMapping("/delete.do")
     public String deleteLunch(@RequestParam("lunchId") int lunchId) throws Exception {
-        log.info("점심/커피 삭제 요청: lunch_id={}", lunchId);
+        log.info("점심/커피 삭제 요청: lunchId={}", lunchId);
         lunchService.deleteLunch(lunchId);
         return "redirect:/lunch/list.do";
     }

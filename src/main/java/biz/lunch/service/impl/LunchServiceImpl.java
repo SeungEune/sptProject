@@ -156,7 +156,7 @@ public class LunchServiceImpl implements LunchService {
     }
 
     /**
-     * 통계 요약 조회 (미리 계산된 lunch_summary에서)
+     * 통계 요약 조회
      */
     @Override
     public List<Map<String, Object>> getStatistics(Map<String, Object> params) throws Exception {
@@ -183,10 +183,10 @@ public class LunchServiceImpl implements LunchService {
 
         int result = lunchMapper.completeSettlement(params);
         if (result == 0) {
-            log.warn("이미 정산 완료된 항목이거나 대상 없음 (month={}, user_id={})",
+            log.warn("이미 정산 완료된 항목이거나 대상 없음 (month={}, userId={})",
                     params.get("month"), params.get("userId"));
         } else {
-            log.info("정산 완료 처리 성공 (month={}, user_id={})",
+            log.info("정산 완료 처리 성공 (month={}, userId={})",
                     params.get("month"), params.get("userId"));
         }
         return result;

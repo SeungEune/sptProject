@@ -10,7 +10,12 @@
         INSERT INTO lunch_master (
             date, store_name, payer_id, total_amount, type, created_at
         ) VALUES (
-                     #{date}, #{storeName}, #{payerId}, #{totalAmount}, #{type}, NOW()
+                     TO_DATE(#{date}, 'YYYY-MM-DD'),
+                     #{storeName},
+                     #{payerId},
+                     #{totalAmount},
+                     #{type},
+                     NOW()
                  )
     </insert>
 
@@ -19,7 +24,7 @@
         UPDATE lunch_master
         SET store_name = #{storeName},
             payer_id = #{payerId},
-            date = #{date},
+            date = TO_DATE(#{date}, 'YYYY-MM-DD'),
             total_amount = #{totalAmount},
             type = #{type}
         WHERE lunch_id = #{lunchId};
@@ -36,8 +41,13 @@
         INSERT INTO lunch_participant (
         lunch_id, user_id, individual_amount, is_paid
         ) VALUES
-        <foreach collection="participants" item="p" separator=",">
-            (#{lunchId}, #{p.userId}, #{p.individualAmount}, 'N')
+        <foreach collection="participants" item="item" separator=",">
+            (
+            #{lunchId},
+            #{item.userId},
+            TO_NUMBER(#{item.individualAmount}, '99999999'),
+            'N'
+            )
         </foreach>
     </insert>
 
