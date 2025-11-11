@@ -1,7 +1,9 @@
-package egovframework.com.equipment.vo;
+package egovframework.com.equipment_code.vo;
 
 
 import egovframework.com.basetime.Base;
+import egovframework.com.equipment_code.dto.EquipmentCodeRequest;
+import egovframework.com.equipment_code.dto.EquipmentCodeUpdate;
 import lombok.*;
 
 @NoArgsConstructor
@@ -14,5 +16,20 @@ public class EquipmentCodeVO extends Base {
 
     private String code;
 
-    private String type;
+    private String name;
+
+    public EquipmentCodeVO create(EquipmentCodeRequest equipmentCodeRequest) {
+        return EquipmentCodeVO.builder()
+                .code(equipmentCodeRequest.getCode())
+                .name(equipmentCodeRequest.getName())
+                .build();
+    }
+
+    public EquipmentCodeVO update(EquipmentCodeUpdate equipmentCodeUpdate) {
+        return EquipmentCodeVO.builder()
+                .id(equipmentCodeUpdate.getId())
+                .code(equipmentCodeUpdate.getCode())
+                .name(equipmentCodeUpdate.getName())
+                .build();
+    }
 }

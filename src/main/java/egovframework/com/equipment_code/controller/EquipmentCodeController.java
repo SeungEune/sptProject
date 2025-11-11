@@ -1,55 +1,69 @@
-package egovframework.com.equipment.controller;
+package egovframework.com.equipment_code.controller;
 
+import egovframework.com.equipment_code.dto.EquipmentCodeRequest;
+import egovframework.com.equipment_code.dto.EquipmentCodeResponse;
+import egovframework.com.equipment_code.dto.EquipmentCodeUpdate;
+import egovframework.com.equipment_code.service.EquipmentCodeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 
-@RestController
-@RequestMapping(value = "api/equipment_code")
+@Controller
+@RequestMapping(value = "/equipment_code")
 @RequiredArgsConstructor
-public class EquipmentController {
+public class EquipmentCodeController {
 
-    // 장비 조회
-    public Map<String, Object> getEquipment() {
-        return Map.of();
+    final private EquipmentCodeService equipmentCodeService;
+
+    // 장비 분류 조회
+    @GetMapping("/list.do")
+    public String getEquipmentCodes(Model model) {
+        List<EquipmentCodeResponse> codes = equipmentCodeService.getCodes();
+        model.addAttribute("equipmentCodes", codes);
+        return "equipmentCode/list";
     }
 
-    // 장비 등록
-    public Map<String, Object> insertEquipment(Map<String, Object> equipment) {
-        return Map.of();
+    // 장비 분류 단건 조회
+    @GetMapping("/view.do")
+    public String getEquipmentCode(@RequestParam("codeId") Long codeId, Model model) {
+        EquipmentCodeResponse code = equipmentCodeService.getEquipmentCode(codeId);
+        model.addAttribute("equipmentCode", code);
+        return  "equipmentCode/view";
     }
 
-    // 장비 수정
-    public Map<String, Object> updateEquipment(Map<String, Object> equipment) {
-        return Map.of();
+    @GetMapping("/insert.do")
+    public String insertForm() {
+        return "equipmentCode/insert";
     }
 
-    // 장비 삭제
-    public Map<String, Object> deleteEquipment(Long equipmentId) {
-        return Map.of();
+    // 장비 분류 등록
+    @PostMapping("/insert.do")
+    public String insertEquipmentCode(@ModelAttribute EquipmentCodeRequest request) {
+        equipmentCodeService.insertCode(request);
+        return "redirect:/equipmentCode/list.do";
     }
 
-    // 장비 중복 검증 - 자산번호
-    public Optional<Map<String, Object>> validateNumber(String assetNumber) {
-        return Optional.ofNullable(Map.of());
+    // 장비 분류 수정
+    @GetMapping("/update.do")
+    public String updateForm(@RequestParam("codeId") Long codeId, Model model) {
+        EquipmentCodeResponse code = equipmentCodeService.getEquipmentCode(codeId);
+        model.addAttribute("code", code);
+        return "equipmentCode/update";
     }
 
-    // 장비 상태 관리
-    public Map<String, Object> updateEquipmentStatus(Map<String, Object> equipment) {
-        return Map.of();
+    @PostMapping("/update.do")
+    public String updateEquipmentCode(@ModelAttribute EquipmentCodeUpdate update) {
+        equipmentCodeService.updateCode(update);
+        return "redirect:/equipmentCode/list.do";
     }
 
-    // 장비 변경 이력 관리
-    public Map<String, Object> getDirectorHistory(Long equipmentId) {
-        return Map.of();
+    // 장비 분류 삭제
+    @DeleteMapping("/delete.do")
+    public String deleteEquipmentCode(@RequestParam("codeId") Long codeId) {
+        equipmentCodeService.deleteCode(codeId);
+        return "redirect:/equipmentCode/list.do";
     }
-
-    // 장비 담당자 관리
-    public Map<String, Object> updateDirectorHistory(Map<String, Object> equipment) {
-        return Map.of();
-    }
-
 }
