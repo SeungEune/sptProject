@@ -7,6 +7,8 @@ import java.util.Map;
  * 점심/커피 정산 서비스 인터페이스
  */
 public interface LunchService {
+    //점심/커피 내역 등록 조회
+    List<Map<String, Object>> getUserList() throws Exception;
     //점심/커피 내역 등록
     int registerLunch(Map<String, Object> params) throws Exception;
     //점심/커피 내역 수정

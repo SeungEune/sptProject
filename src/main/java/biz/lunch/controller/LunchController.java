@@ -27,6 +27,15 @@ public class LunchController {
     /**
      * 등록 처리
      */
+    @GetMapping("/register.do")
+    public String registerLunch(Model model) throws Exception {
+        // 화면에 뿌릴 사용자 목록 (계산자/참석자 선택용)
+        List<Map<String, Object>> userList = lunchService.getUserList();
+        model.addAttribute("userList", userList);
+
+        return "lunch/register"; // templates/lunch/register.html
+    }
+
     @PostMapping("/register.do")
     public String registerLunch(HttpServletRequest request) throws Exception {
 

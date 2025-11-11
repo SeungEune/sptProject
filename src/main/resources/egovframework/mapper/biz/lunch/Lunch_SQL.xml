@@ -158,6 +158,11 @@
         WHERE lunch_id = #{lunchId}
     </select>
 
+    <select id="getUserList" resultType="map">
+        SELECT user_id AS userId, user_nm AS userNm
+        FROM tb_user
+        ORDER BY user_nm
+    </select>
 
 
 </mapper>

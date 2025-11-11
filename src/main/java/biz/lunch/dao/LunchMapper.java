@@ -33,5 +33,6 @@ public interface LunchMapper {
 
     String getLunchDateById(@Param("lunchId") int lunchId) throws Exception;
 
+    List<Map<String, Object>> getUserList() throws Exception;
 
 }

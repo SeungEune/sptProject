@@ -39,6 +39,11 @@ public class LunchServiceImpl implements LunchService {
     /**
      * 점심/커피 내역 등록
      */
+
+    @Override
+    public List<Map<String, Object>> getUserList() throws Exception {
+        return lunchMapper.getUserList();
+    }
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int registerLunch(Map<String, Object> params) throws Exception {
