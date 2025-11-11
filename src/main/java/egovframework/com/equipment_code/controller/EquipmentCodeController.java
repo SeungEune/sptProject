@@ -50,7 +50,7 @@ public class EquipmentCodeController {
     @GetMapping("/update.do")
     public String updateForm(@RequestParam("codeId") Long codeId, Model model) {
         EquipmentCodeResponse code = equipmentCodeService.getEquipmentCode(codeId);
-        model.addAttribute("code", code);
+        model.addAttribute("EquipmentCode", code);
         return "equipmentCode/update";
     }
 
