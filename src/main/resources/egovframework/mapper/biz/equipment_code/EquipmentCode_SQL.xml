@@ -38,10 +38,21 @@
         FROM EQUIPMENT_CODE
         WHERE ID = #{id,jdbcType=BIGINT}
     </delete>
+
 <!--전체 삭제-->
     <delete id="deleteAll">
         DELETE
         FROM EQUIPMENT_CODE
     </delete>
+
+<!--    이름 조회-->
+    <select id="findByName" resultType="egovframework.com.equipment_code.vo.EquipmentCodeVO">
+        SELECT ID, CODE, NAME
+        FROM EQUIPMENT_CODE
+        WHERE name IN
+        <foreach item="n" index="index" collection="name" open="(" separator="," close=")">
+            #{n}
+        </foreach>
+    </select>
 
 </mapper>

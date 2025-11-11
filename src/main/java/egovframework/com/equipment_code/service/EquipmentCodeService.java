@@ -25,8 +25,9 @@ public interface EquipmentCodeService {
     void deleteCode(Long codeId);
 
     // 장비 분류 필터
-    List<EquipmentCodeResponse> getFilteredCode(List<String> code);
+    List<EquipmentCodeResponse> getFilteredCode(List<String> codes);
 
     // 장비 분류 통계
     CodeStatisticResponse getStatistic(Long codeId);
+
 }

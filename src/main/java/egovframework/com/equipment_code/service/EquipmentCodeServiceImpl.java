@@ -46,8 +46,8 @@ public class EquipmentCodeServiceImpl implements EquipmentCodeService {
     }
 
     @Override
-    public List<EquipmentCodeResponse> getFilteredCode(List<String> code) {
-        return List.of();
+    public List<EquipmentCodeResponse> getFilteredCode(List<String> name) {
+        return EquipmentCodeMapStruct.INSTANCE.toDto(equipmentCodeDAO.findByName(name));
     }
 
     @Override

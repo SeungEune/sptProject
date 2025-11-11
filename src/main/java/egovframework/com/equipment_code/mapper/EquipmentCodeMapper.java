@@ -28,4 +28,6 @@ public interface EquipmentCodeMapper {
     // 전체 삭제
     void deleteAll();
 
+    // 필터 조회
+    List<EquipmentCodeVO> findByName(@Param("name") List<String> name);
 }

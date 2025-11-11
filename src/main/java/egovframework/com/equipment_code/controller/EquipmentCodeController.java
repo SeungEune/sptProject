@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/equipment_code")
+@RequestMapping(value = "/equipmentCode")
 @RequiredArgsConstructor
 public class EquipmentCodeController {
 
@@ -65,5 +65,12 @@ public class EquipmentCodeController {
     public String deleteEquipmentCode(@RequestParam("codeId") Long codeId) {
         equipmentCodeService.deleteCode(codeId);
         return "redirect:/equipmentCode/list.do";
+    }
+
+    // 장비 필터 조회
+    @GetMapping("/filterView.do")
+    public String getFilteredCode(Model model, @RequestParam("names") List<String> names) {
+
+        return "equipmentCode/filterView";
     }
 }

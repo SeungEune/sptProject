@@ -17,9 +17,28 @@ public class EquipmentCodeDAO extends EgovComAbstractDAO {
     public List<EquipmentCodeVO> findAll() {
         return equipmentCodeMapper.findAll();
     }
-    public EquipmentCodeVO findById(Long id) {return equipmentCodeMapper.findById(id);}
-    public int save(EquipmentCodeVO equipmentCodeVO) {return equipmentCodeMapper.save(equipmentCodeVO);}
-    public void update(EquipmentCodeVO equipmentCodeVO) {equipmentCodeMapper.update(equipmentCodeVO);}
-    public void deleteById(Long id) {equipmentCodeMapper.deleteById(id);}
-    public void deleteAll() {equipmentCodeMapper.deleteAll();}
+
+    public EquipmentCodeVO findById(Long id) {
+        return equipmentCodeMapper.findById(id);
+    }
+
+    public int save(EquipmentCodeVO equipmentCodeVO) {
+        return equipmentCodeMapper.save(equipmentCodeVO);
+    }
+
+    public void update(EquipmentCodeVO equipmentCodeVO) {
+        equipmentCodeMapper.update(equipmentCodeVO);
+    }
+
+    public void deleteById(Long id) {
+        equipmentCodeMapper.deleteById(id);
+    }
+
+    public void deleteAll() {
+        equipmentCodeMapper.deleteAll();
+    }
+
+    public List<EquipmentCodeVO> findByName(List<String> names) {
+        return equipmentCodeMapper.findByName(names);
+    }
 }
