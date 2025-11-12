@@ -175,19 +175,21 @@ public class LunchServiceImpl implements LunchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int completeSettlement(Map<String, Object> params) throws Exception {
-        log.info("정산 완료 처리 요청 - params={}", params);
-
         if (!params.containsKey("month") || !params.containsKey("userId")) {
             throw new IllegalArgumentException("month 또는 userId 누락");
         }
+        String action = (String) params.getOrDefault("action", "complete");
+        log.info("정산 처리 ({}): params={}", action, params);
 
+        // Mapper가 'action' 파라미터를 보고 동적으로 쿼리 실행
         int result = lunchMapper.completeSettlement(params);
+
         if (result == 0) {
-            log.warn("이미 정산 완료된 항목이거나 대상 없음 (month={}, userId={})",
-                    params.get("month"), params.get("userId"));
+            log.warn("정산 처리 대상 없음 ({}): (month={}, userId={})",
+                    action, params.get("month"), params.get("userId"));
         } else {
-            log.info("정산 완료 처리 성공 (month={}, userId={})",
-                    params.get("month"), params.get("userId"));
+            log.info("정산 처리 성공 ({}): (month={}, userId={})",
+                    action, params.get("month"), params.get("userId"));
         }
         return result;
     }

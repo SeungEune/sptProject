@@ -77,10 +77,10 @@
             AND m.type = #{type}
         </if>
         <if test="startDate != null">
-            AND m.date &gt;= #{startDate}
+            AND m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
         </if>
         <if test="endDate != null">
-            AND m.date &lt;= #{endDate}
+            AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
         </if>
         GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
         ORDER BY m.date DESC;
@@ -88,6 +88,7 @@
 
     <!-- 사용자별/월별 통계 조회 -->
     <select id="getStatistics" parameterType="map" resultType="map">
+        WITH T_SUMMARY AS (
         SELECT
         s.user_id,
         u.user_nm,
@@ -95,7 +96,8 @@
         s.total_paid,
         s.total_owed,
         s.balance,
-        u2.user_nm AS representative_payer
+        u2.user_nm AS representative_payer,
+        s.representative_payer_id
         FROM lunch_summary s
         JOIN tb_user u ON s.user_id = u.user_id
         LEFT JOIN tb_user u2 ON s.representative_payer_id = u2.user_id
@@ -104,21 +106,55 @@
                 s.month = #{month}
             </if>
         </where>
+        ),
+        T_UNPAID_USERS AS (
+        SELECT DISTINCT p.user_id
+        FROM lunch_participant p
+        JOIN lunch_master m ON p.lunch_id = m.lunch_id
+        WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
+        AND p.is_paid = 'N'
+        AND p.individual_amount > 0
+        )
+        SELECT
+        s.*,
+        CASE
+        WHEN s.total_owed &lt;= 0 THEN 'Y'
+        WHEN s.user_id NOT IN (SELECT user_id FROM T_UNPAID_USERS) THEN 'Y'
+        ELSE 'N'
+        END AS is_settled
+        FROM T_SUMMARY s
         ORDER BY s.balance DESC;
     </select>
 
     <!-- 월별 정산 완료 처리 -->
     <update id="completeSettlement" parameterType="map">
         UPDATE lunch_participant
-        SET is_paid = 'Y',
-            paid_at = NOW()
-        WHERE user_id = #{userId}
-          AND lunch_id IN (
-            SELECT lm.lunch_id
-            FROM lunch_master lm
-            WHERE TO_CHAR(lm.date, 'YYYY-MM') = #{month}
-        )
-          AND is_paid = 'N';
+
+        <choose>
+            <when test="action != null and action == 'cancel'">
+                SET is_paid = 'N',
+                paid_at = NULL
+                WHERE user_id = #{userId}
+                AND lunch_id IN (
+                SELECT lm.lunch_id
+                FROM lunch_master lm
+                WHERE TO_CHAR(lm.date, 'YYYY-MM') = #{month}
+                )
+                AND is_paid = 'Y'
+            </when>
+
+            <otherwise>
+                SET is_paid = 'Y',
+                paid_at = NOW()
+                WHERE user_id = #{userId}
+                AND lunch_id IN (
+                SELECT lm.lunch_id
+                FROM lunch_master lm
+                WHERE TO_CHAR(lm.date, 'YYYY-MM') = #{month}
+                )
+                AND is_paid = 'N'
+            </otherwise>
+        </choose>
     </update>
 
 

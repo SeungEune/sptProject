@@ -12,7 +12,8 @@ import java.util.ArrayList; //
 import java.util.HashMap; //
 import java.util.List;
 import java.util.Map;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 /**
  * 점심/커피 정산 컨트롤러
  */
@@ -71,7 +72,16 @@ public class LunchController {
     @GetMapping("/list.do")
     public String getLunchList(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
         log.info("점심/커피 목록 조회: {}", params);
+        // 1. searchMonth 파라미터가 없으면 현재 월로 기본값 설정
+        if (params.get("searchMonth") == null || params.get("searchMonth").toString().isEmpty()) {
+            String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+            params.put("searchMonth", currentMonth);
+        }
 
+        // 2. getStatistics 쿼리가 'month' 파라미터를 사용할 수 있도록 값을 복사합니다.
+        if (params.containsKey("searchMonth")) {
+            params.put("month", params.get("searchMonth"));
+        }
         List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
         List<Map<String, Object>> summaryList = lunchService.getStatistics(params);
 
@@ -151,8 +161,15 @@ public class LunchController {
      */
     @PostMapping("/completeSettlement.do")
     public String completeSettlement(@RequestParam Map<String, Object> params) throws Exception {
-        log.info("정산 완료 처리 요청: {}", params);
+
+        log.info("정산 완료/취소 통합 처리 요청: {}", params);
         lunchService.completeSettlement(params);
-        return "redirect:/lunch/list.do";
+        // 2. 리다이렉트 로직은 동일
+        String month = (String) params.get("month");
+        if (month != null && !month.isEmpty()) {
+            return "redirect:/lunch/list.do?searchMonth=" + month;
+        } else {
+            return "redirect:/lunch/list.do";
+        }
     }
 }

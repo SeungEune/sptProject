@@ -137,17 +137,40 @@
                 <!-- 정산 완료 버튼 -->
                 <tr class="bg-white">
                     <td class="p-3" colspan="2">정산처리</td>
+
                     <td th:each="user : ${summaryList}" class="p-3">
-                        <form th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
-                            <input type="hidden" name="month"
-                                   th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
-                            <input type="hidden" name="userId" th:value="${user.user_id}" />
-                            <button type="submit"
-                                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm disabled:bg-gray-300 disabled:cursor-not-allowed">
-                                정산완료
-                            </button>
-                        </form>
+
+                        <div th:if="${user.total_owed > 0}">
+
+                            <form th:if="${user.is_settled == 'N'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                <input type="hidden" name="month"
+                                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                <input type="hidden" name="userId" th:value="${user.user_id}" />
+                                <input type="hidden" name="action" value="complete" />
+
+                                <button type="submit"
+                                        class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                    정산완료
+                                </button>
+                            </form>
+
+                            <form th:if="${user.is_settled == 'Y'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                <input type="hidden" name="month"
+                                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                <input type="hidden" name="userId" th:value="${user.user_id}" />
+                                <input type="hidden" name="action" value="cancel" />
+
+                                <button type="submit"
+                                        class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                    정산취소
+                                </button>
+                            </form>
+
+                        </div>
+
+                        <span th:if="${user.total_owed <= 0}" class="text-sm text-gray-400">해당 없음</span>
                     </td>
+
                     <td class="p-3"></td>
                     <td class="p-3"></td>
                 </tr>
