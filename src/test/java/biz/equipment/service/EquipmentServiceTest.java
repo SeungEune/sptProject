@@ -1,26 +1,26 @@
-package egovframework.com.equipment.service;
+package biz.equipment.service;
 
 import biz.equipment.dao.EquipmentDAO;
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentUpdate;
-import biz.equipment.service.EquipmentService;
 import biz.equipment.vo.EquipmentVO;
 import biz.equipment.vo.Status;
-import egovframework.com.config.TestMapperConfig;
+import biz.config.TestMapperConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import egovframework.EgovBootApplication;
+
 
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-@SpringBootTest
 @Import(TestMapperConfig.class)
+@SpringBootTest(classes = EgovBootApplication.class)
 public class EquipmentServiceTest {
 
     @Autowired

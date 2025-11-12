@@ -1,4 +1,4 @@
-package egovframework.com.config;
+package biz.config;
 
 
 import org.mybatis.spring.annotation.MapperScan;
