@@ -3,16 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="egovframework.com.equipment_code.mapper.EquipmentCodeMapper">
+<mapper namespace="biz.mapper.EquipmentCodeMapper">
 
     <!--조회-->
-    <select id="findAll" resultType="egovframework.com.equipment_code.vo.EquipmentCodeVO">
+    <select id="findAll" resultType="biz.equipment_code.vo.EquipmentCodeVO">
         SELECT ID, CODE, NAME
         FROM EQUIPMENT_CODE
     </select>
 
     <!--단건조회    -->
-    <select id="findById" resultType="egovframework.com.equipment_code.vo.EquipmentCodeVO">
+    <select id="findById" resultType="biz.equipment_code.vo.EquipmentCodeVO">
         SELECT ID, CODE, NAME
         FROM EQUIPMENT_CODE
         WHERE ID = #{id}
@@ -25,7 +25,7 @@
     </insert>
 
     <!--    수정-->
-    <update id="update" parameterType="egovframework.com.equipment_code.vo.EquipmentCodeVO">
+    <update id="update" parameterType="biz.equipment_code.vo.EquipmentCodeVO">
         UPDATE EQUIPMENT_CODE
         SET CODE = #{equipmentCode.code},
             NAME = #{equipmentCode.name}
@@ -46,7 +46,7 @@
     </delete>
 
 <!--    이름 조회-->
-    <select id="findByName" resultType="egovframework.com.equipment_code.vo.EquipmentCodeVO">
+    <select id="findByName" resultType="biz.equipment_code.vo.EquipmentCodeVO">
         SELECT ID, CODE, NAME
         FROM EQUIPMENT_CODE
         WHERE name IN

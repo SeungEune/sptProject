@@ -1,7 +1,7 @@
 package biz.equipment.dao;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
-import biz.equipment.mapper.EquipmentMapper;
+import biz.mapper.EquipmentMapper;
 import biz.equipment.vo.EquipmentVO;
 import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;

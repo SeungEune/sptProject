@@ -69,6 +69,7 @@ public class EquipmentController {
         return "equipment/director/update";
     }
 
+    // 관리자 수정
     @PostMapping("/director/update.do")
     public String updateDirector(@RequestParam("id") Long id, @RequestParam("director") String director) {
         equipmentService.updateDirector(id, director);

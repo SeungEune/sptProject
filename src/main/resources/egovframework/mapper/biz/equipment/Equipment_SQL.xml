@@ -3,16 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="egovframework.com.equipment.mapper.EquipmentMapper">
+<mapper namespace="biz.mapper.EquipmentMapper">
 
     <!--조회-->
-    <select id="findAll" resultType="egovframework.com.equipment.vo.EquipmentVO">
+    <select id="findAll" resultType="biz.equipment.vo.EquipmentVO">
         SELECT ID, CODE, NAME, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
         FROM EQUIPMENT
     </select>
 
     <!--단건조회    -->
-    <select id="findById" resultType="egovframework.com.equipment.vo.EquipmentVO">
+    <select id="findById" resultType="biz.equipment.vo.EquipmentVO">
         SELECT ID, CODE, NAME, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
         FROM EQUIPMENT
         WHERE ID = #{id}
@@ -26,7 +26,7 @@
     </insert>
 
     <!--    수정-->
-    <update id="update" parameterType="egovframework.com.equipment.vo.EquipmentVO">
+    <update id="update" parameterType="biz.equipment.vo.EquipmentVO">
         UPDATE EQUIPMENT
         SET SERIAL_NUMBER = #{equipment.serialNumber},
             ACCESS_NUMBER = #{equipment.accessNumber},

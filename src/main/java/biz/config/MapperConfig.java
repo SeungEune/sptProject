@@ -11,7 +11,7 @@ public class MapperConfig {
     public static MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer configurer = new MapperScannerConfigurer();
         configurer.setBasePackage("biz.mapper");
-        configurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
+        configurer.setSqlSessionFactoryBeanName("sqlSession");
         return configurer;
     }
 }
