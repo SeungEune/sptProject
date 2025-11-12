@@ -10,20 +10,20 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "/office")
+@RequestMapping("/equipment")
 @RequiredArgsConstructor
 public class EquipmentController {
 
     final private EquipmentService equipmentService;
 
     // 장비 조회
-    @GetMapping("/officeEqpmnList.do")
+    @GetMapping("/equipmentList.do")
     public String getEquipmentCodes(Model model) {
         model.addAttribute("equipment", equipmentService.getEquipments()) ;
-        return "office/officeEqpmnList.do";
+        return "equipment/equipmentList";
     }
 
-    // 장비 분류 단건 조회
+    // 장비 단건 조회
     @GetMapping("view.do")
     public String getEquipmentCode(@RequestParam("id") Long id, Model model) {
         model.addAttribute(equipmentService.getEquipment(id));

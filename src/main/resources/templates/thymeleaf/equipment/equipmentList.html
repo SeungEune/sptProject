@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 조회</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-white flex flex-col lg:flex-row">
+
+<!-- 모바일 햄버거 버튼 -->
+<button id="menu-toggle" class="lg:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-3 rounded-md shadow-lg">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- 오버레이 -->
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+<!-- 사이드바 -->
+<aside id="sidebar" class="fixed lg:static inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-64 bg-white shadow-md lg:shadow-r-none p-6 flex flex-col flex-shrink-0 border-r-0">
+
+    <button id="close-menu" class="lg:hidden absolute top-4 right-4 text-gray-600 hover:text-gray-900">
+        <i class="fas fa-times text-xl"></i>
+    </button>
+
+    <div class="mb-10 mt-8 lg:mt-0">
+        <img th:src="@{/images/logo.png}" alt="Specialty Logo" class="w-40" />
+    </div>
+
+    <nav>
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">출입관리</h3>
+        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비 분류</a>
+        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비</a>
+
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">장비관리</h3>
+        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비 분류</a>
+        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비</a>
+
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">정산관리</h3>
+        <a th:href="@{/lunch/register.do}" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">내역 등록</a>
+        <a th:href="@{/lunch/list.do}" class="block py-2 px-4 rounded text-blue-600 font-bold bg-blue-100">내역 조회</a>
+        <a th:href="@{/lunch/statistics.do}" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">통계 조회</a>
+    </nav>
+</aside>
+
+<div class="flex-1 flex flex-col">
+    <!-- ✅ 헤더 추가 -->
+    <header class="bg-white px-4 md:px-6 py-4 border-b border-gray-200">
+        <div class="flex justify-end items-center gap-4">
+            <a th:href="@{/mypage}" class="text-gray-700 hover:text-blue-600 flex items-center">
+                <i class="fas fa-user"></i>
+                <span class="ml-2 hidden sm:inline">마이페이지</span>
+            </a>
+            <a th:href="@{/logout}" class="text-gray-700 hover:text-red-600 flex items-center">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="ml-2 hidden sm:inline">로그아웃</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="flex-1 p-4 md:p-6 lg:p-10 overflow-auto lg:ml-0">
+        <div class="mb-6 mt-16 lg:mt-0">
+            <h2 class="text-xl md:text-2xl text-[#4f6df5] font-bold">
+                <i class="fas fa-list-ul text-black"></i> 점심/커피 내역 조회
+            </h2>
+        </div>
+
+        <!-- 검색 필터 -->
+        <form th:action="@{/lunch/list.do}" method="get" class="flex items-center gap-2 mb-4">
+            <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
+                   th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                   onchange="this.form.submit()" />
+        </form>
+
+        <!-- 내역 테이블 -->
+        <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
+            <table class="w-full min-w-[1000px] text-sm text-center">
+                <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3 font-semibold text-gray-700">날짜</th>
+                    <th class="p-3 font-semibold text-gray-700">가게</th>
+                    <th th:each="user : ${summaryList}"
+                        th:text="${user.user_nm}"
+                        th:data-user-id="${user.user_id}"
+                        class="p-3 font-semibold text-gray-700">
+                    </th>
+                    <th class="p-3 font-semibold text-gray-700">합계</th>
+                    <th class="p-3 font-semibold text-gray-700">관리</th>
+                </tr>
+                </thead>
+                <tbody id="lunch-table-body">
+                <tr th:each="item : ${lunchList}" class="border-b hover:bg-gray-50"
+                    th:data-participants="${item.participants}">
+                    <td class="p-3" th:text="${#strings.substring(item.date, 5)}"></td>
+                    <td class="p-3" th:text="${item.store_name}"></td>
+                    <td th:each="user : ${summaryList}"
+                        th:class="'p-3 cell-user-' + ${user.user_id}">
+                        -
+                    </td>
+                    <td class="p-3" th:text="${#numbers.formatInteger(item.total_amount, 0, 'COMMA')}"></td>
+                    <td class="p-3">
+                        <form th:action="@{/lunch/delete.do}" method="post" class="inline-block">
+                            <input type="hidden" name="lunchId" th:value="${item.lunch_id}" />
+                            <button type="submit" class="text-red-500 hover:text-red-700"
+                                    onclick="return confirm('이 내역을 삭제하시겠습니까?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                <!-- 총 금액 -->
+                <tr class="bg-gray-100 font-bold border-b">
+                    <td class="p-3" colspan="2">총금액(부담금)</td>
+                    <td th:each="user : ${summaryList}" class="p-3"
+                        th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')}">
+                    </td>
+                    <td class="p-3"
+                        th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}"></td>
+                    <td class="p-3"></td>
+                </tr>
+
+                <!-- 송금 금액 -->
+                <tr class="bg-gray-100 font-bold">
+                    <td class="p-3" colspan="2">송금액(정산액)</td>
+                    <td th:each="user : ${summaryList}" class="p-3"
+                        th:classappend="${user.balance < 0 ? 'text-red-500' : 'text-blue-500'}"
+                        th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
+                    </td>
+                    <td class="p-3"></td>
+                    <td class="p-3"></td>
+                </tr>
+
+                <!-- 정산 완료 버튼 -->
+                <tr class="bg-white">
+                    <td class="p-3" colspan="2">정산처리</td>
+
+                    <td th:each="user : ${summaryList}" class="p-3">
+
+                        <div th:if="${user.total_owed > 0}">
+
+                            <form th:if="${user.is_settled == 'N'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                <input type="hidden" name="month"
+                                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                <input type="hidden" name="userId" th:value="${user.user_id}" />
+                                <input type="hidden" name="action" value="complete" />
+
+                                <button type="submit"
+                                        class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                    정산완료
+                                </button>
+                            </form>
+
+                            <form th:if="${user.is_settled == 'Y'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                <input type="hidden" name="month"
+                                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                <input type="hidden" name="userId" th:value="${user.user_id}" />
+                                <input type="hidden" name="action" value="cancel" />
+
+                                <button type="submit"
+                                        class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                    정산취소
+                                </button>
+                            </form>
+
+                        </div>
+
+                        <span th:if="${user.total_owed <= 0}" class="text-sm text-gray-400">해당 없음</span>
+                    </td>
+
+                    <td class="p-3"></td>
+                    <td class="p-3"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    // 사이드바 토글 기능
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    function openSidebar() {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    menuToggle.addEventListener('click', openSidebar);
+    closeMenu.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    // 테이블 참석자 금액 렌더링
+    document.addEventListener("DOMContentLoaded", function() {
+        const headers = document.querySelectorAll('thead th[data-user-id]');
+        const userIdsInOrder = Array.from(headers).map(th => th.getAttribute('data-user-id'));
+        const rows = document.querySelectorAll('tbody tr[data-participants]');
+
+        rows.forEach(row => {
+            const participantString = row.getAttribute('data-participants');
+            if (!participantString) return;
+
+            const participantMap = new Map();
+            participantString.split(', ').forEach(pair => {
+                const parts = pair.split(':');
+                if (parts.length === 2) {
+                    participantMap.set(parts[0], parseInt(parts[1]).toLocaleString());
+                }
+            });
+
+            userIdsInOrder.forEach(userId => {
+                const cell = row.querySelector('td.cell-user-' + userId);
+                if (cell) {
+                    if (participantMap.has(userId)) {
+                        cell.innerText = participantMap.get(userId);
+                    } else {
+                        cell.innerText = '-';
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
