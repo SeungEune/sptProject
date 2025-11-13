@@ -5,262 +5,320 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>점심/커피 내역 등록</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
 </head>
-<body class="bg-white flex flex-col lg:flex-row">
-
-<!-- 모바일 햄버거 버튼 -->
-<button id="menu-toggle" class="lg:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-3 rounded-md shadow-lg">
-    <i class="fas fa-bars"></i>
-</button>
-
-<!-- 오버레이 -->
-<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
-
-<!-- 사이드바 -->
-<aside id="sidebar" class="fixed lg:static inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-64 bg-white shadow-md lg:shadow-r-none p-6 flex flex-col flex-shrink-0 border-r-0">
-
-    <button id="close-menu" class="lg:hidden absolute top-4 right-4 text-gray-600 hover:text-gray-900">
-        <i class="fas fa-times text-xl"></i>
-    </button>
-
-    <div class="mb-10 mt-8 lg:mt-0">
-        <img th:src="@{/images/logo.png}" alt="Specialty Logo" class="w-40" />
-    </div>
-    <nav>
-
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">출입관리</h3>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비 분류</a>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비</a>
-
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">장비관리</h3>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비 분류</a>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비</a>
-
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">정산관리</h3>
-        <a th:href="@{/lunch/register}" class="block py-2 px-4 rounded text-blue-600 font-bold bg-blue-100">내역 등록</a>
-        <a th:href="@{/lunch/list.do}" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">내역 조회</a>
-        <a th:href="@{/lunch/statistics.do}" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">통계 조회</a>
-
+<body class="page-wrapper"> <header class="site-header">
+    <a th:href="@{/}" class="logo">
+        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+    </a>
+    <nav class="user-nav">
+        <a th:href="@{/mypage}">
+            <i class="fas fa-user"></i>
+            <span>마이페이지</span>
+        </a>
+        <a th:href="@{/logout}">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>로그아웃</span>
+        </a>
     </nav>
-</aside>
+</header>
 
-<div class="flex-1 flex flex-col">
-    <!-- 헤더 -->
-    <header class="bg-white px-4 md:px-6 py-4 border-b border-gray-200">
-    <div class="flex justify-end items-center gap-4">
-            <a th:href="@{/mypage}" class="text-gray-700 hover:text-blue-600 flex items-center">
-                <i class="fas fa-user"></i>
-                <span class="ml-2 hidden sm:inline">마이페이지</span>
-            </a>
-            <a th:href="@{/logout}" class="text-gray-700 hover:text-red-600 flex items-center">
-                <i class="fas fa-sign-out-alt"></i>
-                <span class="ml-2 hidden sm:inline">로그아웃</span>
-            </a>
+<div class="main-container">
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <h3 class="nav-title">계정관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/account/manage}">계정관리</a></li>
+                    <li><a th:href="@{/account/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">출입관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/access/manage}">계정관리</a></li>
+                    <li><a th:href="@{/access/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">장비관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">정산관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/lunch/register}" class="active">내역등록</a></li>
+                    <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
+                    <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+    <main class="content-area">
+        <h1 class="content-title">점심/커피 내역 등록</h1>
+
+        <div class="content-body">
+
+            <form class="entry-form" th:action="@{/lunch/register.do}" method="post">
+
+                <div class="form-group">
+                    <label for="date-input">날짜</label>
+                    <input type="date" id="date-input" name="date"
+                           th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="store-name">가게명</label>
+                    <input type="text" id="store-name" name="storeName" placeholder="내용을 입력하세요" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="participant-search">참석자 선택<span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span></label>
+                    <input type="text" id="participant-search" onkeyup="filterParticipants()" placeholder="내용을 입력하세요">
+                    <div id="search-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-search">계산자 선택<span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span></label>
+                    <input type="text" id="payer-search" onkeyup="filterPayers()" placeholder="내용을 입력하세요">
+                    <input type="hidden" id="payerId" name="payerId" required>
+                    <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
+
+                <fieldset class="form-group">
+                    <legend class="legend-title">유형 선택</legend>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="type-lunch" name="type" value="점심" checked>
+                            <label for="type-lunch">점심</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="type-coffee" name="type" value="커피">
+                            <label for="type-coffee">커피</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="submit-btn">등록</button>
+            </form>
+
+            <div class="amount-panel">
+                <h2 class="amount-panel-title">개인별 금액 입력</h2>
+                <div class="amount-list" id="amount-list-container">
+                    <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                        참석자를 선택하면 여기에 입력칸이 생성됩니다.
+                    </p>
+                </div>
+            </div>
+
         </div>
-    </header>
-    <main class="flex-1 p-4 md:p-6 lg:p-10 overflow-auto lg:ml-0">
-
-        <h2 class="text-xl md:text-2xl text-[#4f6df5] font-bold mb-6 md:mb-8 mt-16 lg:mt-0">
-            <i class="fas fa-edit text-black"></i> 점심/커피 내역 등록
-        </h2>
-
-
-        <form th:action="@{/lunch/register.do}" method="post" class="space-y-6">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="date" class="block text-sm font-semibold text-gray-700">날짜</label>
-                    <input type="date" id="date" name="date" class="mt-1 border border-gray-300 rounded p-2 w-full"
-                           th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required />
-                </div>
-                <div>
-                    <label for="storeName" class="block text-sm font-semibold text-gray-700">가게명</label>
-                    <input type="text" id="storeName" name="storeName" placeholder="예: 떡볶이집" class="mt-1 border border-gray-300 rounded p-2 w-full" required />
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">참석자 선택</label>
-                    <p class="text-xs text-gray-500 mb-2">선택 시 하단에 금액 입력란이 생성됩니다.</p>
-
-                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-5 gap-2 border border-gray-300 p-3 rounded-lg bg-white h-40 overflow-y-auto">
-
-                        <div th:each="user : ${userList}" class="relative">
-                            <input type="checkbox"
-                                   th:id="'user-check-' + ${user.userid}"
-                                   class="hidden peer participant-checkbox" th:data-user-id="${user.userid}"
-                                   th:data-user-name="${user.usernm}"
-                                   onchange="updateParticipantInputs(this)" />
-
-                            <label th:for="'user-check-' + ${user.userid}"
-                                   th:text="${user.usernm}"
-                                   class="cursor-pointer block w-full text-sm text-center p-2 rounded-md border border-gray-300 bg-gray-50
-                              hover:bg-gray-200
-                              peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 peer-checked:font-semibold">
-                            </label>
-                        </div>
-
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">계산자 선택</label>
-                    <p class="text-xs text-gray-500 mb-2">&nbsp;</p>
-                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-5 gap-2 border border-gray-300 p-3 rounded-lg bg-white h-40 overflow-y-auto">
-
-                        <div th:each="user : ${userList}" class="relative">
-                            <input type="radio"
-                                   th:id="'payer-radio-' + ${user.userid}"
-                                   name="payerId" th:value="${user.userid}"
-                                   class="hidden peer" required />
-                            <label th:for="'payer-radio-' + ${user.userid}"
-                                   th:text="${user.usernm}"
-                                   class="cursor-pointer block w-full text-sm text-center p-2 rounded-md border border-gray-300 bg-gray-50
-                                          hover:bg-gray-200
-                                          peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 peer-checked:font-semibold">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">유형 선택</label>
-
-                    <div class="mt-2 flex gap-4 md:gap-8 lg:gap-16 border border-gray-300 p-3 rounded-lg bg-white h-40 items-center justify-center">
-
-                        <div class="relative w-32 md:w-40">
-                            <input type="radio"
-                                   id="type-lunch"
-                                   name="type"
-                                   value="점심" class="hidden peer"
-                                   checked
-                                   required />
-
-                            <label for="type-lunch"
-                                   class="cursor-pointer block w-full text-sm text-center p-2 rounded-md border border-gray-300 bg-gray-50
-                          hover:bg-gray-200
-                          peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 peer-checked:font-semibold">
-                                점심
-                            </label>
-                        </div>
-
-                        <div class="relative w-32 md:w-40">
-                            <input type="radio"
-                                   id="type-coffee"
-                                   name="type"
-                                   value="커피" class="hidden peer"
-                                   required />
-
-                            <label for="type-coffee"
-                                   class="cursor-pointer block w-full text-sm text-center p-2 rounded-md border border-gray-300 bg-gray-50
-                          hover:bg-gray-200
-                          peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 peer-checked:font-semibold">
-                                커피
-                            </label>
-                        </div>
-
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700">개인별 금액 입력</label>
-                    <div id="participant-inputs-container" class="mt-2 border border-gray-300 p-3 rounded-lg bg-white h-40 overflow-y-auto flex flex-col items-center justify-center">
-                        <p id="participant-placeholder" class="text-sm text-gray-500 text-center">참석자를 선택하면 여기에 입력칸이 생성됩니다.</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="pt-4 text-left">
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold w-full md:w-auto">
-                    등록하기
-                </button>
-            </div>
-        </form>
     </main>
 </div>
 
+<footer class="site-footer-bottom">
+    <div class="footer-container">
+        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        <p class="footer-slogan">
+            <span class="line">스마트한 공간정보로 더 나은 내일을 여는 (주)스패셜티입니다.</span>
+            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
+        </p>
+    </div>
+</footer>
+
 <script th:inline="javascript">
-    // 사이드바 토글 기능
+    // --- 유저 데이터 로드 ---
+    const userList = /*[[${userList}]]*/ [];
+    const selectedParticipants = new Set();
+    let selectedPayerId = null;
+
+    // --- 참석자 검색 및 선택 로직 ---
+    function filterParticipants() {
+        const query = document.getElementById('participant-search').value.toLowerCase().trim();
+        const resultsDiv = document.getElementById('search-results');
+
+        if (query === '') {
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            return;
+        }
+
+        const filtered = userList.filter(user =>
+            user.usernm.toLowerCase().includes(query) && !selectedParticipants.has(user.userid)
+        );
+
+        if (filtered.length === 0) {
+            resultsDiv.innerHTML = '<div class="p-2 text-sm text-gray-500 text-center">검색 결과가 없습니다.</div>';
+            resultsDiv.style.display = 'block';
+            return;
+        }
+
+        resultsDiv.innerHTML = filtered.map(user =>
+            `<div onclick="addParticipant('${user.userid}', '${user.usernm}')">
+                ${user.usernm}
+            </div>`
+        ).join('');
+
+        resultsDiv.style.display = 'block';
+    }
+
+    function addParticipant(userId, userName) {
+        if (selectedParticipants.has(userId)) return;
+
+        selectedParticipants.add(userId);
+
+        const container = document.getElementById('amount-list-container');
+        const placeholder = document.getElementById('amount-placeholder');
+        placeholder.style.display = 'none';
+
+        // --- 새 HTML 구조(.amount-row)에 맞게 요소 생성 ---
+        const amountRow = document.createElement('div');
+        amountRow.className = 'amount-row';
+        amountRow.id = 'participant-row-' + userId; // 제거를 위한 ID
+
+        // 1. 이름
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.innerText = userName;
+
+        // 2. 금액 입력 그룹
+        const amountGroup = document.createElement('div');
+        amountGroup.className = 'amount-input-group';
+
+        // 2a. 숨겨진 userId input
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'participantUserIds';
+        hiddenInput.value = userId;
+
+        // 2b. 금액 input
+        const amountInput = document.createElement('input');
+        amountInput.type = 'number';
+        amountInput.name = 'participantAmounts';
+        amountInput.placeholder = '금액입력';
+        amountInput.required = true;
+
+        // 2c. '원' 텍스트
+        const unitSpan = document.createElement('span');
+        unitSpan.innerText = '원';
+
+        // 2d. 삭제 버튼
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>'; // Font Awesome 아이콘
+        removeBtn.onclick = () => removeParticipant(userId);
+
+        // 요소 조립
+        amountGroup.appendChild(amountInput);
+        amountGroup.appendChild(unitSpan);
+        amountGroup.appendChild(removeBtn);
+
+        amountRow.appendChild(hiddenInput); // 숨겨진 input 추가
+        amountRow.appendChild(nameSpan);
+        amountRow.appendChild(amountGroup);
+
+        container.appendChild(amountRow);
+        // --- 요소 생성 끝 ---
+
+        // 검색창 초기화
+        document.getElementById('participant-search').value = '';
+        document.getElementById('search-results').style.display = 'none';
+    }
+
+    function removeParticipant(userId) {
+        selectedParticipants.delete(userId);
+        const rowToRemove = document.getElementById('participant-row-' + userId);
+        if (rowToRemove) {
+            rowToRemove.remove();
+        }
+
+        const container = document.getElementById('amount-list-container');
+        const placeholder = document.getElementById('amount-placeholder');
+
+        // 남은 row가 없으면 placeholder 다시 표시
+        if (container.children.length === 1) { // placeholder 자신만 남았을 때
+            placeholder.style.display = 'block';
+        }
+    }
+
+    // --- 계산자 검색 및 선택 로직 ---
+    function filterPayers() {
+        const query = document.getElementById('payer-search').value.toLowerCase().trim();
+        const resultsDiv = document.getElementById('payer-results');
+
+        if (query === '') {
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            return;
+        }
+
+        const filtered = userList.filter(user =>
+            user.usernm.toLowerCase().includes(query)
+        );
+
+        if (filtered.length === 0) {
+            resultsDiv.innerHTML = '<div class="p-2 text-sm text-gray-500 text-center">검색 결과가 없습니다.</div>';
+            resultsDiv.style.display = 'block';
+            return;
+        }
+
+        resultsDiv.innerHTML = filtered.map(user =>
+            `<div onclick="selectPayer('${user.userid}', '${user.usernm}')">
+                ${user.usernm}
+            </div>`
+        ).join('');
+
+        resultsDiv.style.display = 'block';
+    }
+
+    function selectPayer(userId, userName) {
+        selectedPayerId = userId;
+        document.getElementById('payerId').value = userId; // hidden input에 ID 저장
+        document.getElementById('payer-search').value = userName; // 검색창에 이름 표시
+        document.getElementById('payer-results').style.display = 'none';
+    }
+
+    // --- 사이드바 토글 기능 (px-code에는 없었지만, 이전 코드에 있었으므로 추가) ---
     const menuToggle = document.getElementById('menu-toggle');
     const closeMenu = document.getElementById('close-menu');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
 
-    function openSidebar() {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeSidebar() {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    menuToggle.addEventListener('click', openSidebar);
-    closeMenu.addEventListener('click', closeSidebar);
-    overlay.addEventListener('click', closeSidebar);
-
-    // 참석자 입력 업데이트 함수
-    function updateParticipantInputs(checkbox) {
-        const container = document.getElementById('participant-inputs-container');
-        const placeholder = document.getElementById('participant-placeholder');
-        const userId = checkbox.getAttribute('data-user-id');
-        const userName = checkbox.getAttribute('data-user-name');
-        const inputDivId = 'participant-' + userId;
-
-        if (checkbox.checked) {
-            const inputDiv = document.createElement('div');
-            inputDiv.id = inputDivId;
-            inputDiv.className = 'border border-gray-300 rounded-md p-2 bg-gray-50 mb-2 flex items-center justify-between w-full max-w-xs md:max-w-sm';
-
-            const hiddenInputId = document.createElement('input');
-            hiddenInputId.type = 'hidden';
-            hiddenInputId.name = 'participantUserIds';
-            hiddenInputId.value = userId;
-
-            const label = document.createElement('label');
-            label.innerText = userName;
-            label.className = 'text-sm font-semibold text-gray-700';
-
-            const rightSection = document.createElement('div');
-            rightSection.className = 'flex items-center gap-2';
-
-            const amountInput = document.createElement('input');
-            amountInput.type = 'number';
-            amountInput.name = 'participantAmounts';
-            amountInput.className = 'border border-gray-300 rounded p-2 w-20 md:w-24 text-sm';
-            amountInput.placeholder = window.innerWidth < 768 ? '금액' : '금액 입력';
-
-            amountInput.required = true;
-
-            const unit = document.createElement('span');
-            unit.innerText = '원';
-            unit.className = 'text-sm text-gray-700';
-
-            rightSection.appendChild(amountInput);
-            rightSection.appendChild(unit);
-
-            inputDiv.appendChild(hiddenInputId);
-            inputDiv.appendChild(label);
-            inputDiv.appendChild(rightSection);
-            container.appendChild(inputDiv);
-        } else {
-            const inputDivToRemove = document.getElementById(inputDivId);
-            if (inputDivToRemove) {
-                container.removeChild(inputDivToRemove);
-            }
+    // (menuToggle 등이 null일 수 있으므로 null 체크 추가)
+    if (menuToggle) {
+        function openSidebar() {
+            if (sidebar) sidebar.classList.remove('-translate-x-full');
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
-        placeholder.style.display = container.children.length > 1 ? 'none' : 'block';
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        if (closeMenu) closeMenu.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
     }
+
+    // --- 문서 클릭 시 드롭다운 숨기기 ---
+    document.addEventListener('click', function(event) {
+        const participantSearchContainer = document.getElementById('participant-search').closest('.form-group');
+        const payerSearchContainer = document.getElementById('payer-search').closest('.form-group');
+
+        if (!participantSearchContainer.contains(event.target)) {
+            document.getElementById('search-results').style.display = 'none';
+        }
+        if (!payerSearchContainer.contains(event.target)) {
+            document.getElementById('payer-results').style.display = 'none';
+        }
+    });
+
 </script>
 
 </body>
