@@ -6,204 +6,229 @@
     <title>점심/커피 내역 조회</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="bg-white flex flex-col lg:flex-row">
 
-<!-- 모바일 햄버거 버튼 -->
-<button id="menu-toggle" class="lg:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-3 rounded-md shadow-lg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+</head>
+<body class="page-wrapper">
+
+<button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
 
-<!-- 오버레이 -->
-<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+<div id="overlay" class="mobile-overlay"></div>
 
-<!-- 사이드바 -->
-<aside id="sidebar" class="fixed lg:static inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-64 bg-white shadow-md lg:shadow-r-none p-6 flex flex-col flex-shrink-0 border-r-0">
 
-    <button id="close-menu" class="lg:hidden absolute top-4 right-4 text-gray-600 hover:text-gray-900">
-        <i class="fas fa-times text-xl"></i>
-    </button>
-
-    <div class="mb-10 mt-8 lg:mt-0">
-        <img th:src="@{/images/logo.png}" alt="Specialty Logo" class="w-40" />
-    </div>
-
-    <nav>
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">출입관리</h3>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비 분류</a>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비</a>
-
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">장비관리</h3>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비 분류</a>
-        <a href="#" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">장비</a>
-
-        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">정산관리</h3>
-        <a th:href="@{/lunch/register.do}" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">내역 등록</a>
-        <a th:href="@{/lunch/list.do}" class="block py-2 px-4 rounded text-blue-600 font-bold bg-blue-100">내역 조회</a>
-        <a th:href="@{/lunch/statistics.do}" class="block py-2 px-4 rounded text-gray-700 hover:bg-gray-200">통계 조회</a>
-    </nav>
-</aside>
-
-<div class="flex-1 flex flex-col">
-    <!-- ✅ 헤더 추가 -->
-    <header class="bg-white px-4 md:px-6 py-4 border-b border-gray-200">
-        <div class="flex justify-end items-center gap-4">
-            <a th:href="@{/mypage}" class="text-gray-700 hover:text-blue-600 flex items-center">
+<header class="site-header">
+    <div class="header-container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        </a>
+        <nav class="user-nav">
+            <a th:href="@{/mypage}">
                 <i class="fas fa-user"></i>
-                <span class="ml-2 hidden sm:inline">마이페이지</span>
+                <span>마이페이지</span>
             </a>
-            <a th:href="@{/logout}" class="text-gray-700 hover:text-red-600 flex items-center">
+            <a th:href="@{/logout}">
                 <i class="fas fa-sign-out-alt"></i>
-                <span class="ml-2 hidden sm:inline">로그아웃</span>
+                <span>로그아웃</span>
             </a>
-        </div>
-    </header>
+        </nav>
+    </div>
+</header>
 
-    <!-- 메인 콘텐츠 -->
-    <main class="flex-1 p-4 md:p-6 lg:p-10 overflow-auto lg:ml-0">
-        <div class="mb-6 mt-16 lg:mt-0">
-            <h2 class="text-xl md:text-2xl text-[#4f6df5] font-bold">
-                <i class="fas fa-list-ul text-black"></i> 점심/커피 내역 조회
-            </h2>
-        </div>
+<div class="main-container">
 
-        <!-- 검색 필터 -->
-        <form th:action="@{/lunch/list.do}" method="get" class="flex items-center gap-2 mb-4">
-            <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
-                   th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
-                   onchange="this.form.submit()" />
-        </form>
+    <aside class="sidebar" id="sidebar">
 
-        <!-- 내역 테이블 -->
-        <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
-            <table class="w-full min-w-[1000px] text-sm text-center">
-                <thead class="bg-gray-100">
-                <tr>
-                    <th class="p-3 font-semibold text-gray-700">날짜</th>
-                    <th class="p-3 font-semibold text-gray-700">가게</th>
-                    <th th:each="user : ${summaryList}"
-                        th:text="${user.user_nm}"
-                        th:data-user-id="${user.user_id}"
-                        class="p-3 font-semibold text-gray-700">
-                    </th>
-                    <th class="p-3 font-semibold text-gray-700">합계</th>
-                    <th class="p-3 font-semibold text-gray-700">관리</th>
-                </tr>
-                </thead>
-                <tbody id="lunch-table-body">
-                <tr th:each="item : ${lunchList}" class="border-b hover:bg-gray-50"
-                    th:data-participants="${item.participants}">
-                    <td class="p-3" th:text="${#strings.substring(item.date, 5)}"></td>
-                    <td class="p-3" th:text="${item.store_name}"></td>
-                    <td th:each="user : ${summaryList}"
-                        th:class="'p-3 cell-user-' + ${user.user_id}">
-                        -
-                    </td>
-                    <td class="p-3" th:text="${#numbers.formatInteger(item.total_amount, 0, 'COMMA')}"></td>
-                    <td class="p-3">
-                        <form th:action="@{/lunch/delete.do}" method="post" class="inline-block">
-                            <input type="hidden" name="lunchId" th:value="${item.lunch_id}" />
-                            <button type="submit" class="text-red-500 hover:text-red-700"
-                                    onclick="return confirm('이 내역을 삭제하시겠습니까?');">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+        <button id="close-menu" class="mobile-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
 
-                <!-- 총 금액 -->
-                <tr class="bg-gray-100 font-bold border-b">
-                    <td class="p-3" colspan="2">총금액(부담금)</td>
-                    <td th:each="user : ${summaryList}" class="p-3"
-                        th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')}">
-                    </td>
-                    <td class="p-3"
-                        th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}"></td>
-                    <td class="p-3"></td>
-                </tr>
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <h3 class="nav-title">계정관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/account/manage}">계정관리</a></li>
+                    <li><a th:href="@{/account/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">출입관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/access/manage}">계정관리</a></li>
+                    <li><a th:href="@{/access/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">장비관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">정산관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/lunch/register.do}">내역등록</a></li>
+                    <li><a th:href="@{/lunch/list.do}" class="active">내역조회</a></li>
+                    <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
 
-                <!-- 송금 금액 -->
-                <tr class="bg-gray-100 font-bold">
-                    <td class="p-3" colspan="2">송금액(정산액)</td>
-                    <td th:each="user : ${summaryList}" class="p-3"
-                        th:classappend="${user.balance < 0 ? 'text-red-500' : 'text-blue-500'}"
-                        th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
-                    </td>
-                    <td class="p-3"></td>
-                    <td class="p-3"></td>
-                </tr>
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">점심/커피 내역 조회</h1>
 
-                <!-- 정산 완료 버튼 -->
-                <tr class="bg-white">
-                    <td class="p-3" colspan="2">정산처리</td>
+            <div class="content-body" style="display: block;"> <form th:action="@{/lunch/list.do}" method="get" class="flex items-center gap-2 mb-4">
+                <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
+                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                       onchange="this.form.submit()" />
+            </form>
 
-                    <td th:each="user : ${summaryList}" class="p-3">
+                <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[1000px] text-sm text-center">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-3 font-semibold text-gray-700">날짜</th>
+                            <th class="p-3 font-semibold text-gray-700">가게</th>
+                            <th th:each="user : ${summaryList}"
+                                th:text="${user.user_nm}"
+                                th:data-user-id="${user.user_id}"
+                                class="p-3 font-semibold text-gray-700">
+                            </th>
+                            <th class="p-3 font-semibold text-gray-700">합계</th>
+                            <th class="p-3 font-semibold text-gray-700">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody id="lunch-table-body">
+                        <tr th:each="item : ${lunchList}" class="border-b hover:bg-gray-50"
+                            th:data-participants="${item.participants}">
+                            <td class="p-3" th:text="${#strings.substring(item.date, 5)}"></td>
+                            <td class="p-3" th:text="${item.store_name}"></td>
+                            <td th:each="user : ${summaryList}"
+                                th:class="'p-3 cell-user-' + ${user.user_id}">
+                                -
+                            </td>
+                            <td class="p-3" th:text="${#numbers.formatInteger(item.total_amount, 0, 'COMMA')}"></td>
+                            <td class="p-3">
+                                <form th:action="@{/lunch/delete.do}" method="post" class="inline-block">
+                                    <input type="hidden" name="lunchId" th:value="${item.lunch_id}" />
+                                    <button type="submit" class="text-red-500 hover:text-red-700"
+                                            onclick="return confirm('이 내역을 삭제하시겠습니까?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
 
-                        <div th:if="${user.total_owed > 0}">
+                        <tr class="bg-gray-100 font-bold border-b">
+                            <td class="p-3" colspan="2">총금액(부담금)</td>
+                            <td th:each="user : ${summaryList}" class="p-3"
+                                th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')}">
+                            </td>
+                            <td class="p-3"
+                                th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}"></td>
+                            <td class="p-3"></td>
+                        </tr>
 
-                            <form th:if="${user.is_settled == 'N'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
-                                <input type="hidden" name="month"
-                                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
-                                <input type="hidden" name="userId" th:value="${user.user_id}" />
-                                <input type="hidden" name="action" value="complete" />
+                        <tr class="bg-gray-100 font-bold">
+                            <td class="p-3" colspan="2">송금액(정산액)</td>
+                            <td th:each="user : ${summaryList}" class="p-3"
+                                th:classappend="${user.balance < 0 ? 'text-red-500' : 'text-blue-500'}"
+                                th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
+                            </td>
+                            <td class="p-3"></td>
+                            <td class="p-3"></td>
+                        </tr>
 
-                                <button type="submit"
-                                        class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
-                                    정산완료
-                                </button>
-                            </form>
+                        <tr class="bg-white">
+                            <td class="p-3" colspan="2">정산처리</td>
 
-                            <form th:if="${user.is_settled == 'Y'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
-                                <input type="hidden" name="month"
-                                       th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
-                                <input type="hidden" name="userId" th:value="${user.user_id}" />
-                                <input type="hidden" name="action" value="cancel" />
+                            <td th:each="user : ${summaryList}" class="p-3">
 
-                                <button type="submit"
-                                        class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
-                                    정산취소
-                                </button>
-                            </form>
+                                <div th:if="${user.total_owed > 0}">
 
-                        </div>
+                                    <form th:if="${user.is_settled == 'N'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                        <input type="hidden" name="month"
+                                               th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                        <input type="hidden" name="userId" th:value="${user.user_id}" />
+                                        <input type="hidden" name="action" value="complete" />
 
-                        <span th:if="${user.total_owed <= 0}" class="text-sm text-gray-400">해당 없음</span>
-                    </td>
+                                        <button type="submit"
+                                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                            정산완료
+                                        </button>
+                                    </form>
 
-                    <td class="p-3"></td>
-                    <td class="p-3"></td>
-                </tr>
-                </tbody>
-            </table>
+                                    <form th:if="${user.is_settled == 'Y'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                        <input type="hidden" name="month"
+                                               th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                        <input type="hidden" name="userId" th:value="${user.user_id}" />
+                                        <input type="hidden" name="action" value="cancel" />
+
+                                        <button type="submit"
+                                                class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                            정산취소
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                                <span th:if="${user.total_owed <= 0}" class="text-sm text-gray-400">해당 없음</span>
+                            </td>
+
+                            <td class="p-3"></td>
+                            <td class="p-3"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 </div>
 
+<footer class="site-footer-bottom">
+    <div class="footer-container">
+        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        <p class="footer-slogan">
+            <span class="line">전북 전주시 덕진구 만성북로 51-25, 3015호 스패셜티 (스페이스온 지식산업센터)</span>
+            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
+        </p>
+    </div>
+</footer>
+
 <script th:inline="javascript">
-    // 사이드바 토글 기능
+
+    // --- ✅ [공통] 사이드바 토글 기능 ---
     const menuToggle = document.getElementById('menu-toggle');
     const closeMenu = document.getElementById('close-menu');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
 
-    function openSidebar() {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+    if (menuToggle) {
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('active');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        if (closeMenu) closeMenu.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
     }
 
-    function closeSidebar() {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    menuToggle.addEventListener('click', openSidebar);
-    closeMenu.addEventListener('click', closeSidebar);
-    overlay.addEventListener('click', closeSidebar);
-
-    // 테이블 참석자 금액 렌더링
+    // --- ✅ [이식] 테이블 참석자 금액 렌더링 스크립트 ---
     document.addEventListener("DOMContentLoaded", function() {
         const headers = document.querySelectorAll('thead th[data-user-id]');
         const userIdsInOrder = Array.from(headers).map(th => th.getAttribute('data-user-id'));
@@ -217,6 +242,7 @@
             participantString.split(', ').forEach(pair => {
                 const parts = pair.split(':');
                 if (parts.length === 2) {
+                    // 콤마(,)가 포함된 문자열을 숫자로 변환 후 다시 콤마를 찍어줌
                     participantMap.set(parts[0], parseInt(parts[1]).toLocaleString());
                 }
             });
@@ -233,6 +259,7 @@
             });
         });
     });
+
 </script>
 
 </body>

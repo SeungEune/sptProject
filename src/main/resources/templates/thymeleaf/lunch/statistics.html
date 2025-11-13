@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>점심/커피 통계 조회</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+</head>
+<body class="page-wrapper">
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<header class="site-header">
+    <div class="header-container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        </a>
+        <nav class="user-nav">
+            <a th:href="@{/mypage}">
+                <i class="fas fa-user"></i>
+                <span>마이페이지</span>
+            </a>
+            <a th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>로그아웃</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<div class="main-container">
+
+    <aside class="sidebar" id="sidebar">
+
+        <button id="close-menu" class="mobile-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <h3 class="nav-title">계정관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/account/manage}">계정관리</a></li>
+                    <li><a th:href="@{/account/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">출입관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/access/manage}">계정관리</a></li>
+                    <li><a th:href="@{/access/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">장비관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">정산관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/lunch/register.do}">내역등록</a></li>
+                    <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
+                    <li><a th:href="@{/lunch/statistics.do}" class="active">통계조회</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">점심/커피 통계 조회</h1>
+
+            <div class="content-body" style="display: block;"> </div>
+        </div>
+    </main>
+</div>
+
+<footer class="site-footer-bottom">
+    <div class="footer-container">
+        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        <p class="footer-slogan">
+            <span class="line">전북 전주시 덕진구 만성북로 51-25, 3015호 스패셜티 (스페이스온 지식산업센터)</span>
+            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
+        </p>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+
+    // --- 사이드바 토글 기능 (공통) ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (menuToggle) {
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('active');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        if (closeMenu) closeMenu.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+    }
+
+    // --- (statistics.html 고유의 JS가 필요하면 여기에 추가 - 예: Chart.js) ---
+
+</script>
+
+</body>
+</html>
