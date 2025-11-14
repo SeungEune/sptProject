@@ -73,18 +73,18 @@ public class LunchController {
     public String getLunchList(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
         log.info("점심/커피 목록 조회: {}", params);
 
-        // 1. searchMonth 기본값 설정
+        //searchMonth 기본값 설정
         if (params.get("searchMonth") == null || params.get("searchMonth").toString().isEmpty()) {
             String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
             params.put("searchMonth", currentMonth);
         }
 
-        // 2. 통계 조회용 month 세팅
+        // 통계 조회용 month 세팅
         if (params.containsKey("searchMonth")) {
             params.put("month", params.get("searchMonth"));
         }
 
-        // 3. 원본 데이터 조회
+        // 원본 데이터 조회
         List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
         List<Map<String, Object>> summaryList = lunchService.getStatistics(params);
 
@@ -111,7 +111,7 @@ public class LunchController {
                 String payerName = item.get("payer_name") != null ? item.get("payer_name").toString() : "";
                 boolean isRepresentative = REPRESENTATIVE_NAME.equals(payerName);
 
-                //  DETAIL 행 (참여자 금액 행)
+                //  DETAIL 참여자 금액 행
                 Map<String, Object> detailRow = new HashMap<>(item);
                 detailRow.put("rowType", "DETAIL");
                 dailyRows.add(detailRow);
@@ -136,9 +136,8 @@ public class LunchController {
             }
         }
 
-        // 6. 모델에 담기
-        model.addAttribute("lunchList", lunchList);         // 원본 (필요 시 사용)
-        model.addAttribute("flatLunchList", flatLunchList); // 화면 표시용
+        model.addAttribute("lunchList", lunchList);
+        model.addAttribute("flatLunchList", flatLunchList);
         model.addAttribute("summaryList", summaryList);
         model.addAttribute("params", params);
 
@@ -244,10 +243,18 @@ public class LunchController {
     public String getStatistics(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
         log.info("점심/커피 통계 조회: {}", params);
 
+        if (params.get("searchMonth") == null || params.get("searchMonth").toString().isEmpty()) {
+            String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+            params.put("searchMonth", currentMonth);
+        }
+
+        if (params.containsKey("searchMonth")) {
+            params.put("month", params.get("searchMonth"));
+        }
+
         List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
         List<Map<String, Object>> summaryList = lunchService.getStatistics(params);
 
-        // 데이터를 Model에 추가
         model.addAttribute("lunchList", lunchList); // 일자별 지출 그래프
         model.addAttribute("summaryList", summaryList); // 사용자별 통계 그래프
         model.addAttribute("params", params);
