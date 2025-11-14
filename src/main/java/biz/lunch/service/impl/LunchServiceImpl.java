@@ -187,8 +187,22 @@ public class LunchServiceImpl implements LunchService {
     public List<Map<String, Object>> getStatistics(Map<String, Object> params) throws Exception {
         log.info("점심/커피 통계 조회 - params={}", params);
 
-        if (params.containsKey("searchMonth") && !params.containsKey("month")) {
-            params.put("month", params.get("searchMonth"));
+        // [수정됨] searchMonth를 startDate, endDate로 변환
+        if (params.containsKey("searchMonth") && params.get("searchMonth") != null) {
+            String monthStr = params.get("searchMonth").toString();
+
+            if (monthStr.length() == 7) {
+                YearMonth yearMonth = YearMonth.parse(monthStr);
+
+                // 정산 기간: 전달 26일 ~ 당월 25일 (getLunchList와 동일하게)
+                LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26); // "2025-10-26"
+                LocalDate endDate = yearMonth.atDay(25);                                      // "2025-11-25"
+
+                params.put("startDate", startDate.toString());
+                params.put("endDate", endDate.toString());
+
+                log.info("통계 조회 기간: {} ~ {}", startDate, endDate);
+            }
         }
 
         return lunchMapper.getStatistics(params);
