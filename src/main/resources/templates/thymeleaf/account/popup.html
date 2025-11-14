@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 등록</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+</head>
+<body class="page-wrapper">
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<header class="site-header">
+    <div class="header-container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        </a>
+        <nav class="user-nav">
+            <a th:href="@{/mypage}">
+                <i class="fas fa-user"></i>
+                <span>마이페이지</span>
+            </a>
+            <a th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>로그아웃</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<div class="main-container">
+
+
+    <main class="content-area">
+
+    </main>
+</div>
+
+
+<script th:inline="javascript">
+    Swal.fire({
+        title: '수정 완료',
+        text: '마이페이지가 수정되었습니다.',
+        icon: 'success',
+        confirmButtonText: '확인',
+        allowOutsideClick: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // /mypage 로 이동
+            window.location.href = '/mypage';
+            // 뒤로가기 방지하려면 아래처럼:
+            // window.location.replace(/*[[@{/mypage}]]*/ '/mypage');
+        }
+    });
+</script>
+
+
+</body>
+</html>

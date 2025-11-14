@@ -1,0 +1,46 @@
+.search-filter{
+    border: 1px solid black;
+    width: 10vw;
+    height: 30vh;
+}
+.search-filter .search-option-field{
+    display: flex;
+    flex-direction: column;
+}
+.auto-index {
+    counter-reset: row;
+    width: 50vw;
+    table-layout: fixed;           /* 열폭 고정해서 헤더/바디 일치 */
+    border-collapse: collapse;
+}
+.auto-index tbody tr { counter-increment: row; }
+.auto-index tbody tr td:first-child::before { content: counter(row); }
+
+.auto-index th,
+.auto-index td{
+    padding: 8px 12px;             /* th/td 패딩 동일 */
+    text-align: left;              /* 필요시 center/right */
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;        /* 패딩 포함 폭 계산 */
+}
+.auto-index th{
+    background:#fafafa;
+}
+#search-keyword-form, .regist-area{
+    display: flex;
+    width: 50vw;
+    height: 50px;
+    justify-content: flex-end;
+    align-items: center;
+}
+.submit-btn{
+    width: 60px !important;
+    height: 32px !important;
+}
+
+#search-keyword-form-content{
+    width: 20vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

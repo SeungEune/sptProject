@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 등록</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+   <link rel="stylesheet" th:href="@{/css/account/manage.css}">
+</head>
+<body>
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+
+    <!-- ✅ 레이아웃에 넘길 조각을 반드시 감싸서 선언 -->
+    <div th:fragment="content">
+        <h1 class="content-title">계정관리</h1>
+
+        <div class="content-body">
+
+            <div class="search-filter">
+                <h3>검색필터</h3>
+                <div class="search-option-field">
+                    <label for="search-option">옵션</label>
+                    <select id="search-option" name="search-option">
+                        <option value="all" selected>전체</option>
+                        <option value="id">아이디</option>
+                        <option value="tel">전화번호</option>
+                        <option value="email">이메일</option>
+                        <option value="name">이름</option>
+                        <option value="position">직책</option>
+                        <option value="registDate">등록일</option>
+                    </select>
+                </div>
+                <div class="search-option-field">
+                    <label for="search-option-position">직책옵션</label>
+                    <select id="search-option-position" name="search-option-position">
+                        <option value="pm">부장</option>
+                        <option value="pl">과장</option>
+                        <option value="as">대리</option>
+                        <option value="new">담당</option>
+                    </select>
+                </div>
+                <div class="search-option-field">
+                    <label for="search-option-registDate">등록일옵션</label>
+                    <input id="search-option-registDate" type="month" name="registDateMonth">
+                </div>
+            </div>
+            <div class="table-area">
+                <form id="search-keyword-form">
+                    <div id="search-keyword-form-content">
+                        <label for="search-keyword">검색어</label>
+                        <input id="search-keyword" name="search-keyword">
+                        <button type="submit" class="submit-btn">찾기</button>
+                    </div>
+                </form>
+                <table class="auto-index">
+                    <colgroup>
+                        <col style="width:6%;">   <!-- 번호 -->
+                        <col style="width:12%;">  <!-- 아이디 -->
+                        <col style="width:14%;">  <!-- 전화번호 -->
+                        <col style="width:30%;">  <!-- 이메일 -->
+                        <col style="width:10%;">  <!-- 이름 -->
+                        <col style="width:10%;">  <!-- 직책 -->
+                        <col style="width:18%;">  <!-- 등록일 -->
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>번호</th><th>아이디</th><th>전화번호</th><th>이메일</th><th>이름</th><th>직책</th><th>등록일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td></td><td>abcd</td><td>010-1111-1111</td><td>abcd@spatialt.co.kr</td><td>한승준</td><td>담당</td><td>2025/11/03</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="regist-area">
+                    <button type="button" class="submit-btn" onclick="location.href='/account/create'">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

@@ -35,6 +35,13 @@ public class EgovLoginController {
      * @param model Model 객체
      * @return 로그인 페이지
      */
+
+    @PostMapping("/login/password/resetRequest.do")
+    public String userPasswordReset(Model model) {
+        //LoginVO loginVO = SessionUtil.getLoginUser();
+        return "system/user/password/reset";
+    }
+
     @GetMapping("/login/loginForm.do")
     public String loginForm(Model model) {
         // 이미 로그인된 사용자는 메인 페이지로 리다이렉트

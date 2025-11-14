@@ -26,14 +26,49 @@ public class MainController {
     public String mainForm(Model model) {
         // SessionUtil을 사용한 로그인 정보 확인
         LoginVO loginVO = SessionUtil.getLoginUser();
-        
+
         if (loginVO == null) {
             return "redirect:/login/loginForm.do";
         }
-        
+
         // 로그인된 사용자 정보를 모델에 추가
         model.addAttribute("loginVO", loginVO);
         return "main/mainForm";
     }
+
+    @GetMapping("mypage")
+    public String mypage(Model model) {
+        return "account/mypage";
+    }
+    @GetMapping("mypage/update")
+    public String mypageUpdate(Model model) {
+        return "account/updateMypage";
+    }
+    @GetMapping("mypage/update/success")
+    public String mypageUpdateSuccess(Model model) {
+        return "account/popup";
+    }
+
+    @GetMapping("/account/manage")
+    public String userAccountManage(Model model) {
+        LoginVO loginVO = SessionUtil.getLoginUser();
+        return "account/manage";
+    }
+
+    @GetMapping("/account/create")
+    public String userAccountCreate(Model model) {
+        LoginVO loginVO = SessionUtil.getLoginUser();
+        return "account/create";
+    }
+
+    @GetMapping("/enter/enter.do")
+    public String enter(Model model) {
+        LoginVO loginVO = SessionUtil.getLoginUser();
+        return "enter/enter";
+    }
+
+
+
+
 }
 

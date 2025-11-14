@@ -1,0 +1,96 @@
+:root{
+    --label-w: 120px;   /* 라벨 텍스트 고정폭(원하는 값으로 조정) */
+    --row-gap: 10px;    /* 줄 간격 */
+}
+#create-info-form,#info-form,#pw-form{
+    width: 40vw;
+    height: 60vh;
+    margin: 0 auto;
+    background: white;
+    padding: 1%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
+}
+
+#create-user-form label,#user-form label, #pw-form label{
+    display: block;                /* 줄마다 한 줄 */
+    margin-bottom: var(--row-gap);
+}
+
+#create-user-form .lbl, #user-form .lbl,#pw-form .lbl{
+    display: inline-block;
+    width: var(--label-w);         /* ← 이 값으로 ‘인풋 시작선’ 고정 */
+    /*margin-right: 8px;             !* 라벨-인풋 사이 여백 *!*/
+}
+
+#create-user-form input, #user-form input, #pw-form input{
+    width: 360px;                  /* 동일 폭(원하면 auto로 바꿔도 OK) */
+    height: 34px;
+    /*padding: 6px 10px;*/
+}
+
+.btn-group,.pw-btn-group{
+    position: relative;
+    left: 25vw;
+    top: 10vh;
+    width: 8vw;
+    height: 4vh;
+    display: flex;
+    justify-content: space-between;
+}
+.btn-group button, .pw-btn-group button{
+    width: 3vw;
+    height: 100%;
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    color: white;
+    transition: background-color .15s ease, box-shadow .15s ease, transform .02s;
+}
+/*등록*/
+#create-btn{
+    background:#7c3aed;
+}
+#create-btn:hover { filter: brightness(0.92); }
+
+#update-btn, #update-pw-btn{
+    background: orange;
+}
+#update-btn:hover,
+#update-btn:focus-visible,
+#update-btn:active,
+#update-pw-btn:hover,
+#update-pw-btn:focus-visible,
+#update-pw-btn:active
+{
+    background: darkorange;
+}
+#cancel-pw-btn{
+    background: #6b7280;
+}
+#cancel-pw-btn:hover{
+    filter: brightness(0.92);
+}
+#delete-btn{
+    background: red;
+}
+#delete-btn:hover,
+#delete-btn:focus-visible,
+#delete-btn:active{
+    background: darkred;
+}
+
+/* 기본(보기 모드): 수정=주황, 삭제=빨강 */
+#update-btn { background: orange; color:#fff; }
+#delete-btn { background: red; color:#fff; }
+
+/* 수정 모드일 때: 확인(보라), 취소(중간 회색) */
+#update-btn.is-confirm { background:#7c3aed; }
+#update-btn.is-confirm:hover { filter: brightness(0.92); }
+#delete-btn.is-cancel { background:#6b7280; }
+#delete-btn.is-cancel:hover { filter: brightness(0.92); }
+
+/* label의 display:block 보다 우선해 hidden을 확실히 숨김 */
+#user-form [hidden] {
+    display: none !important;
+}

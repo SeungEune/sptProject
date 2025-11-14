@@ -1,37 +1,78 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+
+<!--&lt;!&ndash; TOC JavaScript &ndash;&gt;-->
+<!--<script th:src="@{/js/toc/toc.js}"></script>-->
+
+<!--<div th:fragment="tocLayout">-->
+<!--    &lt;!&ndash; TOC 사이드바 &ndash;&gt;-->
+<!--    <aside class="dashboard-sidebar">-->
+<!--        <div class="sidebar-menu">-->
+<!--            &lt;!&ndash; 1차 메뉴 반복 &ndash;&gt;-->
+<!--            <div th:each="menu : ${menuList}" class="sidebar-menu-item-wrapper">-->
+<!--                &lt;!&ndash; 1차 메뉴 아이템 &ndash;&gt;-->
+<!--                <div class="sidebar-menu-item toc-menu-item"-->
+<!--                     th:classappend="${(menu.subMenuList != null and menu.subMenuList.size() > 0) ? 'has-submenu' : ''} + ${#strings.contains(#httpServletRequest.requestURI, menu.menuUrl) ? ' active' : ''}">-->
+<!--                    <i th:class="'icon-' + ${menu.menuIcon}"></i>-->
+<!--                    <span th:text="${menu.menuNm}"></span>-->
+<!--                    &lt;!&ndash; 하위 메뉴가 있는 경우 화살표 아이콘 표시 &ndash;&gt;-->
+<!--                    <span th:if="${menu.subMenuList != null and menu.subMenuList.size() > 0}" class="submenu-arrow">▼</span>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; 2차 메뉴 (하위 메뉴) &ndash;&gt;-->
+<!--                <div class="submenu-list" th:if="${menu.subMenuList != null and menu.subMenuList.size() > 0}">-->
+<!--                    <a th:each="subMenu : ${menu.subMenuList}"-->
+<!--                       th:href="@{${subMenu.menuUrl}}"-->
+<!--                       class="submenu-item"-->
+<!--                       th:classappend="${#strings.contains(#httpServletRequest.requestURI, subMenu.menuUrl)} ? 'active' : ''">-->
+<!--                        <i th:class="'icon-' + ${subMenu.menuIcon}"></i>-->
+<!--                        <span th:text="${subMenu.menuNm}"></span>-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </aside>-->
+<!--</div>-->
+<!--</html>-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
-<!-- TOC JavaScript -->
-<script th:src="@{/js/toc/toc.js}"></script>
-
+<body>
 <div th:fragment="tocLayout">
-    <!-- TOC 사이드바 -->
-    <aside class="dashboard-sidebar">
-        <div class="sidebar-menu">
-            <!-- 1차 메뉴 반복 -->
-            <div th:each="menu : ${menuList}" class="sidebar-menu-item-wrapper">
-                <!-- 1차 메뉴 아이템 -->
-                <div class="sidebar-menu-item toc-menu-item" 
-                     th:classappend="${(menu.subMenuList != null and menu.subMenuList.size() > 0) ? 'has-submenu' : ''} + ${#strings.contains(#httpServletRequest.requestURI, menu.menuUrl) ? ' active' : ''}">
-                    <i th:class="'icon-' + ${menu.menuIcon}"></i>
-                    <span th:text="${menu.menuNm}"></span>
-                    <!-- 하위 메뉴가 있는 경우 화살표 아이콘 표시 -->
-                    <span th:if="${menu.subMenuList != null and menu.subMenuList.size() > 0}" class="submenu-arrow">▼</span>
-                </div>
-                
-                <!-- 2차 메뉴 (하위 메뉴) -->
-                <div class="submenu-list" th:if="${menu.subMenuList != null and menu.subMenuList.size() > 0}">
-                    <a th:each="subMenu : ${menu.subMenuList}"
-                       th:href="@{${subMenu.menuUrl}}"
-                       class="submenu-item"
-                       th:classappend="${#strings.contains(#httpServletRequest.requestURI, subMenu.menuUrl)} ? 'active' : ''">
-                        <i th:class="'icon-' + ${subMenu.menuIcon}"></i>
-                        <span th:text="${subMenu.menuNm}"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </aside>
-</div>
-</html>
+<aside class="sidebar" id="sidebar">
 
+    <button id="close-menu" class="mobile-close-btn">
+        <i class="fas fa-times"></i>
+    </button>
+
+    <nav class="sidebar-nav">
+        <div class="nav-group">
+            <h3 class="nav-title">계정관리</h3>
+            <ul class="nav-list">
+                <li><a th:href="@{/account/manage}">계정관리</a></li>
+            </ul>
+        </div>
+        <div class="nav-group">
+            <h3 class="nav-title">출입관리</h3>
+            <ul class="nav-list">
+                <li><a th:href="@{/access/manage}">출입관리</a></li>
+            </ul>
+        </div>
+        <div class="nav-group">
+            <h3 class="nav-title">장비관리</h3>
+            <ul class="nav-list">
+                <li><a th:href="@{/equipment/manage}">장비관리</a></li>
+            </ul>
+        </div>
+        <div class="nav-group">
+            <h3 class="nav-title">정산관리</h3>
+            <ul class="nav-list">
+                <li><a th:href="@{/lunch/register}" class="active">내역등록</a></li>
+                <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
+                <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
+            </ul>
+        </div>
+    </nav>
+</aside>
+</div>
+</body>
+</html>
