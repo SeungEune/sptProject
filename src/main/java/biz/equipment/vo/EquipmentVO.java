@@ -10,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
+//@Setter
 public class EquipmentVO extends Base {
 
     private Long id;
