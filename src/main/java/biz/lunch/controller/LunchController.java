@@ -23,7 +23,7 @@ public class LunchController {
     private final LunchService lunchService;
 
     /**
-     * 등록 처리
+     * 등록 화면
      */
     @GetMapping("/register.do")
     public String registerLunch(Model model) throws Exception {
@@ -34,6 +34,9 @@ public class LunchController {
         return "lunch/register";
     }
 
+    /**
+     * 등록 처리
+     */
     @PostMapping("/register.do")
     public String registerLunch(HttpServletRequest request) throws Exception {
 
@@ -60,7 +63,7 @@ public class LunchController {
 
         log.info("점심/커피 등록 요청 (Form): {}", params);
         lunchService.registerLunch(params);
-        return "redirect:/lunch/list.do"; //
+        return "redirect:/lunch/list.do";
     }
 
     /**
@@ -142,7 +145,29 @@ public class LunchController {
         return "lunch/list";
     }
 
-
+    /**
+     * 수정 화면
+     */
+    @GetMapping("/update.do")
+    public String updateLunch(@RequestParam("lunchId") int lunchId, Model model) throws Exception {
+        log.info("점심/커피 수정 화면 요청: lunchId={}", lunchId);
+        
+        // 사용자 목록 조회
+        List<Map<String, Object>> userList = lunchService.getUserList();
+        
+        // 해당 점심 데이터 조회
+        Map<String, Object> params = new HashMap<>();
+        params.put("lunchId", lunchId);
+        List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
+        
+        if (lunchList != null && !lunchList.isEmpty()) {
+            Map<String, Object> lunch = lunchList.get(0);
+            model.addAttribute("lunch", lunch);
+        }
+        
+        model.addAttribute("userList", userList);
+        return "lunch/update";
+    }
 
     /**
      * 수정 처리
@@ -176,6 +201,30 @@ public class LunchController {
         log.info("점심/커피 수정 요청 (Form): {}", params);
         lunchService.updateLunch(params);
         return "redirect:/lunch/list.do";
+    }
+
+    /**
+     * 삭제 화면
+     */
+    @GetMapping("/delete.do")
+    public String deleteLunch(@RequestParam("lunchId") int lunchId, Model model) throws Exception {
+        log.info("점심/커피 삭제 화면 요청: lunchId={}", lunchId);
+        
+        // 사용자 목록 조회
+        List<Map<String, Object>> userList = lunchService.getUserList();
+        
+        // 해당 점심 데이터 조회
+        Map<String, Object> params = new HashMap<>();
+        params.put("lunchId", lunchId);
+        List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
+        
+        if (lunchList != null && !lunchList.isEmpty()) {
+            Map<String, Object> lunch = lunchList.get(0);
+            model.addAttribute("lunch", lunch);
+        }
+        
+        model.addAttribute("userList", userList);
+        return "lunch/delete";
     }
 
     /**

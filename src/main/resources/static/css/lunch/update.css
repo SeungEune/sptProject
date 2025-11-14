@@ -1,0 +1,20 @@
+/* 수정 페이지 전용 스타일 */
+
+/* 삭제 버튼 스타일 */
+.delete-btn {
+    background-color: #dc2626 !important;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #b91c1c !important;
+    opacity: 1;
+}
+
+/* 버튼 컨테이너 */
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
