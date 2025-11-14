@@ -2,6 +2,7 @@ package biz.equipment.service;
 
 import biz.equipment.dao.EquipmentDAO;
 import biz.equipment.dto.EquipmentRequest;
+import biz.equipment.dto.EquipmentResponse;
 import biz.equipment.dto.EquipmentUpdate;
 import biz.equipment.vo.EquipmentVO;
 import biz.equipment.vo.Status;
@@ -43,6 +44,9 @@ public class EquipmentServiceTest {
     @Test
     void 장비_전체_조회를_성공한다() {
         assertThat(equipmentService.getEquipments().size()).isEqualTo(2);
+        EquipmentResponse response = equipmentService.getEquipments().get(0);
+        assertThat(response.getSerialNumber()).isEqualTo("serialNumber1");
+
     }
 
     @Test
