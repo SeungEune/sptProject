@@ -3,6 +3,7 @@ package biz.equipment.controller;
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentUpdate;
 import biz.equipment.service.EquipmentService;
+import biz.equipment.service.EquipmentServiceImpl;
 import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -10,14 +11,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/equipment")
 @RequiredArgsConstructor
 public class EquipmentController {
 
     final private EquipmentService equipmentService;
-
     // 장비 조회
-    @GetMapping("/equipmentList.do")
+    @GetMapping("/equipment/equipmentList.do")
     public String getEquipmentCodes(Model model) {
         model.addAttribute("equipment", equipmentService.getEquipments()) ;
         return "equipment/equipmentList";
