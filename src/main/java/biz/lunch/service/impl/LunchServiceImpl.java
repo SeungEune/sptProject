@@ -11,7 +11,7 @@ import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.time.LocalDate;
 @Slf4j
 @Service("lunchService")
 public class LunchServiceImpl implements LunchService {
@@ -166,8 +166,15 @@ public class LunchServiceImpl implements LunchService {
             String monthStr = params.get("searchMonth").toString();
             if (monthStr.length() == 7) {
                 YearMonth yearMonth = YearMonth.parse(monthStr);
-                params.put("startDate", yearMonth.atDay(1).toString());
-                params.put("endDate", yearMonth.atEndOfMonth().toString());
+
+                // 정산 기간: 전달 26일 ~ 당월 25일
+                LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26);  // 전달 26일
+                LocalDate endDate = yearMonth.atDay(25);                                       // 당월 25일
+
+                params.put("startDate", startDate.toString());
+                params.put("endDate", endDate.toString());
+
+                log.info("정산 기간: {} ~ {}", startDate, endDate);
             }
         }
         return lunchMapper.getLunchList(params);

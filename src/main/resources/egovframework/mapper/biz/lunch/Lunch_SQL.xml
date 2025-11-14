@@ -45,8 +45,7 @@
             (
             #{lunchId},
             #{item.userId},
-            TO_NUMBER(#{item.individualAmount}, '99999999'),
-            'N'
+            #{item.individualAmount}::integer, 'N'
             )
         </foreach>
     </insert>

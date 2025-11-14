@@ -13,10 +13,7 @@
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
-
 <div id="overlay" class="mobile-overlay"></div>
-
-
 <header class="site-header">
     <div class="header-container">
         <a th:href="@{/}" class="logo">
@@ -34,15 +31,11 @@
         </nav>
     </div>
 </header>
-
 <div class="main-container">
-
     <aside class="sidebar" id="sidebar">
-
         <button id="close-menu" class="mobile-close-btn">
             <i class="fas fa-times"></i>
         </button>
-
         <nav class="sidebar-nav">
             <div class="nav-group">
                 <h3 class="nav-title">계정관리</h3>
@@ -120,17 +113,17 @@
                         </div>
                     </fieldset>
 
+                    <div id="hidden-fields"></div>
                     <button type="submit" class="submit-btn">등록</button>
                 </form>
-
-                    <div class="amount-panel">
-                        <h2 class="amount-panel-title">개인별 금액 입력</h2>
-                        <div class="amount-list" id="amount-list-container">
-                            <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
-                                참석자를 선택하면 여기에 입력칸이 생성됩니다.
-                            </p>
-                        </div>
+                <div class="amount-panel">
+                    <h2 class="amount-panel-title">개인별 금액 입력</h2>
+                    <div class="amount-list" id="amount-list-container">
+                        <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                            참석자를 선택하면 여기에 입력칸이 생성됩니다.
+                        </p>
                     </div>
+                </div>
 
             </div>
         </div>
@@ -146,14 +139,15 @@
         </p>
     </div>
 </footer>
-
 <script th:inline="javascript">
     // --- 유저 데이터 로드 ---
     const userList = /*[[${userList}]]*/ [];
+    console.log("userList:", userList);
+    console.log("userList 길이:", userList.length);
     const selectedParticipants = new Set();
     let selectedPayerId = null;
 
-    // --- 참석자 검색 및 선택 로직 ---
+    // --- 참석자 검색 (수정 없음) ---
     function filterParticipants() {
         const query = document.getElementById('participant-search').value.toLowerCase().trim();
         const resultsDiv = document.getElementById('search-results');
@@ -183,87 +177,110 @@
         resultsDiv.style.display = 'block';
     }
 
+
+    // --- [수정됨] addParticipant (UI와 Hidden Data 분리) ---
     function addParticipant(userId, userName) {
         if (selectedParticipants.has(userId)) return;
-
         selectedParticipants.add(userId);
 
         const container = document.getElementById('amount-list-container');
         const placeholder = document.getElementById('amount-placeholder');
         placeholder.style.display = 'none';
 
-        // --- 새 HTML 구조(.amount-row)에 맞게 요소 생성 ---
+        // ----- 1) UI용 amount-row 생성 (오른쪽 박스용) -----
         const amountRow = document.createElement('div');
         amountRow.className = 'amount-row';
-        amountRow.id = 'participant-row-' + userId; // 제거를 위한 ID
+        amountRow.id = 'participant-row-' + userId; // UI 제거용 ID
 
-        // 1. 이름
         const nameSpan = document.createElement('span');
         nameSpan.className = 'name';
         nameSpan.innerText = userName;
 
-        // 2. 금액 입력 그룹
         const amountGroup = document.createElement('div');
         amountGroup.className = 'amount-input-group';
 
-        // 2a. 숨겨진 userId input
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'participantUserIds';
-        hiddenInput.value = userId;
+        // UI 금액 input (서버 전송용 name 속성 없음)
+        const uiAmountInput = document.createElement('input');
+        uiAmountInput.type = 'number';
+        uiAmountInput.placeholder = '금액입력';
+        uiAmountInput.required = true;
 
-        // 2b. 금액 input
-        const amountInput = document.createElement('input');
-        amountInput.type = 'number';
-        amountInput.name = 'participantAmounts';
-        amountInput.placeholder = '금액입력';
-        amountInput.required = true;
-
-        // 2c. '원' 텍스트
         const unitSpan = document.createElement('span');
         unitSpan.innerText = '원';
 
-        // 2d. 삭제 버튼
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
         removeBtn.className = 'remove-btn';
-        removeBtn.innerHTML = '<i class="fas fa-times"></i>'; // Font Awesome 아이콘
-        removeBtn.onclick = () => removeParticipant(userId);
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.onclick = () => removeParticipant(userId); // 제거 함수 호출
 
-        // 요소 조립
-        amountGroup.appendChild(amountInput);
+        amountGroup.appendChild(uiAmountInput);
         amountGroup.appendChild(unitSpan);
         amountGroup.appendChild(removeBtn);
 
-        amountRow.appendChild(hiddenInput); // 숨겨진 input 추가
         amountRow.appendChild(nameSpan);
         amountRow.appendChild(amountGroup);
 
-        container.appendChild(amountRow);
-        // --- 요소 생성 끝 ---
+        container.appendChild(amountRow); // UI 요소를 amount-panel에 추가
 
-        // 검색창 초기화
+
+        // ----- 2) form 내부 hidden field 생성 (왼쪽 <form> 안쪽용) -----
+        const hiddenFields = document.getElementById("hidden-fields");
+
+        // hidden userId (서버 전송용)
+        const hiddenUserInput = document.createElement("input");
+        hiddenUserInput.type = "hidden";
+        hiddenUserInput.name = "participantUserIds";
+        hiddenUserInput.value = userId;
+        hiddenUserInput.id = "hidden-user-" + userId; // 데이터 제거용 ID
+
+        // hidden amountInput (서버 전송용)
+        const hiddenAmountInput = document.createElement("input");
+        hiddenAmountInput.type = "hidden";
+        hiddenAmountInput.name = "participantAmounts";
+        hiddenAmountInput.value = ""; // 초기값
+        hiddenAmountInput.id = "hidden-amount-" + userId; // 데이터 제거용 ID
+
+        // [핵심] UI input에서 값 입력하면 hidden input에 값 동기화
+        uiAmountInput.addEventListener("input", () => {
+            hiddenAmountInput.value = uiAmountInput.value;
+        });
+
+        hiddenFields.appendChild(hiddenUserInput);
+        hiddenFields.appendChild(hiddenAmountInput); // hidden 요소를 form에 추가
+
+
+        // --- 검색창 초기화 (수정 없음) ---
         document.getElementById('participant-search').value = '';
         document.getElementById('search-results').style.display = 'none';
     }
 
+
+    // --- [수정됨] removeParticipant (UI와 Hidden Data 동시 제거) ---
     function removeParticipant(userId) {
         selectedParticipants.delete(userId);
-        const rowToRemove = document.getElementById('participant-row-' + userId);
-        if (rowToRemove) {
-            rowToRemove.remove();
-        }
 
+        // 1. UI 제거 (오른쪽 패널)
+        const rowToRemove = document.getElementById('participant-row-' + userId);
+        if (rowToRemove) rowToRemove.remove();
+
+        // 2. Hidden Data 제거 (왼쪽 폼 내부)
+        const hiddenUser = document.getElementById('hidden-user-' + userId);
+        const hiddenAmount = document.getElementById('hidden-amount-' + userId);
+        if (hiddenUser) hiddenUser.remove();
+        if (hiddenAmount) hiddenAmount.remove();
+
+        // 3. Placeholder 처리 (수정 없음)
         const container = document.getElementById('amount-list-container');
         const placeholder = document.getElementById('amount-placeholder');
-
-        // 남은 row가 없으면 placeholder 다시 표시
-        if (container.children.length === 1) { // placeholder 자신만 남았을 때
+        // (참고: container.children.length가 1이 아니라 0이어야 할 수 있습니다.
+        //  placeholder가 container의 자식요소라면 1이 맞습니다.)
+        if (container.children.length === 1) {
             placeholder.style.display = 'block';
         }
     }
 
-    // --- 계산자 검색 및 선택 로직 ---
+    // --- 계산자 검색 (수정 없음) ---
     function filterPayers() {
         const query = document.getElementById('payer-search').value.toLowerCase().trim();
         const resultsDiv = document.getElementById('payer-results');
@@ -293,6 +310,7 @@
         resultsDiv.style.display = 'block';
     }
 
+    // --- 계산자 선택 (수정 없음) ---
     function selectPayer(userId, userName) {
         selectedPayerId = userId;
         document.getElementById('payerId').value = userId; // hidden input에 ID 저장
@@ -300,7 +318,7 @@
         document.getElementById('payer-results').style.display = 'none';
     }
 
-    // 사이드바 토글 기능 ---
+    // --- 사이드바 토글 (수정 없음) ---
     const menuToggle = document.getElementById('menu-toggle');
     const closeMenu = document.getElementById('close-menu');
     const sidebar = document.getElementById('sidebar');
@@ -308,14 +326,12 @@
 
     if (menuToggle) {
         function openSidebar() {
-            // .active 클래스를 추가하여 CSS가 사이드바를 보이게 함
             if (sidebar) sidebar.classList.add('active');
             if (overlay) overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeSidebar() {
-            // .active 클래스를 제거하여 CSS가 사이드바를 숨기게 함
             if (sidebar) sidebar.classList.remove('active');
             if (overlay) overlay.classList.remove('active');
             document.body.style.overflow = '';
@@ -326,7 +342,7 @@
         if (overlay) overlay.addEventListener('click', closeSidebar);
     }
 
-    // --- 문서 클릭 시 드롭다운 숨기기 ---
+    // --- 문서 클릭 시 드롭다운 숨기기 (수정 없음) ---
     document.addEventListener('click', function(event) {
         const participantSearchContainer = document.getElementById('participant-search').closest('.form-group');
         const payerSearchContainer = document.getElementById('payer-search').closest('.form-group');

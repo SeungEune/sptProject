@@ -110,7 +110,7 @@
                         <tr th:each="row : ${flatLunchList}"
                             class="detail-row border-b hover:bg-gray-50"
                             th:classappend="${row.rowType == 'PAY'} ? ' pay-row' : ''"
-                            th:attr="data-participants=${row.rowType == 'DETAIL'} ? row.participants : null">
+                            th:attr="data-participants=${row.rowType == 'DETAIL' ? row.participants : null}">
 
                             <!-- 날짜: 해당 날짜의 첫 행에만 rowspan 으로 출력 -->
                             <td class="date-cell p-3 font-bold align-middle"
@@ -119,14 +119,14 @@
                                 th:text="${#strings.substring(row.date, 5)}">
                             </td>
 
-                            <!-- 가게 / 결제 라벨 -->
-                            <td th:class="${row.rowType == 'DETAIL'} ? 'store-name-cell p-3' : 'pay-label p-3'"
-                                th:text="${row.rowType == 'DETAIL'} ? row.store_name : '결제금액'">
+                            <!--  가게 / 결제 라벨 (수정) -->
+                            <td th:class="${row.rowType == 'DETAIL' ? 'store-name-cell p-3' : 'pay-label p-3'}"
+                                th:text="${row.rowType == 'DETAIL' ? row.store_name : '결제금액'}">
                             </td>
 
                             <!-- 사용자별 칸 -->
                             <td th:each="user : ${summaryList}"
-                                th:class="${row.rowType == 'DETAIL'} ? 'p-3 cell-user-' + user.user_id : 'p-3 text-red-600 font-bold'">
+                                th:class="${row.rowType == 'DETAIL' ? 'p-3 cell-user-' + user.user_id : 'p-3 text-red-600 font-bold'}">
 
                                 <!-- DETAIL 행: 기본은 '-' (JS가 나중에 채움) -->
                                 <span th:if="${row.rowType == 'DETAIL'}">-</span>
@@ -140,7 +140,7 @@
                             </td>
 
                             <!-- 합계 -->
-                            <td th:class="${row.rowType == 'DETAIL'} ? 'p-3' : 'pay-total p-3'"
+                            <td th:class="${row.rowType == 'DETAIL' ? 'p-3' : 'pay-total p-3'}"
                                 th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}">
                             </td>
 
