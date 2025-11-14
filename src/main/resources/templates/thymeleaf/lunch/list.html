@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
-
+    <link rel="stylesheet" th:href="@{/css/lunch/list.css}">
 </head>
 <body class="page-wrapper">
 
@@ -90,7 +90,7 @@
             </form>
 
                 <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
-                    <table class="w-full min-w-[1000px] text-sm text-center">
+                    <table class="lunch-table w-full min-w-[1000px] text-sm text-center">
                         <thead class="bg-gray-100">
                         <tr>
                             <th class="p-3 font-semibold text-gray-700">날짜</th>
@@ -105,38 +105,74 @@
                         </tr>
                         </thead>
                         <tbody id="lunch-table-body">
-                        <tr th:each="item : ${lunchList}" class="border-b hover:bg-gray-50"
-                            th:data-participants="${item.participants}">
-                            <td class="p-3" th:text="${#strings.substring(item.date, 5)}"></td>
-                            <td class="p-3" th:text="${item.store_name}"></td>
-                            <td th:each="user : ${summaryList}"
-                                th:class="'p-3 cell-user-' + ${user.user_id}">
-                                -
+
+                        <!-- 날짜/점심/커피/결제까지 평탄화된 flatLunchList 기준으로 렌더링 -->
+                        <tr th:each="row : ${flatLunchList}"
+                            class="detail-row border-b hover:bg-gray-50"
+                            th:classappend="${row.rowType == 'PAY'} ? ' pay-row' : ''"
+                            th:attr="data-participants=${row.rowType == 'DETAIL'} ? row.participants : null">
+
+                            <!-- 날짜: 해당 날짜의 첫 행에만 rowspan 으로 출력 -->
+                            <td class="date-cell p-3 font-bold align-middle"
+                                th:if="${row.isFirstOfDate}"
+                                th:rowspan="${row.dateRowSpan}"
+                                th:text="${#strings.substring(row.date, 5)}">
                             </td>
-                            <td class="p-3" th:text="${#numbers.formatInteger(item.total_amount, 0, 'COMMA')}"></td>
-                            <td class="p-3">
-                                <form th:action="@{/lunch/delete.do}" method="post" class="inline-block">
-                                    <input type="hidden" name="lunchId" th:value="${item.lunch_id}" />
-                                    <button type="submit" class="text-red-500 hover:text-red-700"
-                                            onclick="return confirm('이 내역을 삭제하시겠습니까?');">
+
+                            <!-- 가게 / 결제 라벨 -->
+                            <td th:class="${row.rowType == 'DETAIL'} ? 'store-name-cell p-3' : 'pay-label p-3'"
+                                th:text="${row.rowType == 'DETAIL'} ? row.store_name : '결제금액'">
+                            </td>
+
+                            <!-- 사용자별 칸 -->
+                            <td th:each="user : ${summaryList}"
+                                th:class="${row.rowType == 'DETAIL'} ? 'p-3 cell-user-' + user.user_id : 'p-3 text-red-600 font-bold'">
+
+                                <!-- DETAIL 행: 기본은 '-' (JS가 나중에 채움) -->
+                                <span th:if="${row.rowType == 'DETAIL'}">-</span>
+
+                                <!-- PAY 행: 계산자에게만 금액, 나머지는 '-' -->
+                                <span th:if="${row.rowType == 'PAY'}">
+            <span th:if="${user.user_id == row.payer_id}"
+                  th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}"></span>
+            <span th:unless="${user.user_id == row.payer_id}">-</span>
+        </span>
+                            </td>
+
+                            <!-- 합계 -->
+                            <td th:class="${row.rowType == 'DETAIL'} ? 'p-3' : 'pay-total p-3'"
+                                th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}">
+                            </td>
+
+                            <!-- 관리(삭제) - DETAIL 행에서만 노출 -->
+                            <td class="delete-cell p-3">
+                                <form th:if="${row.rowType == 'DETAIL'}"
+                                      th:action="@{/lunch/delete.do}"
+                                      method="post"
+                                      class="inline-block"
+                                      onsubmit="return confirm('이 내역을 삭제하시겠습니까?');">
+                                    <input type="hidden" name="lunchId" th:value="${row.lunch_id}" />
+                                    <button type="submit" class="text-red-500 hover:text-red-700">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
                             </td>
                         </tr>
 
+
                         <tr class="bg-gray-100 font-bold border-b">
-                            <td class="p-3" colspan="2">총금액(부담금)</td>
+                            <td class="p-3" colspan="2">총 합계</td>
                             <td th:each="user : ${summaryList}" class="p-3"
                                 th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')}">
                             </td>
                             <td class="p-3"
-                                th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}"></td>
+                                th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}">
+                            </td>
                             <td class="p-3"></td>
                         </tr>
 
                         <tr class="bg-gray-100 font-bold">
-                            <td class="p-3" colspan="2">송금액(정산액)</td>
+                            <td class="p-3" colspan="2">송금 총액</td>
                             <td th:each="user : ${summaryList}" class="p-3"
                                 th:classappend="${user.balance < 0 ? 'text-red-500' : 'text-blue-500'}"
                                 th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
@@ -149,10 +185,12 @@
                             <td class="p-3" colspan="2">정산처리</td>
 
                             <td th:each="user : ${summaryList}" class="p-3">
-
                                 <div th:if="${user.total_owed > 0}">
 
-                                    <form th:if="${user.is_settled == 'N'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                    <form th:if="${user.is_settled == 'N'}"
+                                          th:action="@{/lunch/completeSettlement.do}"
+                                          method="post"
+                                          class="inline-block">
                                         <input type="hidden" name="month"
                                                th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
                                         <input type="hidden" name="userId" th:value="${user.user_id}" />
@@ -164,7 +202,10 @@
                                         </button>
                                     </form>
 
-                                    <form th:if="${user.is_settled == 'Y'}" th:action="@{/lunch/completeSettlement.do}" method="post" class="inline-block">
+                                    <form th:if="${user.is_settled == 'Y'}"
+                                          th:action="@{/lunch/completeSettlement.do}"
+                                          method="post"
+                                          class="inline-block">
                                         <input type="hidden" name="month"
                                                th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
                                         <input type="hidden" name="userId" th:value="${user.user_id}" />
@@ -184,7 +225,10 @@
                             <td class="p-3"></td>
                             <td class="p-3"></td>
                         </tr>
+
                         </tbody>
+
+
                     </table>
                 </div>
             </div>

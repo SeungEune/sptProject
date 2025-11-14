@@ -65,8 +65,16 @@ public class LunchServiceImpl implements LunchService {
         if (masterResult > 0 && params.containsKey("lunchId")) {
 
             if (params.containsKey("participants")) {
-                lunchMapper.insertParticipantsBatch(params);
-                log.debug("참여자 등록 완료");
+                // 리스트를 직접 가져와서 null이 아니고 비어있는지(!isEmpty) 확인
+                List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
+
+                if (participants != null && !participants.isEmpty()) {
+                    lunchMapper.insertParticipantsBatch(params);
+                    log.debug("참여자 등록 완료");
+                } else {
+                    // 참여자가 0명인 경우는 로그를 남기고 실행을 건너뜀
+                    log.warn("참여자가 0명이므로 insertParticipantsBatch를 건너뜁니다.");
+                }
             }
 
             // 등록된 날짜 기준으로 summary 갱신
@@ -101,7 +109,17 @@ public class LunchServiceImpl implements LunchService {
 
         lunchMapper.deleteParticipantsByLunchId(lunchId);
         if (params.containsKey("participants")) {
-            lunchMapper.insertParticipantsBatch(params);
+            // 리스트를 직접 가져와서 null이 아니고 비어있는지(!isEmpty) 확인
+            List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
+
+            if (participants != null && !participants.isEmpty()) {
+                // 리스트가 비어있지 않을 때만 배치 인서트를 실행
+                lunchMapper.insertParticipantsBatch(params);
+                log.debug("참여자 (수정) 등록 완료");
+            } else {
+                // 참여자가 0명이면 로그만 남기고 건너뜀
+                log.warn("참여자가 0명이므로 insertParticipantsBatch를 건너뜁니다.");
+            }
         }
 
         // 수정된 날짜 기준으로 summary 갱신

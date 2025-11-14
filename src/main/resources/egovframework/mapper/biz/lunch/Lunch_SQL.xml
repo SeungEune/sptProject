@@ -186,12 +186,7 @@
             ),
             -- (D) 이 달의 대표 정산자
             T_REP AS (
-        SELECT payer_id
-        FROM lunch_master
-        WHERE TO_CHAR(date, 'YYYY-MM') = #{month}
-        GROUP BY payer_id
-        ORDER BY SUM(total_amount) DESC
-            LIMIT 1
+        SELECT user_id AS payer_id FROM tb_user WHERE user_nm = '이승은'
             )
         INSERT INTO lunch_summary (user_id, month, total_paid, total_owed, representative_payer_id)
         SELECT

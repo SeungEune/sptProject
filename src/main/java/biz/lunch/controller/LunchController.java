@@ -6,12 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.LinkedHashMap;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList; //
-import java.util.HashMap; //
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 /**
@@ -72,26 +69,79 @@ public class LunchController {
     @GetMapping("/list.do")
     public String getLunchList(@RequestParam(required = false) Map<String, Object> params, Model model) throws Exception {
         log.info("점심/커피 목록 조회: {}", params);
-        // 1. searchMonth 파라미터가 없으면 현재 월로 기본값 설정
+
+        // 1. searchMonth 기본값 설정
         if (params.get("searchMonth") == null || params.get("searchMonth").toString().isEmpty()) {
             String currentMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
             params.put("searchMonth", currentMonth);
         }
 
-        // 2. getStatistics 쿼리가 'month' 파라미터를 사용할 수 있도록 값을 복사합니다.
+        // 2. 통계 조회용 month 세팅
         if (params.containsKey("searchMonth")) {
             params.put("month", params.get("searchMonth"));
         }
+
+        // 3. 원본 데이터 조회
         List<Map<String, Object>> lunchList = lunchService.getLunchList(params);
         List<Map<String, Object>> summaryList = lunchService.getStatistics(params);
 
-        // 데이터를 Model에 추가
-        model.addAttribute("lunchList", lunchList);   // 상단 목록
-        model.addAttribute("summaryList", summaryList); // 하단 요약
-        model.addAttribute("params", params);       // 검색 조건 유지를 위해
+        // 4. 날짜 기준으로 그룹핑
+        Map<String, List<Map<String, Object>>> byDate = new LinkedHashMap<>();
+        for (Map<String, Object> item : lunchList) {
+            Object dateObj = item.get("date");
+            if (dateObj == null) continue;
+            String date = dateObj.toString();
+            byDate.computeIfAbsent(date, k -> new ArrayList<>()).add(item);
+        }
+
+        // 5. 화면용 flat 리스트 생성 (DETAIL / PAY)
+        List<Map<String, Object>> flatLunchList = new ArrayList<>();
+        final String REPRESENTATIVE_NAME = "이승은"; // 기본 정산자
+
+        for (Map.Entry<String, List<Map<String, Object>>> entry : byDate.entrySet()) {
+            String date = entry.getKey();
+            List<Map<String, Object>> itemsForDate = entry.getValue();
+
+            List<Map<String, Object>> dailyRows = new ArrayList<>();
+
+            for (Map<String, Object> item : itemsForDate) {
+                String payerName = item.get("payer_name") != null ? item.get("payer_name").toString() : "";
+                boolean isRepresentative = REPRESENTATIVE_NAME.equals(payerName);
+
+                //  DETAIL 행 (참여자 금액 행)
+                Map<String, Object> detailRow = new HashMap<>(item);
+                detailRow.put("rowType", "DETAIL");
+                dailyRows.add(detailRow);
+
+                // PAY 행 (결제 금액 행) - 대표 정산자가 아닐 때만
+                if (!isRepresentative) {
+                    Map<String, Object> payRow = new HashMap<>(item);
+                    payRow.put("rowType", "PAY");
+                    dailyRows.add(payRow);
+                }
+            }
+
+            // 날짜 셀 rowspan 계산 & 첫 행 표시 플래그
+            int rowSpan = dailyRows.size();
+            for (int i = 0; i < dailyRows.size(); i++) {
+                Map<String, Object> row = dailyRows.get(i);
+                row.put("isFirstOfDate", i == 0);   // 첫 행이면 true
+                if (i == 0) {
+                    row.put("dateRowSpan", rowSpan); // 첫 행에만 rowspan 값
+                }
+                flatLunchList.add(row);
+            }
+        }
+
+        // 6. 모델에 담기
+        model.addAttribute("lunchList", lunchList);         // 원본 (필요 시 사용)
+        model.addAttribute("flatLunchList", flatLunchList); // 화면 표시용
+        model.addAttribute("summaryList", summaryList);
+        model.addAttribute("params", params);
 
         return "lunch/list";
     }
+
 
 
     /**
