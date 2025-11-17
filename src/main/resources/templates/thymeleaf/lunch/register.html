@@ -136,7 +136,7 @@
         }
 
         const filtered = userList.filter(user =>
-            user.usernm.toLowerCase().includes(query) && !selectedParticipants.has(user.userid)
+            user.userName.toLowerCase().includes(query) && !selectedParticipants.has(user.userId)
         );
 
         if (filtered.length === 0) {
@@ -146,8 +146,8 @@
         }
 
         resultsDiv.innerHTML = filtered.map(user =>
-            `<div onclick="addParticipant('${user.userid}', '${user.usernm}')">
-                ${user.usernm}
+            `<div onclick="addParticipant('${user.userId}', '${user.userName}')">
+                ${user.userName}
             </div>`
         ).join('');
 
@@ -254,7 +254,7 @@
         }
 
         const filtered = userList.filter(user =>
-            user.usernm.toLowerCase().includes(query)
+            user.userName.toLowerCase().includes(query)
         );
 
         if (filtered.length === 0) {
@@ -264,8 +264,8 @@
         }
 
         resultsDiv.innerHTML = filtered.map(user =>
-            `<div onclick="selectPayer('${user.userid}', '${user.usernm}')">
-                ${user.usernm}
+            `<div onclick="selectPayer('${user.userId}', '${user.userName}')">
+                ${user.userName}
             </div>`
         ).join('');
 

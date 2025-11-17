@@ -5,7 +5,7 @@
 <mapper namespace="biz.lunch.dao.LunchMapper">
 
     <!-- 점심/커피 내역 등록 (ServiceImpl에서 참여자 별도 등록) -->
-    <insert id="registerLunch" parameterType="map"
+    <insert id="registerLunch" parameterType="biz.lunch.vo.LunchVO"
             useGeneratedKeys="true" keyProperty="lunchId" keyColumn="lunch_id">
         INSERT INTO lunch_master (
             date, store_name, payer_id, total_amount, type, created_at
@@ -20,7 +20,7 @@
     </insert>
 
     <!-- 점심/커피 내역 수정 -->
-    <update id="updateLunch" parameterType="map">
+    <update id="updateLunch" parameterType="biz.lunch.vo.LunchVO">
         UPDATE lunch_master
         SET store_name = #{storeName},
             payer_id = #{payerId},
@@ -37,11 +37,11 @@
     </delete>
 
     <!-- 새로운 참여자 등록 (일괄 등록 처리) -->
-    <insert id="insertParticipantsBatch" parameterType="map">
+    <insert id="insertParticipantsBatch" parameterType="biz.lunch.vo.LunchVO">
         INSERT INTO lunch_participant (
         lunch_id, user_id, individual_amount, is_paid
         ) VALUES
-        <foreach collection="participants" item="item" separator=",">
+        <foreach collection="participantList" item="item" separator=",">
             (
             #{lunchId},
             #{item.userId},
@@ -57,36 +57,38 @@
     </delete>
 
     <!-- 점심/커피 내역 조회 -->
-    <select id="getLunchList" parameterType="map" resultType="map">
+    <select id="getLunchList" parameterType="biz.lunch.vo.LunchVO" resultType="biz.lunch.vo.LunchVO">
         SELECT
-        m.lunch_id,
+        m.lunch_id AS lunchId,
         m.date,
-        m.store_name,
-        m.total_amount,
+        m.store_name AS storeName,
+        m.total_amount AS totalAmount,
         m.type,
-        m.payer_id,
-        u.user_nm AS payer_name,
+        m.payer_id AS payerId,
+        u.user_nm AS payerName,
         STRING_AGG(p.user_id || ':' || p.individual_amount, ', ') AS participants,
-        SUM(p.individual_amount) AS total_participant_amount
+        SUM(p.individual_amount) AS totalParticipantAmount
         FROM lunch_master m
         JOIN tb_user u ON m.payer_id = u.user_id
         LEFT JOIN lunch_participant p ON m.lunch_id = p.lunch_id
         WHERE 1=1
+        <if test="lunchId != null">
+            AND m.lunch_id = #{lunchId}
+        </if>
         <if test="type != null and type != ''">
             AND m.type = #{type}
         </if>
-        <if test="startDate != null">
-            AND m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
-        </if>
-        <if test="endDate != null">
-            AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        <if test="date != null and date.contains('~')">
+            <bind name="dates" value="date.split('~')" />
+            AND m.date &gt;= TO_DATE(#{dates[0]}, 'YYYY-MM-DD')
+            AND m.date &lt;= TO_DATE(#{dates[1]}, 'YYYY-MM-DD')
         </if>
         GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
         ORDER BY m.date DESC;
     </select>
 
     <!-- 사용자별/월별 통계 조회 -->
-    <select id="getStatistics" parameterType="map" resultType="map">
+    <select id="getStatistics" resultType="biz.lunch.vo.SummaryVO">
         WITH T_SUMMARY AS (
         SELECT
         s.user_id,
@@ -115,18 +117,25 @@
         AND p.individual_amount > 0
         )
         SELECT
-        s.*,
+        s.user_id AS userId,
+        s.user_nm AS userName,
+        s.month,
+        s.total_paid AS totalPaid,
+        s.total_owed AS totalOwed,
+        s.balance,
+        s.representative_payer_id AS representativePayerId,
+        s.representative_payer AS representativePayerName,
         CASE
         WHEN s.total_owed &lt;= 0 THEN 'Y'
         WHEN s.user_id NOT IN (SELECT user_id FROM T_UNPAID_USERS) THEN 'Y'
         ELSE 'N'
-        END AS is_settled
+        END AS isSettled
         FROM T_SUMMARY s
         ORDER BY s.balance DESC;
     </select>
 
     <!-- 월별 정산 완료 처리 -->
-    <update id="completeSettlement" parameterType="map">
+    <update id="completeSettlement">
         UPDATE lunch_participant
 
         <choose>
@@ -158,7 +167,7 @@
 
 
     <!-- 요약 테이블 자동 갱신 -->
-    <insert id="updateSummaryAfterChange" parameterType="map">
+    <insert id="updateSummaryAfterChange">
         WITH
         -- (A) 기존 월 데이터 삭제
             deleted AS (
@@ -204,8 +213,8 @@
         WHERE lunch_id = #{lunchId}
     </select>
 
-    <select id="getUserList" resultType="map">
-        SELECT user_id AS userId, user_nm AS userNm
+    <select id="getUserList" resultType="biz.lunch.vo.UserVO">
+        SELECT user_id AS userId, user_nm AS userName
         FROM tb_user
         ORDER BY user_nm
     </select>
