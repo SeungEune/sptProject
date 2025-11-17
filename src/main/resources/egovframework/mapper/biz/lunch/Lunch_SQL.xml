@@ -78,10 +78,11 @@
         <if test="type != null and type != ''">
             AND m.type = #{type}
         </if>
-        <if test="date != null and date.contains('~')">
-            <bind name="dates" value="date.split('~')" />
-            AND m.date &gt;= TO_DATE(#{dates[0]}, 'YYYY-MM-DD')
-            AND m.date &lt;= TO_DATE(#{dates[1]}, 'YYYY-MM-DD')
+        <if test="startDate != null">
+            AND m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
         </if>
         GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
         ORDER BY m.date DESC;

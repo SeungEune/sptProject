@@ -163,8 +163,9 @@ public class LunchServiceImpl implements LunchService {
             LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26);
             LocalDate endDate = yearMonth.atDay(25);
             
-            // date 필드에 startDate 저장, storeName에 endDate 임시 저장 (searchVO 확장 필요 시 수정)
-            searchVO.setDate(startDate.toString() + "~" + endDate.toString());
+            // startDate, endDate 필드에 직접 세팅
+            searchVO.setStartDate(startDate.toString());
+            searchVO.setEndDate(endDate.toString());
             
             log.info("정산 기간: {} ~ {}", startDate, endDate);
         }

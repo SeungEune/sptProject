@@ -136,9 +136,9 @@
         // 사용자별 부담금/결제금
         if (summaryList && summaryList.length > 0) {
             const ctxUser = document.getElementById('userSummaryChart').getContext('2d');
-            const userLabels = summaryList.map(s => s.user_nm);
-            const owed = summaryList.map(s => s.total_owed);
-            const paid = summaryList.map(s => s.total_paid);
+            const userLabels = summaryList.map(s => s.userName);
+            const owed = summaryList.map(s => s.totalOwed);
+            const paid = summaryList.map(s => s.totalPaid);
 
             new Chart(ctxUser, {
                 type: 'bar',
@@ -177,7 +177,7 @@
             const list = [...lunchList].reverse();
 
             const labels = list.map(i => i.date.substring(5));
-            const amounts = list.map(i => i.total_amount);
+            const amounts = list.map(i => i.totalAmount);
 
             new Chart(ctxDaily, {
                 type: 'line',
@@ -217,8 +217,8 @@
                 const date = item.date.substring(5);
                 if (!map.has(date)) map.set(date, { lunch: 0, coffee: 0 });
 
-                if (item.type === '점심') map.get(date).lunch += item.total_amount;
-                else if (item.type === '커피') map.get(date).coffee += item.total_amount;
+                if (item.type === '점심') map.get(date).lunch += item.totalAmount;
+                else if (item.type === '커피') map.get(date).coffee += item.totalAmount;
             }
 
             const labels = Array.from(map.keys());
@@ -247,7 +247,7 @@
         if (summaryList && summaryList.length > 0) {
             const ctxBalance = document.getElementById('balanceChart').getContext('2d');
 
-            const labels = summaryList.map(u => u.user_nm);
+            const labels = summaryList.map(u => u.userName);
             const values = summaryList.map(u => Math.abs(u.balance));
             const bgColors = summaryList.map(u => u.balance >= 0 ? colorBlueDark : colorRed);
             const borderColors = summaryList.map(u => u.balance >= 0 ? colorBlueBorderDark : colorRedBorder);

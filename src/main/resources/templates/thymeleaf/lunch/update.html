@@ -31,7 +31,7 @@
             <div class="content-body">
                 <form class="entry-form" th:action="@{/lunch/update.do}" method="post">
 
-                    <input type="hidden" name="lunchId" th:value="${lunch.lunch_id}">
+                    <input type="hidden" name="lunchId" th:value="${lunch.lunchId}">
 
                     <div class="form-group">
                         <label for="date-input">날짜</label>
@@ -41,7 +41,7 @@
                     <div class="form-group">
                         <label for="store-name">가게명</label>
                         <input type="text" id="store-name" name="storeName"
-                               th:value="${lunch.store_name}" placeholder="내용을 입력하세요" required>
+                               th:value="${lunch.storeName}" placeholder="내용을 입력하세요" required>
                     </div>
 
                     <div class="form-group">
@@ -61,9 +61,9 @@
                             <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
                         </label>
                         <input type="text" id="payer-search" onkeyup="filterPayers()"
-                               placeholder="내용을 입력하세요" th:value="${lunch.payer_name}">
+                               placeholder="내용을 입력하세요" th:value="${lunch.payerName}">
                         <input type="hidden" id="payerId" name="payerId"
-                               th:value="${lunch.payer_id}" required>
+                               th:value="${lunch.payerId}" required>
                         <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
                     </div>
 
@@ -115,12 +115,12 @@
     // --- 유저 데이터 ---
     const userList = /*[[${userList}]]*/ [];
     const selectedParticipants = new Set();
-    let selectedPayerId = /*[[${lunch.payer_id}]]*/ null;
+    let selectedPayerId = /*[[${lunch.payerId}]]*/ null;
 
     const existingParticipants = /*[[${lunch.participants}]]*/ '';
 
     function goToDelete() {
-        const lunchId = /*[[${lunch.lunch_id}]]*/ '';
+        const lunchId = /*[[${lunch.lunchId}]]*/ '';
         if (confirm('삭제 페이지로 이동하시겠습니까?')) {
             window.location.href = '/lunch/delete.do?lunchId=' + lunchId;
         }
@@ -132,8 +132,8 @@
             const participants = existingParticipants.split(', ');
             participants.forEach(function(item) {
                 const [userId, amount] = item.split(':');
-                const user = userList.find(u => u.userid === userId);
-                if (user) addParticipant(userId, user.usernm, parseInt(amount));
+                const user = userList.find(u => u.userId === userId);
+                if (user) addParticipant(userId, user.userName, parseInt(amount));
             });
         }
     });
