@@ -7,21 +7,21 @@
 
     <!--조회-->
     <select id="findAll" resultType="biz.equipment.vo.EquipmentVO">
-        SELECT ID, CODE, NAME, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
+        SELECT ID, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
         FROM EQUIPMENT
     </select>
 
     <!--단건조회    -->
     <select id="findById" resultType="biz.equipment.vo.EquipmentVO">
-        SELECT ID, CODE, NAME, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
+        SELECT ID, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
         FROM EQUIPMENT
         WHERE ID = #{id}
     </select>
 
     <!--등록    -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO EQUIPMENT(CODE, NAME, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS)
-        VALUES (#{equipment.code}, #{equipment.name}, #{equipment.serialNumber}, #{equipment.accessNumber},
+        INSERT INTO EQUIPMENT(SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS)
+        VALUES ( #{equipment.serialNumber}, #{equipment.accessNumber},
                 #{equipment.director}, #{equipment.status})
     </insert>
 

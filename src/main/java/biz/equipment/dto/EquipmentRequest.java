@@ -10,9 +10,9 @@ public class EquipmentRequest {
 
     Long id;
 
-    private String code;
-
-    private String name;
+//    private String code;
+//
+//    private String name;
 
     private String serialNumber;
 

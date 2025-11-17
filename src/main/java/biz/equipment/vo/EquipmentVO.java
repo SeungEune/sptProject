@@ -15,9 +15,9 @@ public class EquipmentVO extends Base {
 
     private Long id;
 
-    private String code;
-
-    private String name;
+//    private String code;
+//
+//    private String name;
 
     private String serialNumber;
 
@@ -30,8 +30,8 @@ public class EquipmentVO extends Base {
 
     public EquipmentVO create(EquipmentRequest equipmentRequest) {
         return EquipmentVO.builder()
-                .code(equipmentRequest.getCode())
-                .name(equipmentRequest.getName())
+//                .code(equipmentRequest.getCode())
+//                .name(equipmentRequest.getName())
                 .serialNumber(equipmentRequest.getSerialNumber())
                 .accessNumber(equipmentRequest.getAccessNumber())
                 .director(equipmentRequest.getDirector())
