@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>점심/커피 통계 조회</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body class="page-wrapper">
+
+<header class="site-header">
+    <div class="header-container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        </a>
+        <nav class="user-nav">
+            <a th:href="@{/mypage}">
+                <i class="fas fa-user"></i>
+                <span>마이페이지</span>
+            </a>
+            <a th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>로그아웃</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<div class="main-container">
+
+    <aside class="sidebar" id="sidebar">
+        <button id="close-menu" class="mobile-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <h3 class="nav-title">계정관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/account/manage}">계정관리</a></li>
+                    <li><a th:href="@{/account/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">출입관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/access/manage}">계정관리</a></li>
+                    <li><a th:href="@{/access/reset}">비밀번호 초기화</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">장비관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
+                </ul>
+            </div>
+            <div class="nav-group">
+                <h3 class="nav-title">정산관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/lunch/register.do}">내역등록</a></li>
+                    <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
+                    <li><a th:href="@{/lunch/statistics.do}" class="active">통계조회</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">점심/커피 통계 조회</h1>
+
+            <div class="content-body" style="display: block;">
+
+                <form th:action="@{/lunch/statistics.do}" method="get" class="flex items-center gap-2 mb-4">
+                    <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
+                           th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                           onchange="this.form.submit()" />
+                </form>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">사용자별 통계 (부담금 vs 결제금)</h2>
+                        <canvas id="userSummaryChart"></canvas>
+
+                        <div class="mt-6 border-t pt-4">
+                            <h3 class="text-lg font-semibold mb-2">사용자별 총 부담금</h3>
+                            <ul class="divide-y divide-gray-200">
+                                <li th:each="user : ${summaryList}" class="flex justify-between items-center py-2">
+                                    <span class="font-medium text-gray-800" th:text="${user.user_nm}"></span>
+                                    <span class="text-gray-600" th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')} + '원'"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">일별 지출 추이 (종합)</h2>
+                        <canvas id="dailyExpenseChart"></canvas>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">일자별 지출 (점심/커피 구분)</h2>
+                        <canvas id="dailyTypeChart"></canvas>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">사용자별 송금/수금 총액</h2>
+                        <canvas id="balanceChart"></canvas> </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<footer class="site-footer-bottom">
+    <div class="footer-container">
+        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        <p class="footer-slogan">
+            <span class="line">전북 전주시 덕진구 만성북로 51-25, 3015호 스패셜티 (스페이스온 지식산업센터)</span>
+            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
+        </p>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (menuToggle) {
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('active');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        if (closeMenu) closeMenu.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+    }
+    // --- Chart.js 렌더링---
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const summaryList = /*[[${summaryList}]]*/ [];
+        const lunchList = /*[[${lunchList}]]*/ [];
+        const formatCurrency = (value) => new Intl.NumberFormat('ko-KR').format(value) + '원';
+
+        //공통 색상 정의
+        const colorBlueDark = 'rgba(59, 130, 246, 0.7)';
+        const colorBlueLight = 'rgba(147, 197, 253, 0.7)';
+        const colorBlueBorderDark = 'rgba(59, 130, 246, 1)';
+        const colorBlueBorderLight = 'rgba(147, 197, 253, 1)';
+        const colorRed = 'rgba(255, 99, 132, 0.7)';
+        const colorRedBorder = 'rgba(255, 99, 132, 1)';
+
+
+        //사용자별 통계
+        if (summaryList && summaryList.length > 0) {
+            const ctxUser = document.getElementById('userSummaryChart').getContext('2d');
+
+            const userLabels = summaryList.map(s => s.user_nm);
+            const totalOwedData = summaryList.map(s => s.total_owed);
+            const totalPaidData = summaryList.map(s => s.total_paid);
+
+            new Chart(ctxUser, {
+                type: 'bar',
+                data: {
+                    labels: userLabels,
+                    datasets: [
+                        {
+                            label: '총 부담금 (먹은 돈)',
+                            data: totalOwedData,
+                            backgroundColor: colorBlueLight,
+                            borderColor: colorBlueBorderLight,
+                            borderWidth: 1
+                        },
+                        {
+                            label: '총 결제금 (낸 돈)',
+                            data: totalPaidData,
+                            backgroundColor: colorBlueDark,
+                            borderColor: colorBlueBorderDark,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true, ticks: { callback: (value) => formatCurrency(value) } } },
+                    plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${formatCurrency(context.raw)}` } } }
+                }
+            });
+        }
+
+        // 일별 지출 추이
+        if (lunchList && lunchList.length > 0) {
+            const ctxDaily = document.getElementById('dailyExpenseChart').getContext('2d');
+
+            const reversedList = [...lunchList].reverse();
+            const dailyLabels = reversedList.map(item => item.date.substring(5)); //
+            const dailyAmounts = reversedList.map(item => item.total_amount);
+
+            new Chart(ctxDaily, {
+                type: 'line',
+                data: {
+                    labels: dailyLabels,
+                    datasets: [{
+                        label: '일별 지출액',
+                        data: dailyAmounts,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: colorBlueBorderDark,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: colorBlueBorderDark,
+                        pointBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (value) => formatCurrency(value) }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            callbacks: {
+                                title: (context) => `${context[0].label}`,
+                                label: (context) => `지출액: ${formatCurrency(context.raw)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 일자별 지출 (점심/커피 구분)
+        if (lunchList && lunchList.length > 0) {
+            const ctxDailyType = document.getElementById('dailyTypeChart').getContext('2d');
+
+            const dailyData = new Map();
+            const sortedLunchList = [...lunchList].reverse();
+
+            for (const item of sortedLunchList) {
+                const dateLabel = item.date.substring(5);
+                if (!dailyData.has(dateLabel)) {
+                    dailyData.set(dateLabel, { date: dateLabel, lunch: 0, coffee: 0 });
+                }
+                const entry = dailyData.get(dateLabel);
+                if (item.type === '점심') {
+                    entry.lunch += item.total_amount;
+                } else if (item.type === '커피') {
+                    entry.coffee += item.total_amount;
+                }
+            }
+
+            const dailyEntries = Array.from(dailyData.values());
+            const dailyTypeLabels = dailyEntries.map(e => e.date);
+            const lunchData = dailyEntries.map(e => e.lunch);
+            const coffeeData = dailyEntries.map(e => e.coffee);
+
+            new Chart(ctxDailyType, {
+                type: 'bar',
+                data: {
+                    labels: dailyTypeLabels,
+                    datasets: [
+                        {
+                            label: '점심',
+                            data: lunchData,
+                            backgroundColor: colorBlueDark,
+                        },
+                        {
+                            label: '커피',
+                            data: coffeeData,
+                            backgroundColor: colorBlueLight,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { stacked: false },
+                        y: { beginAtZero: true, stacked: false, ticks: { callback: (value) => formatCurrency(value) } }
+                    },
+                    plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${formatCurrency(context.raw)}` } } }
+                }
+            });
+        }
+
+        // 사용자별 송금/수금 총액
+        if (summaryList && summaryList.length > 0) {
+            const ctxBalance = document.getElementById('balanceChart').getContext('2d');
+
+            const balanceLabels = summaryList.map(u => u.user_nm);
+            const balanceData = summaryList.map(u => Math.abs(u.balance));
+            const balanceColors = summaryList.map(user => (user.balance >= 0 ? colorBlueDark : colorRed));
+            const balanceBorderColors = summaryList.map(user => (user.balance >= 0 ? colorBlueBorderDark : colorRedBorder));
+
+            new Chart(ctxBalance, {
+                type: 'bar',
+                data: {
+                    labels: balanceLabels,
+                    datasets: [{
+                        label: '송금/수금 총액',
+                        data: balanceData,
+                        backgroundColor: balanceColors,
+                        borderColor: balanceBorderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) => formatCurrency(value)
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const dataIndex = context.dataIndex;
+                                    const originalBalance = summaryList[dataIndex].balance;
+                                    const value = context.raw || 0;
+
+                                    const label = originalBalance >= 0 ? '받을 금액' : '송금할 금액';
+                                    return `${label}: ${formatCurrency(value)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+</script>
+
+</body>
+</html>

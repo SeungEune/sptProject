@@ -1,0 +1,132 @@
+/* --- 기본 테이블 스타일 --- */
+table.lunch-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 14px;
+}
+
+table.lunch-table thead th {
+    background-color: #f3f4f6; /* Tailwind gray-100 */
+    padding: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+table.lunch-table tbody td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #e5e7eb; /* Tailwind gray-200 */
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 날짜 셀 – 가운데 정렬 + 굵게 */
+.date-cell {
+    font-weight: 700;
+    background-color: #ffffff;
+    width: 70px;
+    border-right: 1px solid #d1d5db; /* gray-300 */
+    vertical-align: middle !important;
+    text-align: center;
+}
+
+/* 가게명 행 */
+.store-name-cell {
+    font-weight: 500;
+}
+
+/* DETAIL 행 hover */
+.detail-row:hover {
+    background-color: #f9fafb; /* gray-50 */
+}
+
+/* PAY 행 (결제 금액) */
+.pay-row {
+    background-color: #fef2f2; /* red-50 */
+    font-weight: 700;
+}
+
+.pay-label {
+    color: #dc2626; /* red-600 */
+    font-weight: 700;
+}
+
+/* PAY 행 전체 금액 */
+.pay-total {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+/* 사용자 금액 칸 */
+.amount-cell {
+    text-align: center;
+    font-weight: 500;
+}
+
+/* 삭제 버튼 셀 */
+.delete-cell button {
+    transition: 0.2s ease;
+}
+
+.delete-cell button:hover {
+    transform: scale(1.1);
+}
+
+/* 구분선 진하게 표시되는 날짜 섹션 사이 */
+.table-section-separator {
+    border-top: 3px solid #d1d5db !important; /* gray-300 */
+}
+
+/* 행 전체 높이 균등 */
+table.lunch-table tr {
+    height: 42px;
+}
+
+/* 반응형 스크롤 */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+/* 정산 완료/취소 버튼 스타일 미세 조정 */
+.settle-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+.settle-btn-complete {
+    background-color: #3b82f6; /* blue-500 */
+    color: white;
+}
+
+.settle-btn-cancel {
+    background-color: #6b7280; /* gray-500 */
+    color: white;
+}
+
+.settle-btn-complete:hover {
+    background-color: #2563eb; /* blue-600 */
+}
+
+.settle-btn-cancel:hover {
+    background-color: #4b5563; /* gray-600 */
+}
+
+/* 총합/송금 Section 더 두드러지게 */
+.summary-section td {
+    font-weight: 700;
+    background-color: #f3f4f6 !important; /* gray-100 */
+    border-bottom: 2px solid #d1d5db !important;
+}
+
+/* 송금 음수/양수 색 처리 */
+.text-positive {
+    color: #2563eb; /* blue-600 */
+    font-weight: 700;
+}
+
+.text-negative {
+    color: #dc2626; /* red-600 */
+    font-weight: 700;
+}
