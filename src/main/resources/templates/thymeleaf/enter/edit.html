@@ -18,43 +18,10 @@
     <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
 
     <!-- ✅ 이 페이지 전용 -->
-<!--    <link rel="stylesheet" th:href="@{/css/account/mypage.css}">-->
-    <style>
-        .form-section { margin-top:20px; }
-        .hidden { display:none; }
-        .submit-btn {
-            height: 52px;
-            background-color: var(--color-primary);
-            color: var(--color-white);
-            border: none;
-            border-radius: 6px;
-            font-family: var(--font-abeezee);
-            font-size: 15px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 10px;
-            align-self: center;
-            width: 152px;
-        }
-        .cancel-btn {
-            height: 52px;
-            background-color: #FFFFFF;
-            color: black;
-            border: 1px solid black;
-            border-radius: 6px;
-            font-family: var(--font-abeezee);
-            font-size: 15px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 10px;
-            align-self: center;
-            width: 152px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
+
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
@@ -63,138 +30,138 @@
 
 <div th:replace="~{cmm/header :: headerLayout}"></div>
 
-<div class="main-container">
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">출입관리 상세</h1>
+    <div th:fragment="content">
+        <h1 class="content-title">출입관리 상세</h1>
 
-            <div class="content-body form">
-                <section>
-                    <div class="form-container">
+        <div class="content-body form">
+            <section>
+                <div class="form-container">
 
-                        <form class="profile-form"
-                              th:action="@{/enter/edit/{id}(id=${enter.enterId})}"
-                              th:object="${enter}"
-                              method="post">
+                    <form class="profile-form"
+                          th:action="@{/enter/edit/{id}(id=${enter.enterId})}"
+                          th:object="${enter}"
+                          method="post">
 
-                            <!-- 1) 유형 -->
-                            <div class="form-group">
-                                <label>유형</label>
-                                <div>
-                                    <label>
-                                        <input type="radio"
-                                               th:field="*{type}"
-                                               value="GUEST"> 게스트
-                                    </label>
-                                    <label style="margin-left:20px;">
-                                        <input type="radio"
-                                               th:field="*{type}"
-                                               value="EMP"> 직원
-                                    </label>
-                                </div>
+                        <!-- 1) 유형 -->
+                        <div class="form-group">
+                            <label>유형</label>
+                            <div>
+                                <label>
+                                    <input type="radio"
+                                           th:field="*{type}"
+                                           value="GUEST"> 게스트
+                                </label>
+                                <label style="margin-left:20px;">
+                                    <input type="radio"
+                                           th:field="*{type}"
+                                           value="EMP"> 직원
+                                </label>
                             </div>
+                        </div>
 
-                            <!-- 2) 출입수단 -->
+                        <!-- 2) 출입수단 -->
+                        <div class="form-group">
+                            <label>출입수단</label>
+                            <select th:field="*{method}">
+                                <option value="CARD">카드</option>
+                                <option value="FINGER">지문</option>
+                                <option value="QR">QR</option>
+                            </select>
+                        </div>
+
+                        <!-- 3) 게스트 전용 -->
+                        <div id="guest-section" class="form-section">
                             <div class="form-group">
-                                <label>출입수단</label>
-                                <select th:field="*{method}">
-                                    <option value="CARD">카드</option>
-                                    <option value="FINGER">지문</option>
-                                    <option value="QR">QR</option>
+                                <label for="guest-name">게스트 이름</label>
+                                <input id="guest-name" th:field="*{guestNm}" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label for="guest-phone">전화번호</label>
+                                <input id="guest-phone" th:field="*{guestPhone}" type="tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="guest-email">Email</label>
+                                <input id="guest-email" th:field="*{guestEmail}" type="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="guest-end">게스트 마감일</label>
+                                <input id="guest-end" th:field="*{endGuestDt}" type="date">
+                            </div>
+                        </div>
+
+                        <!-- 4) 직원 전용 -->
+                        <div id="emp-section" class="form-section">
+                            <div class="form-group">
+                                <label for="user-id">직원 아이디</label>
+                                <select id="user-id" th:field="*{userId}">
+                                    <option value="">-- 직원 선택 --</option>
+                                    <option th:each="u : ${userList}"
+                                            th:value="${u.userId}"
+                                            th:text="${u.userId + ' / ' + u.name}">
+                                    </option>
                                 </select>
                             </div>
 
-                            <!-- 3) 게스트 전용 -->
-                            <div id="guest-section" class="form-section">
-                                <div class="form-group">
-                                    <label for="guest-name">게스트 이름</label>
-                                    <input id="guest-name" th:field="*{guestNm}" type="text">
-                                </div>
-                                <div class="form-group">
-                                    <label for="guest-phone">전화번호</label>
-                                    <input id="guest-phone" th:field="*{guestPhone}" type="tel">
-                                </div>
-                                <div class="form-group">
-                                    <label for="guest-email">Email</label>
-                                    <input id="guest-email" th:field="*{guestEmail}" type="email">
-                                </div>
-                                <div class="form-group">
-                                    <label for="guest-end">게스트 마감일</label>
-                                    <input id="guest-end" th:field="*{endGuestDt}" type="date">
-                                </div>
+                            <div class="form-group">
+                                <label for="status">상태</label>
+                                <select id="status" th:field="*{status}">
+                                    <option value="NORMAL">정상</option>
+                                    <option value="REST">휴면</option>
+                                </select>
                             </div>
 
-                            <!-- 4) 직원 전용 -->
-                            <div id="emp-section" class="form-section">
-                                <div class="form-group">
-                                    <label for="user-id">직원 아이디</label>
-                                    <select id="user-id" th:field="*{userId}">
-                                        <option value="">-- 직원 선택 --</option>
-                                        <option th:each="u : ${userList}"
-                                                th:value="${u.userId}"
-                                                th:text="${u.userId + ' / ' + u.name}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="status">상태</label>
-                                    <select id="status" th:field="*{status}">
-                                        <option value="NORMAL">정상</option>
-                                        <option value="REST">휴면</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="emp-name">이름</label>
-                                    <input id="emp-name" th:field="*{name}" type="text" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label for="emp-phone">전화번호</label>
-                                    <input id="emp-phone" th:field="*{phone}" type="tel" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label for="emp-email">Email</label>
-                                    <input id="emp-email" th:field="*{email}" type="email" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label for="jssfc">직책</label>
-                                    <select id="jssfc" th:field="*{jssfcCd}">
-                                        <option value="HEAD">사장</option>
-                                        <option value="PM">부장</option>
-                                        <option value="PL">과장</option>
-                                        <option value="AS">대리</option>
-                                        <option value="NEW">담당</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label for="emp-name">이름</label>
+                                <input id="emp-name" th:field="*{name}" type="text" readonly>
                             </div>
+                            <div class="form-group">
+                                <label for="emp-phone">전화번호</label>
+                                <input id="emp-phone" th:field="*{phone}" type="tel" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="emp-email">Email</label>
+                                <input id="emp-email" th:field="*{email}" type="email" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="jssfc">직책</label>
+                                <select id="jssfc" th:field="*{jssfcCd}">
+                                    <option value="HEAD">사장</option>
+                                    <option value="PM">부장</option>
+                                    <option value="PL">과장</option>
+                                    <option value="AS">대리</option>
+                                    <option value="NEW">담당</option>
+                                </select>
+                            </div>
+                        </div>
 
-                            <!-- 버튼 영역 -->
-                            <div class="form-actions">
-                                <!-- 처음엔 조회 모드: 수정 버튼만 보이게 -->
+                        <!-- 버튼 영역 -->
+                        <div class="form-actions">
+                            <!-- 처음엔 조회 모드: 수정 버튼만 보이게 -->
+                            <div class="btn-area">
+                                <button type="button" id="listBtn" class="cancel-btn btn btn-cancel"
+                                        onclick="location.href='/enter/manage'">목록
+                                </button>
+
                                 <button type="button" id="editBtn"  class="submit-btn">수정</button>
 
                                 <button type="submit" id="saveBtn" class="submit-btn hidden">확인</button>
-                                <button type="button" id="cancelBtn" class="cancel-btn hidden">취소</button>
+                                <button type="button" id="cancelBtn" class="cancel-btn btn btn-cancel hidden">취소</button>
 
                                 <button type="button" id="deleteBtn" class="submit-btn"
                                         th:onclick="|location.href='@{/enter/delete/{id}/confirm(id=${enter.enterId})}'|">
                                     삭제
                                 </button>
-
-                                <button type="button" id="listBtn" class="cancel-btn"
-                                        onclick="location.href='/enter/manage'">목록
-                                </button>
                             </div>
 
-                        </form>
 
-                    </div>
-                </section>
-            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </section>
         </div>
-    </main>
-</div>
+    </div>
 
 <script>
     // 게스트/직원 섹션 토글 (create 화면이랑 동일)
