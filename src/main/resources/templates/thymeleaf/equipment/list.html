@@ -2,46 +2,76 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>장비 조회</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+    <link rel="stylesheet" th:href="@{/css/equipment/button.css}">
 </head>
-<body>
+<body class="page-wrapper">
 
-<h1>장비 목록</h1>
+<!--모바일 메뉴 버튼 -->
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+<div id="overlay" class="mobile-overlay"></div>
 
-<div>
-    <a th:href="@{/equipment/insert.do}"> <button>등록</button></a>
+<!--공통 Header -->
+<header th:replace="cmm/header :: headerLayout"></header>
+
+<div class="main-container">
+
+    <!--공통 Sidebar -->
+    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+
+    <!--본문-->
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">장비</h1>
+                <div class="submit-box">
+                    <a th:href="@{/equipment/insert.do}">
+                        <button class="blue-btn bg-blue">등록</button>
+                    </a>
+                </div>
+                <div>
+                    <table class="equipment-table">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>자산번호</th>
+                            <th>일련번호</th>
+                            <th>담당자</th>
+                            <th>상태</th>
+                            <th>수정/삭제</th>
+                            <th>이력조회</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="item, stat : ${equipment}">
+                            <td th:text="${stat.index + 1}"></td>
+                            <td th:text="${item.accessNumber}"></td>
+                            <td th:text="${item.serialNumber}"></td>
+                            <td th:text="${item.director}"></td>
+                            <td th:text="${item.status}"></td>
+                            <td>
+                                <a th:href="@{/equipment/update.do(id=${item.id})}">수정</a>
+                                <a href="/equipment/delete.do">삭제</a>
+                            </td>
+                            <td>조회</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </main>
 </div>
 
+<!--공통 Footer -->
+<footer th:replace="cmm/footer :: footerLayout"></footer>
 
-<div>
-    <table>
-        <thead>
-        <tr>
-            <th></th>
-            <th>자산번호</th>
-            <th>일련번호</th>
-            <th>담당자</th>
-            <th>상태</th>
-            <th>수정/삭제</th>
-            <th>이력조회</th>
-        </tr>
-        </thead>
+<script th:inline="javascript">
+</script>
 
-        <tbody>
-        <tr th:each="item, stat : ${equipment}">
-            <td th:text="${stat.index + 1}"></td>
-            <td th:text="${item.accessNumber}"></td>
-            <td th:text="${item.serialNumber}"></td>
-            <td th:text="${item.director}"></td>
-            <td th:text="${item.status}"></td>
-            <td>
-                <a th:href="@{/equipment/update.do(id=${item.id})}">수정</a>
-                <a href="/equipment/delete.do">삭제</a>
-            </td>
-            <td>조회</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
 </body>
 </html>
