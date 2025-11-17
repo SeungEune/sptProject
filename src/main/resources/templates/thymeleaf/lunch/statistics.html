@@ -41,7 +41,7 @@
                       class="flex items-center gap-2 mb-4">
                     <input type="month" name="searchMonth"
                            class="border border-gray-300 rounded p-2"
-                           th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                           th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
                            onchange="this.form.submit()" />
                 </form>
 
@@ -57,9 +57,9 @@
                             <ul class="divide-y divide-gray-200">
                                 <li th:each="user : ${summaryList}"
                                     class="flex justify-between items-center py-2">
-                                    <span class="font-medium text-gray-800" th:text="${user.user_nm}"></span>
+                                    <span class="font-medium text-gray-800" th:text="${user.userName}"></span>
                                     <span class="text-gray-600"
-                                          th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')} + '원'"></span>
+                                          th:text="${#numbers.formatInteger(user.totalOwed, 0, 'COMMA')} + '원'"></span>
                                 </li>
                             </ul>
                         </div>

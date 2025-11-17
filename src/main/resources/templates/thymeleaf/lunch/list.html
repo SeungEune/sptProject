@@ -40,7 +40,7 @@
                 <!-- 검색 (월별 조회) -->
                 <form th:action="@{/lunch/list.do}" method="get" class="flex items-center gap-2 mb-4">
                     <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
-                           th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                           th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
                            onchange="this.form.submit()" />
                 </form>
 
@@ -80,36 +80,36 @@
 
                             <!-- 가게명 OR 결제금액 -->
                             <td th:class="${row.rowType == 'DETAIL' ? 'store-name-cell p-3' : 'pay-label p-3'}"
-                                th:text="${row.rowType == 'DETAIL' ? row.store_name : '결제금액'}">
+                                th:text="${row.rowType == 'DETAIL' ? row.storeName : '결제금액'}">
                             </td>
 
                             <!-- 사용자별 금액 -->
                             <td th:each="user : ${summaryList}"
-                                th:class="${row.rowType == 'DETAIL' ? 'p-3 cell-user-' + user.user_id : 'p-3 text-red-600 font-bold'}">
+                                th:class="${row.rowType == 'DETAIL' ? 'p-3 cell-user-' + user.userId : 'p-3 text-red-600 font-bold'}">
 
                                 <!-- DETAIL 행 -->
                                 <span th:if="${row.rowType == 'DETAIL'}">-</span>
 
                                 <!-- PAY 행 -->
                                 <span th:if="${row.rowType == 'PAY'}">
-                                    <span th:if="${user.user_id == row.payer_id}"
-                                          th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}"></span>
-                                    <span th:unless="${user.user_id == row.payer_id}">-</span>
+                                    <span th:if="${user.userId == row.payerId}"
+                                          th:text="${#numbers.formatInteger(row.totalAmount, 0, 'COMMA')}"></span>
+                                    <span th:unless="${user.userId == row.payerId}">-</span>
                                 </span>
                             </td>
 
                             <!-- 합계 -->
                             <td th:class="${row.rowType == 'DETAIL' ? 'p-3' : 'pay-total p-3'}"
-                                th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}">
+                                th:text="${#numbers.formatInteger(row.totalAmount, 0, 'COMMA')}">
                             </td>
 
                             <!-- 관리 -->
                             <td class="action-cell p-3">
                                 <div th:if="${row.rowType == 'DETAIL'}" class="flex items-center justify-center gap-3">
-                                    <a th:href="@{/lunch/update.do(lunchId=${row.lunch_id})}"
+                                    <a th:href="@{/lunch/update.do(lunchId=${row.lunchId})}"
                                        class="text-blue-500 hover:text-blue-700 transition-colors">수정</a>
                                     <p>/</p>
-                                    <a th:href="@{/lunch/delete.do(lunchId=${row.lunch_id})}"
+                                    <a th:href="@{/lunch/delete.do(lunchId=${row.lunchId})}"
                                        class="text-blue-500 hover:text-blue-700 transition-colors">삭제</a>
                                 </div>
                             </td>
@@ -120,10 +120,10 @@
                         <tr class="bg-gray-100 font-bold border-b">
                             <td class="p-3" colspan="2">총 합계</td>
                             <td th:each="user : ${summaryList}" class="p-3"
-                                th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')}">
+                                th:text="${#numbers.formatInteger(user.totalOwed, 0, 'COMMA')}">
                             </td>
                             <td class="p-3"
-                                th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}">
+                                th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[userId != null].![totalOwed]), 0, 'COMMA')}">
                             </td>
                             <td class="p-3"></td>
                         </tr>
@@ -151,7 +151,7 @@
                                           method="post"
                                           class="inline-block">
                                         <input type="hidden" name="month"
-                                               th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                               th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
                                         <input type="hidden" name="userId" th:value="${user.userId}" />
                                         <input type="hidden" name="action" value="complete" />
                             
@@ -167,7 +167,7 @@
                                           method="post"
                                           class="inline-block">
                                         <input type="hidden" name="month"
-                                               th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                               th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
                                         <input type="hidden" name="userId" th:value="${user.userId}" />
                                         <input type="hidden" name="action" value="cancel" />
                             
@@ -178,7 +178,7 @@
                                     </form>
                                 </div>
 
-                                <span th:if="${user.total_owed <= 0}" class="text-sm text-gray-400">해당 없음</span>
+                                <span th:if="${user.totalOwed <= 0}" class="text-sm text-gray-400">해당 없음</span>
                             </td>
 
                             <td class="p-3"></td>
