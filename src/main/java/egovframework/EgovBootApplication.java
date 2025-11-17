@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ServletComponentScan
-@SpringBootApplication(scanBasePackages = {"egovframework"})
+@SpringBootApplication(scanBasePackages = {"egovframework","biz"})
 @MapperScan(basePackages = "biz.mapper")
 
 public class EgovBootApplication extends SpringBootServletInitializer {

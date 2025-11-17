@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 수정</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+</head>
+<body class="page-wrapper">
+
+<!--모바일 메뉴 버튼 -->
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+<div id="overlay" class="mobile-overlay"></div>
+
+<!--공통 Header -->
+<header th:replace="cmm/header :: headerLayout"></header>
+
+<div class="main-container">
+
+    <!--공통 Sidebar -->
+    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+
+    <!--본문-->
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">점심/커피 내역 수정</h1>
+            <div class="content-body">
+                <form class="entry-form" th:action="@{/lunch/update.do}" method="post">
+
+                    <input type="hidden" name="lunchId" th:value="${lunch.lunch_id}">
+
+                    <div class="form-group">
+                        <label for="date-input">날짜</label>
+                        <input type="date" id="date-input" name="date" th:value="${lunch.date}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="store-name">가게명</label>
+                        <input type="text" id="store-name" name="storeName"
+                               th:value="${lunch.store_name}" placeholder="내용을 입력하세요" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="participant-search">
+                            참석자 선택
+                            <span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span>
+                        </label>
+                        <input type="text" id="participant-search"
+                               onkeyup="filterParticipants()" placeholder="내용을 입력하세요">
+                        <div id="search-results"
+                             class="search-results-dropdown" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payer-search">
+                            계산자 선택
+                            <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
+                        </label>
+                        <input type="text" id="payer-search" onkeyup="filterPayers()"
+                               placeholder="내용을 입력하세요" th:value="${lunch.payer_name}">
+                        <input type="hidden" id="payerId" name="payerId"
+                               th:value="${lunch.payer_id}" required>
+                        <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
+                    </div>
+
+                    <fieldset class="form-group">
+                        <legend class="legend-title">유형 선택</legend>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="type-lunch" name="type" value="점심"
+                                       th:checked="${lunch.type == '점심'}">
+                                <label for="type-lunch">점심</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="type-coffee" name="type" value="커피"
+                                       th:checked="${lunch.type == '커피'}">
+                                <label for="type-coffee">커피</label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div id="hidden-fields"></div>
+
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                        <button type="submit" class="submit-btn">수정</button>
+                        <button type="button" class="submit-btn delete-btn" onclick="goToDelete()">삭제</button>
+                    </div>
+                </form>
+
+                <div class="amount-panel">
+                    <h2 class="amount-panel-title">개인별 금액 입력</h2>
+                    <div class="amount-list" id="amount-list-container">
+                        <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                            참석자를 선택하면 여기에 입력칸이 생성됩니다.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<!--공통 Footer -->
+<footer th:replace="cmm/footer :: footerLayout"></footer>
+
+<script th:inline="javascript">
+
+    // --- 유저 데이터 ---
+    const userList = /*[[${userList}]]*/ [];
+    const selectedParticipants = new Set();
+    let selectedPayerId = /*[[${lunch.payer_id}]]*/ null;
+
+    const existingParticipants = /*[[${lunch.participants}]]*/ '';
+
+    function goToDelete() {
+        const lunchId = /*[[${lunch.lunch_id}]]*/ '';
+        if (confirm('삭제 페이지로 이동하시겠습니까?')) {
+            window.location.href = '/lunch/delete.do?lunchId=' + lunchId;
+        }
+    }
+
+    // 기존 참여자 입력칸 자동 생성
+    window.addEventListener('DOMContentLoaded', function() {
+        if (existingParticipants) {
+            const participants = existingParticipants.split(', ');
+            participants.forEach(function(item) {
+                const [userId, amount] = item.split(':');
+                const user = userList.find(u => u.userid === userId);
+                if (user) addParticipant(userId, user.usernm, parseInt(amount));
+            });
+        }
+    });
+
+    // 참석자 검색
+    function filterParticipants() {
+        const query = document.getElementById('participant-search').value.toLowerCase().trim();
+        const resultsDiv = document.getElementById('search-results');
+
+        if (query === '') {
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            return;
+        }
+
+        const filtered = userList.filter(user =>
+            user.usernm.toLowerCase().includes(query) && !selectedParticipants.has(user.userid)
+        );
+
+        if (filtered.length === 0) {
+            resultsDiv.innerHTML = '<div class="p-2 text-sm text-gray-500 text-center">검색 결과가 없습니다.</div>';
+            resultsDiv.style.display = 'block';
+            return;
+        }
+
+        resultsDiv.innerHTML = filtered.map(user =>
+            `<div onclick="addParticipant('${user.userid}', '${user.usernm}')">${user.usernm}</div>`
+        ).join('');
+
+        resultsDiv.style.display = 'block';
+    }
+
+    // 참석자 추가
+    function addParticipant(userId, userName, initialAmount = '') {
+        if (selectedParticipants.has(userId)) return;
+
+        selectedParticipants.add(userId);
+
+        const container = document.getElementById('amount-list-container');
+        const placeholder = document.getElementById('amount-placeholder');
+        placeholder.style.display = 'none';
+
+        const row = document.createElement('div');
+        row.className = 'amount-row';
+        row.id = 'participant-row-' + userId;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.innerText = userName;
+
+        const group = document.createElement('div');
+        group.className = 'amount-input-group';
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'participantUserIds';
+        hiddenInput.value = userId;
+
+        const amountInput = document.createElement('input');
+        amountInput.type = 'number';
+        amountInput.name = 'participantAmounts';
+        amountInput.placeholder = '금액입력';
+        amountInput.value = initialAmount;
+        amountInput.required = true;
+
+        const unitSpan = document.createElement('span');
+        unitSpan.innerText = '원';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.onclick = () => removeParticipant(userId);
+
+        group.appendChild(hiddenInput);
+        group.appendChild(amountInput);
+        group.appendChild(unitSpan);
+        group.appendChild(removeBtn);
+
+        row.appendChild(nameSpan);
+        row.appendChild(group);
+
+        container.appendChild(row);
+
+        document.getElementById('participant-search').value = '';
+        document.getElementById('search-results').style.display = 'none';
+    }
+
+    function removeParticipant(userId) {
+        selectedParticipants.delete(userId);
+        const row = document.getElementById('participant-row-' + userId);
+        if (row) row.remove();
+
+        if (selectedParticipants.size === 0) {
+            document.getElementById('amount-placeholder').style.display = 'block';
+        }
+    }
+
+    // === 계산자 검색 ===
+    function filterPayers() {
+        const query = document.getElementById('payer-search').value.toLowerCase().trim();
+        const resultsDiv = document.getElementById('payer-results');
+
+        if (query === '') {
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            return;
+        }
+
+        const filtered = userList.filter(user =>
+            user.usernm.toLowerCase().includes(query)
+        );
+
+        if (filtered.length === 0) {
+            resultsDiv.innerHTML = '<div class="p-2 text-sm text-gray-500 text-center">검색 결과가 없습니다.</div>';
+            resultsDiv.style.display = 'block';
+            return;
+        }
+
+        resultsDiv.innerHTML = filtered.map(user =>
+            `<div onclick="selectPayer('${user.userid}', '${user.usernm}')">${user.usernm}</div>`
+        ).join('');
+
+        resultsDiv.style.display = 'block';
+    }
+
+    function selectPayer(userId, userName) {
+        selectedPayerId = userId;
+        document.getElementById('payer-search').value = userName;
+        document.getElementById('payerId').value = userId;
+        document.getElementById('payer-results').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

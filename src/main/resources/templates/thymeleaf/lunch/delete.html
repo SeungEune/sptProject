@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 삭제</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+    <style>
+        .delete-btn {
+            background-color: #dc2626 !important;
+        }
+        .delete-btn:hover {
+            background-color: #b91c1c !important;
+        }
+        .readonly-form input[type="text"],
+        .readonly-form input[type="date"],
+        .readonly-form input[type="number"] {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body class="page-wrapper">
+
+<!--모바일 메뉴 버튼 -->
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+<div id="overlay" class="mobile-overlay"></div>
+
+<!--공통 Header -->
+<header th:replace="cmm/header :: headerLayout"></header>
+
+<div class="main-container">
+
+    <!--공통 Sidebar -->
+    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+
+    <!--본문-->
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">점심/커피 내역 삭제</h1>
+
+            <div class="content-body">
+
+                <form class="entry-form readonly-form"
+                      th:action="@{/lunch/delete.do}" method="post">
+
+                    <input type="hidden" name="lunchId" th:value="${lunch.lunch_id}">
+
+                    <div class="form-group">
+                        <label for="date-input">날짜</label>
+                        <input type="date" id="date-input" th:value="${lunch.date}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="store-name">가게명</label>
+                        <input type="text" id="store-name" th:value="${lunch.store_name}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>참석자</label>
+                        <input type="text" disabled style="color: #6b7280;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payer-name">계산자</label>
+                        <input type="text" id="payer-name" th:value="${lunch.payer_name}" disabled>
+                    </div>
+
+                    <fieldset class="form-group">
+                        <legend class="legend-title">유형</legend>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="type-lunch" value="점심"
+                                       th:checked="${lunch.type == '점심'}" disabled>
+                                <label for="type-lunch">점심</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="type-coffee" value="커피"
+                                       th:checked="${lunch.type == '커피'}" disabled>
+                                <label for="type-coffee">커피</label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <button type="submit"
+                            class="submit-btn delete-btn"
+                            onclick="return confirm('정말 삭제하시겠습니까?');">
+                        삭제
+                    </button>
+
+                </form>
+
+                <div class="amount-panel">
+                    <h2 class="amount-panel-title">개인별 금액</h2>
+
+                    <div class="amount-list" id="amount-list-container">
+                        <p id="amount-placeholder" class="amount-placeholder">
+                            참석자 정보를 불러오는 중...
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!--공통 Footer -->
+<footer th:replace="cmm/footer :: footerLayout"></footer>
+
+
+<script th:inline="javascript">
+    const userList = /*[[${userList}]]*/ [];
+    const existingParticipants = /*[[${lunch.participants}]]*/ '';
+
+    window.addEventListener('DOMContentLoaded', function() {
+
+        const container = document.getElementById('amount-list-container');
+        const placeholder = document.getElementById('amount-placeholder');
+
+        if (existingParticipants) {
+
+            placeholder.style.display = 'none';
+
+            const list = existingParticipants.split(', ');
+
+            list.forEach(item => {
+                const [userId, amount] = item.split(':');
+                const user = userList.find(u => u.userid === userId);
+
+                if (!user) return;
+
+                const row = document.createElement('div');
+                row.className = 'amount-row';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = user.usernm;
+
+                const group = document.createElement('div');
+                group.className = 'amount-input-group';
+
+                const amountInput = document.createElement('input');
+                amountInput.type = 'number';
+                amountInput.value = amount;
+                amountInput.disabled = true;
+                amountInput.style.backgroundColor = '#f3f4f6';
+                amountInput.style.cursor = 'not-allowed';
+
+                const unitSpan = document.createElement('span');
+                unitSpan.textContent = '원';
+
+                group.appendChild(amountInput);
+                group.appendChild(unitSpan);
+
+                row.appendChild(nameSpan);
+                row.appendChild(group);
+
+                container.appendChild(row);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 통계 조회</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="page-wrapper">
+
+<!--모바일 토글 버튼 -->
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+<div id="overlay" class="mobile-overlay"></div>
+
+<!--공통 Header -->
+<header th:replace="cmm/header :: headerLayout"></header>
+
+<div class="main-container">
+
+    <!--공통 Sidebar -->
+    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+
+    <!-- ============================= -->
+    <!--           본문 시작           -->
+    <!-- ============================= -->
+    <main class="content-area">
+        <div class="content-inner">
+
+            <h1 class="content-title">점심/커피 통계 조회</h1>
+
+            <div class="content-body" style="display: block;">
+
+                <form th:action="@{/lunch/statistics.do}" method="get"
+                      class="flex items-center gap-2 mb-4">
+                    <input type="month" name="searchMonth"
+                           class="border border-gray-300 rounded p-2"
+                           th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                           onchange="this.form.submit()" />
+                </form>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <!-- 사용자별 통계 -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">사용자별 통계 (부담금 vs 결제금)</h2>
+                        <canvas id="userSummaryChart"></canvas>
+
+                        <div class="mt-6 border-t pt-4">
+                            <h3 class="text-lg font-semibold mb-2">사용자별 총 부담금</h3>
+                            <ul class="divide-y divide-gray-200">
+                                <li th:each="user : ${summaryList}"
+                                    class="flex justify-between items-center py-2">
+                                    <span class="font-medium text-gray-800" th:text="${user.user_nm}"></span>
+                                    <span class="text-gray-600"
+                                          th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')} + '원'"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 일별 지출 추이 -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">일별 지출 추이 (종합)</h2>
+                        <canvas id="dailyExpenseChart"></canvas>
+                    </div>
+
+                    <!-- 일자별 지출 (점심/커피) -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">일자별 지출 (점심/커피 구분)</h2>
+                        <canvas id="dailyTypeChart"></canvas>
+                    </div>
+
+                    <!-- 사용자별 송금/수금 -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">사용자별 송금/수금 총액</h2>
+                        <canvas id="balanceChart"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!--공통 Footer -->
+<footer th:replace="cmm/footer :: footerLayout"></footer>
+
+<script th:inline="javascript">
+
+    // --- 사이드바 토글 공통 ---
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (menuToggle) {
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('active');
+            if (overlay) overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebarFunc() {
+            if (sidebar) sidebar.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', openSidebar);
+        if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
+        if (overlay) overlay.addEventListener('click', closeSidebarFunc);
+    }
+
+    //Chart.js 로직
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const summaryList = /*[[${summaryList}]]*/ [];
+        const lunchList = /*[[${lunchList}]]*/ [];
+        const formatCurrency = (value) => new Intl.NumberFormat('ko-KR').format(value) + '원';
+
+        const colorBlueDark = 'rgba(59, 130, 246, 0.7)';
+        const colorBlueLight = 'rgba(147, 197, 253, 0.7)';
+        const colorBlueBorderDark = 'rgba(59, 130, 246, 1)';
+        const colorBlueBorderLight = 'rgba(147, 197, 253, 1)';
+        const colorRed = 'rgba(255, 99, 132, 0.7)';
+        const colorRedBorder = 'rgba(255, 99, 132, 1)';
+
+        // 사용자별 부담금/결제금
+        if (summaryList && summaryList.length > 0) {
+            const ctxUser = document.getElementById('userSummaryChart').getContext('2d');
+            const userLabels = summaryList.map(s => s.user_nm);
+            const owed = summaryList.map(s => s.total_owed);
+            const paid = summaryList.map(s => s.total_paid);
+
+            new Chart(ctxUser, {
+                type: 'bar',
+                data: {
+                    labels: userLabels,
+                    datasets: [
+                        {
+                            label: '총 부담금',
+                            data: owed,
+                            backgroundColor: colorBlueLight,
+                            borderColor: colorBlueBorderLight,
+                            borderWidth: 1
+                        },
+                        {
+                            label: '총 결제금',
+                            data: paid,
+                            backgroundColor: colorBlueDark,
+                            borderColor: colorBlueBorderDark,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
+                    },
+                    plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } }
+                }
+            });
+        }
+
+        // 일별 지출 추이
+        if (lunchList && lunchList.length > 0) {
+            const ctxDaily = document.getElementById('dailyExpenseChart').getContext('2d');
+            const list = [...lunchList].reverse();
+
+            const labels = list.map(i => i.date.substring(5));
+            const amounts = list.map(i => i.total_amount);
+
+            new Chart(ctxDaily, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '일별 지출액',
+                        data: amounts,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: colorBlueBorderDark,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: colorBlueBorderDark,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
+                    }
+                }
+            });
+        }
+
+        // 일자별 점심/커피 구분
+        if (lunchList && lunchList.length > 0) {
+            const ctxType = document.getElementById('dailyTypeChart').getContext('2d');
+
+            const map = new Map();
+            const sorted = [...lunchList].reverse();
+
+            for (const item of sorted) {
+                const date = item.date.substring(5);
+                if (!map.has(date)) map.set(date, { lunch: 0, coffee: 0 });
+
+                if (item.type === '점심') map.get(date).lunch += item.total_amount;
+                else if (item.type === '커피') map.get(date).coffee += item.total_amount;
+            }
+
+            const labels = Array.from(map.keys());
+            const lunch = labels.map(d => map.get(d).lunch);
+            const coffee = labels.map(d => map.get(d).coffee);
+
+            new Chart(ctxType, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '점심', data: lunch, backgroundColor: colorBlueDark },
+                        { label: '커피', data: coffee, backgroundColor: colorBlueLight }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
+                    }
+                }
+            });
+        }
+
+        // 사용자별 송금/수금 총액
+        if (summaryList && summaryList.length > 0) {
+            const ctxBalance = document.getElementById('balanceChart').getContext('2d');
+
+            const labels = summaryList.map(u => u.user_nm);
+            const values = summaryList.map(u => Math.abs(u.balance));
+            const bgColors = summaryList.map(u => u.balance >= 0 ? colorBlueDark : colorRed);
+            const borderColors = summaryList.map(u => u.balance >= 0 ? colorBlueBorderDark : colorRedBorder);
+
+            new Chart(ctxBalance, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '송금/수금 총액',
+                        data: values,
+                        backgroundColor: bgColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const balance = summaryList[ctx.dataIndex].balance;
+                                    const title = balance >= 0 ? "받을 금액" : "송금할 금액";
+                                    return `${title}: ${formatCurrency(ctx.raw)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

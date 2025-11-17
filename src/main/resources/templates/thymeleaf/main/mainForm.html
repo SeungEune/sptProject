@@ -50,33 +50,39 @@
             </div>
         </div>
 
-        <!-- 빠른 메뉴 -->
-        <div class="widget-card">
-            <div class="widget-card-header">
-                <div class="widget-card-title">
-                    <i>⚡</i>
-                    <span>빠른 메뉴</span>
-                </div>
-            </div>
-            <div class="widget-card-body">
-                <div class="quick-menu-grid">
-                    <a href="/notice/noticeList.do" class="quick-menu-item">
-                        <i>📢</i>
-                        <span>공지사항</span>
-                    </a>
-                    <a href="/equipment/list.do" class="quick-menu-item">
-                        <i>🖥️</i>
-                        <span>장비 관리</span>
-                    </a>
-                    <a href="/cmm/fms/selectFileInfs.do" class="quick-menu-item">
-                        <i>📁</i>
-                        <span>파일 관리</span>
-                    </a>
-                    <a href="#" class="quick-menu-item secondary">
-                        <i>⚙️</i>
-                        <span>설정</span>
-                    </a>
-                </div>
+
+<header class="site-header">
+    <div class="header-container">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
+        </a>
+        <nav class="user-nav">
+            <a th:href="@{/mypage}">
+                <i class="fas fa-user"></i>
+                <span>마이페이지</span>
+            </a>
+            <a th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>로그아웃</span>
+            </a>
+        </nav>
+    </div>
+</header>
+
+<div class="main-container">
+
+    <aside class="sidebar" id="sidebar">
+
+        <button id="close-menu" class="mobile-close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <h3 class="nav-title">계정관리</h3>
+                <ul class="nav-list">
+                    <li><a th:href="@{/account/manage}">계정관리</a></li>
+                </ul>
             </div>
         </div>
     </div>

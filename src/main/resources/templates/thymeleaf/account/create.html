@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+    <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
+    <style>
+        #id-chk-area{
+            display: flex;
+        }
+        .btn-area{
+            display: flex !important;
+        }
+
+        .cancel-btn{
+            margin-left: 20px;
+            width: 60px;
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            height: 32px;
+            border: 1px solid black;
+            cursor: pointer;
+            color: black;
+            font-family: 'Abel', sans-serif;
+            font-weight: 400;
+            font-size: 19px;
+            line-height: 28.5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.2s;
+        }
+
+        .cancel-btn:hover{
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="page-wrapper">
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<!-- header -->
+<div th:replace="~{cmm/header :: headerLayout}"></div>
+
+<div class="main-container">
+
+
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">계정관리</h1>
+
+            <div class="content-body form">
+
+                <section id="user-profile-form">
+                    <div class="form-container">
+                        <form class="profile-form" th:action="@{/account/create}" method="post" th:object="${user}">
+                            <div class="form-group">
+                                <label for="user-id">아이디</label>
+                                <div id="id-chk-area">
+                                    <input id="user-id" th:field="*{userId}" type="text">  <!-- ✅ VO.userId -->
+                                    <button id="id-check-btn" type="button" class="submit-btn">체크</button> <!-- ✅ 버튼은 submit 아님 -->
+                                </div>
+                                <small id="id-check-result"></small>
+                                <div th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">비밀번호</label>
+                                <input id="password" th:field="*{password}" type="password">
+                                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password-chk">비밀번호 확인</label>
+                                <input id="password-chk" th:field="*{passwordChk}" type="password">
+                                <div th:if="${#fields.hasErrors('passwordChk')}" th:errors="*{passwordChk}"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="search-option-position">직책옵션</label>
+                                <select id="search-option-position" th:field="*{jssfcCd}">
+                                    <option value="HEAD">사장</option>
+                                    <option value="PM">부장</option>
+                                    <option value="PL">과장</option>
+                                    <option value="AS">대리</option>
+                                    <option value="NEW">담당</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="name">이름</label>
+                                <input id="name" th:field="*{name}" type="text">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">전화번호</label>
+                                <input id="phone" th:field="*{phone}" type="tel">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input id="email" th:field="*{email}" type="email">
+                            </div>
+
+                            <div class="form-actions">
+                                <div class="btn-area">
+                                    <button type="submit" class="submit-btn">확인</button>
+                                    <button type="button" class="cancel-btn" onclick="location.href='/account/manage'">취소</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+
+<script>
+    document.getElementById('id-check-btn').addEventListener('click', async () => {
+        const input = document.getElementById('user-id');
+        const result = document.getElementById('id-check-result');
+        const userId = input.value.trim();
+        if (!userId) { result.textContent = '아이디를 입력하세요.'; return; }
+
+        const res = await fetch(`/account/create/id-check?userId=${encodeURIComponent(userId)}`);
+        const text = await res.text(); // "OK" | "DUPLICATED"
+        if (text === 'OK') {
+            result.textContent = '사용 가능한 아이디입니다.';
+            result.style.color = 'green';
+        } else {
+            result.textContent = '이미 사용 중인 아이디입니다.';
+            result.style.color = 'red';
+        }
+    });
+</script>
+
+</body>
+</html>
