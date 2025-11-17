@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장비 수정</title>
+    <style>
+        .accordion-item {
+            margin-top: 20px;
+            width: 300px;
+        }
+
+        .accordion-content {
+            display: none;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .accordion-content input {
+            width: calc(100% - 16px);
+            margin: 8px;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        .accordion-content ul {
+            list-style: none;
+            padding: 0 8px 8px 8px;
+            margin: 0;
+        }
+
+        .accordion-content li {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .accordion-content li:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>장비 수정</h1>
+
+<div th:replace="equipment/inputField :: inputField('일련번호', 'serialNumber', 'serialNumber', '일련번호를 입력해주세요')"></div>
+<div th:replace="equipment/inputField :: inputField('자산번호', 'accessNumber', 'accessNumber', '자산번호를 입력해주세요')"></div>
+
+<!-- 담당자 검색 아코디언 -->
+<div class="accordion-item">
+    <label>담당자</label><br>
+    <div>
+        <input placeholder="담당자 이름을 입력해주세요">
+        <button class="accordion-header">
+            <span class="arrow">▼</span>
+        </button>
+        <div class="accordion-content">
+            <ul id="managerList">
+                <li>홍길동 (사용중)</li>
+                <li>김영희 (미사용)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div>
+    <label for="statusSelect">상태</label>
+    <br>
+    <select id="statusSelect" name="status">
+        <option value="active" selected>사용중</option>
+        <option value="inactive">미사용</option>
+        <option value="repair">보수중</option>
+    </select>
+</div>
+
+<div>
+    <button>취소하기</button>
+    <button>등록하기</button>
+</div>
+
+<script>
+    const header = document.querySelector('.accordion-header');
+    const content = document.querySelector('.accordion-content');
+    const arrow = header.querySelector('.arrow');
+
+    header.addEventListener('click', () => {
+        const isOpen = content.style.display === 'block';
+        content.style.display = isOpen ? 'none' : 'block';
+        arrow.textContent = isOpen ? '▼' : '▲';
+    });
+
+    // 검색 input 이벤트 (실제 서버 fetch로 연결 가능)
+    const managerInput = document.getElementById('managerInput');
+    const managerList = document.getElementById('managerList');
+
+    managerInput.addEventListener('input', () => {
+        const name = managerInput.value.trim();
+
+        // 예시: 입력값이 있으면 필터링
+        const items = ['홍길동 (사용중)', '김영희 (미사용)', '박철수 (사용중)'];
+        managerList.innerHTML = '';
+
+        items
+            .filter(item => item.includes(name))
+            .forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                managerList.appendChild(li);
+            });
+    });
+</script>
+
+</body>
+</html>

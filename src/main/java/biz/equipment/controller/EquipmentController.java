@@ -21,6 +21,7 @@ public class EquipmentController {
     public String getEquipmentCodes(Model model) {
         model.addAttribute("equipment", equipmentService.getEquipments()) ;
         return "equipment/list";
+
     }
 
     // 장비 단건 조회
@@ -39,7 +40,7 @@ public class EquipmentController {
     @PostMapping("/insert.do")
     public String insertEquipment(@ModelAttribute EquipmentRequest equipmentRequest) {
         equipmentService.insertEquipment(equipmentRequest);
-        return "redirect:equipment/list.do";
+        return "equipment/list";
     }
 
     // 장비 수정
@@ -64,15 +65,15 @@ public class EquipmentController {
 
     // 중복 조회
     @GetMapping("/check-serialNumber")
-    public String checkSerialNumber(@RequestParam String number, Model model) {
-        model.addAttribute(equipmentService.checkSerialNumber(number));
-        return "/equipment/insert.do";
+    @ResponseBody
+    public String checkSerialNumber(@RequestParam String serialNumber) {
+        return equipmentService.checkSerialNumber(serialNumber);
     }
 
     @GetMapping("/check-accessNumber")
-    public String checkAccessNumber(@RequestParam String number, Model model) {
-        model.addAttribute(equipmentService.checkAccessNumber(number));
-        return "/equipment/insert.do";
+    @ResponseBody
+    public String checkAccessNumber(@RequestParam String accessNumber) {
+        return equipmentService.checkAccessNumber(accessNumber);
     }
 
     // 관리자 수정
@@ -81,6 +82,13 @@ public class EquipmentController {
         model.addAttribute(equipmentService.getEquipment(id));
         return "equipment/director/update";
     }
+
+    // 관리자 찾기
+//    @GetMapping("/director/view.do")
+//    public String getDirector(@RequestParam("name") String name, Model model) {
+//        model.addAttribute(equipmentService.getDirector(id));
+//        return "equipment/director/update";
+//    }
 
     // 관리자 수정
     @PostMapping("/director/update.do")
@@ -95,6 +103,8 @@ public class EquipmentController {
         equipmentService.updateStatus(id, status);
         return "redirect:/equipment/status/list.do";
     }
+
+
 
 
 }
