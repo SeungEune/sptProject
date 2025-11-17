@@ -35,10 +35,10 @@ public class EquipmentServiceTest {
     @BeforeEach
     public void setUp() throws Exception {
         equipmentDAO.deleteAll();
-        testVO = createEquipmentVO("AAAAA", "모니터","serialNumber1","accessNumber1", "홍길동", Status.STORAGE);
+        testVO = createEquipmentVO("serialNumber1","accessNumber1", "홍길동", Status.STORAGE);
         equipmentDAO.save(testVO);
 
-        equipmentDAO.save(createEquipmentVO("BBBBB", "키보드","serialNumber2","accessNumber2", "김철수", Status.USE));
+        equipmentDAO.save(createEquipmentVO("serialNumber2","accessNumber2", "김철수", Status.USE));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class EquipmentServiceTest {
 
     @Test
     void 장비_등록을_성공한다() {
-        equipmentService.insertEquipment(createRequest("CCCCCC", "마우스", "serialNumber3", "accessNumber3", "김영희", Status.REPAIR));
+        equipmentService.insertEquipment(createRequest("serialNumber3", "accessNumber3", "김영희", Status.REPAIR));
         assertThat(equipmentDAO.findAll().size()).isEqualTo(3);
     }
 
@@ -78,11 +78,16 @@ public class EquipmentServiceTest {
 
     @Test
     void 일련_번호_중복_조회를_성공한다(){
+        log.info("조회 결과 중복O: "+equipmentService.checkSerialNumber("serialNumber1"));
+        log.info("조회 결과 중복X: "+equipmentService.checkSerialNumber("seriamber1"));
+
         assertThat(equipmentService.checkSerialNumber("serialNumber1")).isNotNull();
     }
 
     @Test
     void 자산_번호_중복_조회를_성공한다(){
+        log.info("조회 결과 중복O: "+equipmentService.checkAccessNumber("accessNumber1"));
+        log.info("조회 결과 중복X: "+equipmentService.checkAccessNumber("seriamber1"));
         assertThat(equipmentService.checkAccessNumber("accessNumber1")).isNotNull();
     }
 
@@ -92,14 +97,14 @@ public class EquipmentServiceTest {
         assertThat(equipmentDAO.findById(testVO.getId()).getStatus()).isEqualTo(Status.DISPOSAL);
     }
 
-    private EquipmentVO createEquipmentVO(String code, String name, String serialNumber, String accessNumber, String director, Status status) {
-        return new EquipmentVO().create(createRequest(code, name, serialNumber, accessNumber, director, status));
+    private EquipmentVO createEquipmentVO(String serialNumber, String accessNumber, String director, Status status) {
+        return new EquipmentVO().create(createRequest(serialNumber, accessNumber, director, status));
     }
 
-    private EquipmentRequest createRequest(String code, String name, String serialNumber, String accessNumber, String director, Status status) {
+    private EquipmentRequest createRequest(String serialNumber, String accessNumber, String director, Status status) {
         return EquipmentRequest.builder()
-                .code(code)
-                .name(name)
+//                .code(code)
+//                .name(name)
                 .serialNumber(serialNumber)
                 .accessNumber(accessNumber)
                 .director(director)
