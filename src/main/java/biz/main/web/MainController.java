@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * 메인 페이지를 처리하는 컨트롤러 클래스
@@ -36,36 +37,7 @@ public class MainController {
         return "main/mainForm";
     }
 
-    @GetMapping("mypage")
-    public String mypage(Model model) {
-        return "account/mypage";
-    }
-    @GetMapping("mypage/update")
-    public String mypageUpdate(Model model) {
-        return "account/updateMypage";
-    }
-    @GetMapping("mypage/update/success")
-    public String mypageUpdateSuccess(Model model) {
-        return "account/popup";
-    }
 
-    @GetMapping("/account/manage")
-    public String userAccountManage(Model model) {
-        LoginVO loginVO = SessionUtil.getLoginUser();
-        return "account/manage";
-    }
-
-    @GetMapping("/account/create")
-    public String userAccountCreate(Model model) {
-        LoginVO loginVO = SessionUtil.getLoginUser();
-        return "account/create";
-    }
-
-    @GetMapping("/enter/enter.do")
-    public String enter(Model model) {
-        LoginVO loginVO = SessionUtil.getLoginUser();
-        return "enter/enter";
-    }
 
 
 

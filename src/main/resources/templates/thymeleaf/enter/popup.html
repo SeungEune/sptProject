@@ -25,7 +25,7 @@
 
 <!-- 삭제용 hidden form (POST로 보내기) -->
 <form id="deleteForm"
-      th:action="@{/account/delete/{id}(id=${userId})}"
+      th:action="@{/enter/delete/{id}(id=${enterId})}"
       method="post">
     <!-- CSRF 쓰면 토큰 hidden 추가 -->
 </form>
@@ -33,11 +33,11 @@
 <!-- ★ 스크립트 안에서 타임리프 사용하는 부분 -->
 <script th:inline="javascript">
     // 타임리프로 userId를 JS 변수에 바인딩
-    const userId = /*[[${userId}]]*/ '';
+    const enterId = /*[[${enterId}]]*/ '';
 
     Swal.fire({
-        title: '계정 삭제',
-        text: userId + ' 계정을 삭제하시겠습니까?',
+        title: '출입 삭제',
+        text: enterId + ' 출입계정을 삭제하시겠습니까?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: '삭제',
@@ -49,7 +49,7 @@
             document.getElementById('deleteForm').submit();
         } else {
             // 취소 시 목록으로 돌아가기
-            window.location.href = /*[[@{/account/manage}]]*/ '/account/manage';
+            window.location.href = /*[[@{/enter/manage}]]*/ '/enter/manage';
         }
     });
 </script>

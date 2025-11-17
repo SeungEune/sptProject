@@ -26,29 +26,34 @@
 
             <section id="user-profile-form">
                 <div class="form-container">
-                    <form class="profile-form">
+                    <form class="profile-form"
+                      th:object="${user}">
                         <div class="form-group">
                             <label for="user-id">아이디</label>
-                            <input type="text" id="user-id" name="user-id" value="abcd" readonly>
+                            <input type="text" id="user-id" th:field="*{userId}" readonly>
                         </div>
                         <div class="form-group">
                             <label for="password">비밀번호</label>
-                            <input type="password" id="password" name="password" value="************" readonly>
+                            <input type="password" id="password" th:field="*{password}" readonly>
                         </div>
                         <div class="form-group">
                             <label for="name">이름</label>
-                            <input type="text" id="name" name="name" value="한승준" readonly>
+                            <input type="text" id="name" th:field="*{name}" readonly>
                         </div>
                         <div class="form-group">
                             <label for="phone">전화번호</label>
-                            <input type="tel" id="phone" name="phone" value="010-1234-5678" readonly>
+                            <input type="tel" id="phone" th:field="*{phone}" readonly>
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" value="abc@spatialt.co.kr" readonly>
+                            <input type="email" id="email" th:field="*{email}" readonly>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="submit-btn" onclick="location.href='mypage/update'">수정</button>
+                            <button type="button"
+                                    class="submit-btn"
+                                    th:onclick="|location.href='@{/mypage/{id}/update(id=${user.userId})}'|">
+                                수정
+                            </button>
                         </div>
                     </form>
                 </div>

@@ -98,7 +98,7 @@ public class EgovLoginController {
      * @param request HttpServletRequest
      * @return 리다이렉트 URL
      */
-    @GetMapping("/login/logout.do")
+    @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
         SessionUtil.removeAttribute("LoginVO");
         request.getSession().invalidate();

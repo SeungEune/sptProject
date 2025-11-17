@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 등록</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+   <link rel="stylesheet" th:href="@{/css/account/manage.css}">
+</head>
+<body>
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+
+    <!-- ✅ 레이아웃에 넘길 조각을 반드시 감싸서 선언 -->
+    <div th:fragment="content">
+        <h1 class="content-title">출입관리</h1>
+
+        <div class="content-body">
+
+            <div class="table-area">
+                <div class="regist-area">
+                    <button type="button" class="submit-btn" onclick="location.href='/enter/create'">등록</button>
+                </div>
+                <table class="auto-index">
+                    <colgroup>
+                        <col style="width:5%;">   <!-- 번호 -->
+                        <col style="width:7%;">   <!-- 출입번호 -->
+                        <col style="width:10%;">  <!-- 아이디 -->
+                        <col style="width:13%;">  <!-- 전화번호 -->
+                        <col style="width:18%;">  <!-- 이메일 -->
+                        <col style="width:9%;">   <!-- 이름 -->
+                        <col style="width:9%;">   <!-- 출입수단 -->
+                        <col style="width:9%;">   <!-- 직책 -->
+                        <col style="width:8%;">   <!-- 상태 -->
+                        <col style="width:7%;">   <!-- 유형 -->
+                        <col style="width:15%;">  <!-- 등록일 -->
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>번호</th><th>출입번호</th><th>아이디</th><th>전화번호</th><th>이메일</th><th>이름</th><th>출입수단</th><th>직책</th><th>상태</th><th>유형</th><th>등록일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="enter, stat : ${enterList}"
+                        th:onclick="|location.href='@{/enter/edit/{id}(id=${enter.enterId})}'|"
+                        style="cursor: pointer;">
+                        <!-- 번호 -->
+                        <td th:text="${stat.count}"></td>
+                        <td th:text="${enter.enterId}"></td>
+
+                        <!-- 아이디: 게스트면 공백 -->
+                        <td th:text="${enter.type == 'GUEST'} ? '' : ${enter.userId}"></td>
+
+                        <!-- 전화번호: 게스트/직원 다르게 -->
+                        <td th:text="${enter.type == 'GUEST'} ? ${enter.guestPhone} : ${enter.phone}"></td>
+
+                        <!-- 이메일 -->
+                        <td th:text="${enter.type == 'GUEST'} ? ${enter.guestEmail} : ${enter.email}"></td>
+
+                        <!-- 이름 -->
+                        <td th:text="${enter.type == 'GUEST'} ? ${enter.guestNm} : ${enter.name}"></td>
+
+                        <!-- 출입수단 -->
+                        <td th:text="${enter.method}"></td>
+
+                        <!-- 직책: 게스트면 '-' 표시 -->
+                        <td th:text="${enter.type == 'GUEST'} ? '' : ${enter.jssfcCd}"></td>
+
+                        <td th:text="${enter.status}"></td>
+                        <td th:text="${enter.type}"></td>
+                        <td th:text="${#dates.format(enter.registDt, 'yyyy/MM/dd')}"></td>
+                    </tr>
+                    </tbody>
+
+
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

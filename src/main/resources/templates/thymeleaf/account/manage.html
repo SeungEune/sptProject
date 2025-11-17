@@ -21,78 +21,149 @@
 
 <div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-
-    <!-- ✅ 레이아웃에 넘길 조각을 반드시 감싸서 선언 -->
     <div th:fragment="content">
         <h1 class="content-title">계정관리</h1>
 
         <div class="content-body">
 
-            <div class="search-filter">
-                <h3>검색필터</h3>
-                <div class="search-option-field">
-                    <label for="search-option">옵션</label>
-                    <select id="search-option" name="search-option">
-                        <option value="all" selected>전체</option>
-                        <option value="id">아이디</option>
-                        <option value="tel">전화번호</option>
-                        <option value="email">이메일</option>
-                        <option value="name">이름</option>
-                        <option value="position">직책</option>
-                        <option value="registDate">등록일</option>
-                    </select>
+            <!-- ✅ 여기부터 전부 하나의 form 으로 묶자 -->
+            <form id="search-form" th:action="@{/account/manage}" method="get" style="display:flex; width:100%;">
+
+                <!-- 왼쪽 : 추가 필터 영역 -->
+                <div class="search-filter">
+                    <h3>검색필터</h3>
+
+                    <!-- 검색 기준 -->
+                    <div class="search-option-field">
+                        <label for="search-option">검색 기준</label>
+                        <select id="search-option" name="option">
+                            <option value="all"
+                                    th:selected="${search == null or search.option == 'all'}">전체</option>
+                            <option value="id"
+                                    th:selected="${search != null and search.option == 'id'}">아이디</option>
+                            <option value="tel"
+                                    th:selected="${search != null and search.option == 'tel'}">전화번호</option>
+                            <option value="email"
+                                    th:selected="${search != null and search.option == 'email'}">이메일</option>
+                            <option value="name"
+                                    th:selected="${search != null and search.option == 'name'}">이름</option>
+                        </select>
+                    </div>
+
+                    <!-- 직책 필터 -->
+                    <div class="search-option-field">
+                        <label for="search-option-position">직책 필터</label>
+                        <select id="search-option-position" name="jssfcCd">
+                            <option value="" th:selected="${search == null or search.jssfcCd == null}">전체</option>
+                            <option value="HEAD" th:selected="${search != null and search.jssfcCd == 'HEAD'}">사장</option>
+                            <option value="PM"   th:selected="${search != null and search.jssfcCd == 'PM'}">부장</option>
+                            <option value="PL"   th:selected="${search != null and search.jssfcCd == 'PL'}">과장</option>
+                            <option value="AS"   th:selected="${search != null and search.jssfcCd == 'AS'}">대리</option>
+                            <option value="NEW"  th:selected="${search != null and search.jssfcCd == 'NEW'}">담당</option>
+                        </select>
+                    </div>
+
+                    <!-- 등록월 필터 -->
+                    <div class="search-option-field">
+                        <label for="search-option-registDate">등록월 필터</label>
+                        <input id="search-option-registDate"
+                               type="month"
+                               name="registMonth"
+                               th:value="${search != null ? search.registMonth : ''}">
+                    </div>
                 </div>
-                <div class="search-option-field">
-                    <label for="search-option-position">직책옵션</label>
-                    <select id="search-option-position" name="search-option-position">
-                        <option value="pm">부장</option>
-                        <option value="pl">과장</option>
-                        <option value="as">대리</option>
-                        <option value="new">담당</option>
-                    </select>
-                </div>
-                <div class="search-option-field">
-                    <label for="search-option-registDate">등록일옵션</label>
-                    <input id="search-option-registDate" type="month" name="registDateMonth">
-                </div>
-            </div>
-            <div class="table-area">
-                <form id="search-keyword-form">
+
+                <!-- 오른쪽 : 검색어 + 테이블 -->
+                <div class="table-area">
                     <div id="search-keyword-form-content">
                         <label for="search-keyword">검색어</label>
-                        <input id="search-keyword" name="search-keyword">
+                        <input id="search-keyword"
+                               name="keyword"
+                               th:value="${search != null ? search.keyword : ''}">
                         <button type="submit" class="submit-btn">찾기</button>
                     </div>
-                </form>
-                <table class="auto-index">
-                    <colgroup>
-                        <col style="width:6%;">   <!-- 번호 -->
-                        <col style="width:12%;">  <!-- 아이디 -->
-                        <col style="width:14%;">  <!-- 전화번호 -->
-                        <col style="width:30%;">  <!-- 이메일 -->
-                        <col style="width:10%;">  <!-- 이름 -->
-                        <col style="width:10%;">  <!-- 직책 -->
-                        <col style="width:18%;">  <!-- 등록일 -->
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>번호</th><th>아이디</th><th>전화번호</th><th>이메일</th><th>이름</th><th>직책</th><th>등록일</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td></td><td>abcd</td><td>010-1111-1111</td><td>abcd@spatialt.co.kr</td><td>한승준</td><td>담당</td><td>2025/11/03</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="regist-area">
-                    <button type="button" class="submit-btn" onclick="location.href='/account/create'">등록</button>
+
+                    <!-- ↓↓↓ 여기부터는 기존 테이블 그대로 ↓↓↓ -->
+                    <table class="auto-index">
+                        <colgroup>
+                            <col style="width:6%;">
+                            <col style="width:12%;">
+                            <col style="width:14%;">
+                            <col style="width:30%;">
+                            <col style="width:10%;">
+                            <col style="width:10%;">
+                            <col style="width:18%;">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>번호</th><th>아이디</th><th>전화번호</th><th>이메일</th><th>이름</th><th>직책</th><th>등록일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user, stat : ${userList}"
+                            th:onclick="|location.href='@{/account/edit/{id}(id=${user.userId})}'|"
+                            style="cursor: pointer;">
+                            <td th:text="${stat.count}"></td>
+                            <td th:text="${user.userId}"></td>
+                            <td th:text="${user.phone}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.name}"></td>
+                            <td th:text="${user.jssfcCd}"></td>
+                            <td th:text="${#dates.format(user.registDt, 'yyyy/MM/dd')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ✅ 여기 추가 -->
+                    <div class="pagination">
+                        <!-- 이전 페이지 -->
+                        <a th:if="${page > 1}"
+                           th:href="@{/account/manage(
+                    page=${page - 1},
+                    size=${size},
+                    option=${search.option},
+                    keyword=${search.keyword},
+                    jssfcCd=${search.jssfcCd},
+                    registMonth=${search.registMonth}
+                )}">&laquo;</a>
+
+                        <!-- 페이지 번호 -->
+                        <a th:each="p : ${#numbers.sequence(1, totalPages)}"
+                           th:text="${p}"
+                           th:href="@{/account/manage(
+                    page=${p},
+                    size=${size},
+                    option=${search.option},
+                    keyword=${search.keyword},
+                    jssfcCd=${search.jssfcCd},
+                    registMonth=${search.registMonth}
+                )}"
+                           th:classappend="${p == page} ? 'active'">
+                        </a>
+
+                        <!-- 다음 페이지 -->
+                        <a th:if="${page < totalPages}"
+                           th:href="@{/account/manage(
+                    page=${page + 1},
+                    size=${size},
+                    option=${search.option},
+                    keyword=${search.keyword},
+                    jssfcCd=${search.jssfcCd},
+                    registMonth=${search.registMonth}
+                )}">&raquo;</a>
+                    </div>
+
+                    <div class="regist-area">
+                        <button type="button" class="submit-btn" onclick="location.href='/account/create'">등록</button>
+                    </div>
                 </div>
-            </div>
+            </form>
+
         </div>
     </div>
 
 </div>
+
 
 
 </body>
