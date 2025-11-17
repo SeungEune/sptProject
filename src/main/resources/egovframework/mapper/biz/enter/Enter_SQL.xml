@@ -11,18 +11,25 @@
             u.moblphon_no  AS phone,
             u.email_adres  AS email,
             u.jssfc_cd     AS jssfcCd,
+            e.guest_nm     AS guestNm,
+            e.guest_phone  AS guestPhone,
+            e.guest_email  AS guestEmail,
             e.method_cd    AS method,
             e.status_cd    AS status,
             e.type_cd      AS type,
             e.regist_dt    AS registDt,
-            e.end_guest_dt AS endGuestDt,
-            e.guest_nm AS guestNm,
-            e.guest_phone AS guestPhone,
-            e.guest_email AS guestEmail
-        FROM TB_ENTER e
-                 LEFT JOIN TB_USER  u ON e.user_id = u.user_id
-        ORDER BY e.regist_dt DESC
+            e.end_guest_dt AS endGuestDt
+        FROM tb_enter e
+                 LEFT JOIN tb_user u ON e.user_id = u.user_id
+        ORDER BY e.enter_id DESC
+            LIMIT #{size} OFFSET #{offset}
     </select>
+
+
+    <select id="selectEnterCount" resultType="int">
+        SELECT COUNT(*) FROM tb_enter
+    </select>
+
 
     <insert id="insertEnter" parameterType="biz.enter.vo.EnterVO">
         INSERT INTO tb_enter (

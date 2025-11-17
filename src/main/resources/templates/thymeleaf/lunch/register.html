@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +10,7 @@
 
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
 </head>
-
-<body class="page-wrapper">
+<body>
 
 <!-- 모바일 햄버거 버튼 -->
 <button id="menu-toggle" class="mobile-menu-toggle">
@@ -20,21 +18,12 @@
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
-<!-- 공통 Header -->
-<header th:replace="cmm/header :: headerLayout"></header>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
+    <div th:fragment="content">
+        <h1 class="content-title">점심/커피 내역 등록</h1>
 
-<div class="main-container">
-    <!-- 공통 Sidebar -->
-    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
-
-    <!-- 본문 -->
-    <main class="content-area">
-        <div class="content-inner">
-
-            <h1 class="content-title">점심/커피 내역 등록</h1>
-
-            <div class="content-body">
+        <div class="content-body lunch-layout">
 
                 <form class="entry-form"
                       th:action="@{/lunch/register.do}"
@@ -104,18 +93,10 @@
                         </p>
                     </div>
                 </div>
-
             </div>
         </div>
-    </main>
-</div>
+    </div>
 
-
-<!-- 공통 Footer -->
-<footer th:replace="cmm/footer :: footerLayout"></footer>
-
-
-<!-- 기존 JS 전체 그대로 유지 -->
 <script th:inline="javascript">
     // --- 유저 데이터 로드 ---
     const userList = /*[[${userList}]]*/ [];
@@ -124,7 +105,7 @@
     const selectedParticipants = new Set();
     let selectedPayerId = null;
 
-    // --- 참석자 검색 ---
+    // --- 참석자 검색 및 선택 로직 ---
     function filterParticipants() {
         const query = document.getElementById('participant-search').value.toLowerCase().trim();
         const resultsDiv = document.getElementById('search-results');
@@ -157,20 +138,24 @@
     // --- addParticipant ---
     function addParticipant(userId, userName) {
         if (selectedParticipants.has(userId)) return;
+
         selectedParticipants.add(userId);
 
         const container = document.getElementById('amount-list-container');
         const placeholder = document.getElementById('amount-placeholder');
         placeholder.style.display = 'none';
 
+        // --- 새 HTML 구조(.amount-row)에 맞게 요소 생성 ---
         const amountRow = document.createElement('div');
         amountRow.className = 'amount-row';
         amountRow.id = 'participant-row-' + userId;
 
+        // 1. 이름
         const nameSpan = document.createElement('span');
         nameSpan.className = 'name';
         nameSpan.innerText = userName;
 
+        // 2. 금액 입력 그룹
         const amountGroup = document.createElement('div');
         amountGroup.className = 'amount-input-group';
 
