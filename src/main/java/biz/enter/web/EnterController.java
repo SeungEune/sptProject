@@ -8,10 +8,7 @@ import biz.user.vo.UserVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -25,12 +22,23 @@ public class EnterController {
     @Resource(name = "userService")
     private UserService userService;   // ★ 추가
 
+    // Controller
     @GetMapping("/enter/manage")
-    public String enterManage(Model model) throws Exception {
-        List<EnterVO> list = enterService.getEnterList();
-        model.addAttribute("enterList", list);
+    public String manage(@RequestParam(defaultValue = "1") int page,
+                         @RequestParam(defaultValue = "10") int size,
+                         Model model) throws Exception {
+
+        List<EnterVO> enterList = enterService.getEnterList(page, size);
+        int totalCount = enterService.getEnterCount();
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        model.addAttribute("enterList", enterList);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
+
         return "enter/manage";
     }
+
 
     /** 등록 폼 */
     @GetMapping("/enter/create")

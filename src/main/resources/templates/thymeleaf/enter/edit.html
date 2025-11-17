@@ -6,10 +6,52 @@
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
+    <!-- ✅ 공통 기초 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <!-- 대시보드 / toc 는 안 써도 됨 -->
+
+    <!-- ✅ 레이아웃 & 헤더 -->
+    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
+    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
+
+    <!-- ✅ 이 페이지 전용 -->
+<!--    <link rel="stylesheet" th:href="@{/css/account/mypage.css}">-->
     <style>
         .form-section { margin-top:20px; }
         .hidden { display:none; }
+        .submit-btn {
+            height: 52px;
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-abeezee);
+            font-size: 15px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+            align-self: center;
+            width: 152px;
+        }
+        .cancel-btn {
+            height: 52px;
+            background-color: #FFFFFF;
+            color: black;
+            border: 1px solid black;
+            border-radius: 6px;
+            font-family: var(--font-abeezee);
+            font-size: 15px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+            align-self: center;
+            width: 152px;
+        }
     </style>
 </head>
 <body class="page-wrapper">
@@ -132,15 +174,15 @@
                                 <!-- 처음엔 조회 모드: 수정 버튼만 보이게 -->
                                 <button type="button" id="editBtn"  class="submit-btn">수정</button>
 
-                                <button type="submit" id="saveBtn" class="submit-btn hidden">저장</button>
+                                <button type="submit" id="saveBtn" class="submit-btn hidden">확인</button>
                                 <button type="button" id="cancelBtn" class="cancel-btn hidden">취소</button>
 
-                                <button type="button" class="submit-btn"
+                                <button type="button" id="deleteBtn" class="submit-btn"
                                         th:onclick="|location.href='@{/enter/delete/{id}/confirm(id=${enter.enterId})}'|">
                                     삭제
                                 </button>
 
-                                <button type="button" class="cancel-btn"
+                                <button type="button" id="listBtn" class="cancel-btn"
                                         onclick="location.href='/enter/manage'">목록
                                 </button>
                             </div>
@@ -174,27 +216,32 @@
         const form   = document.querySelector('.profile-form');
         const inputs = form.querySelectorAll('input, select');
 
-        const isView = (mode === 'view');
+        const isView = (mode === 'view');   // true면 조회모드, false면 수정모드
 
         inputs.forEach(el => {
-            // 엔터번호 같은 hidden 이나 readOnly 전용은 넘어가도 됨
             if (el.type === 'hidden') return;
 
             if (el.tagName === 'INPUT') {
                 if (el.type === 'radio') {
-                    el.disabled = isView;      // 조회모드: 라디오 클릭 불가
+                    el.disabled = isView;
                 } else {
-                    el.readOnly = isView;      // 텍스트, date 등
+                    el.readOnly = isView;
                 }
             } else if (el.tagName === 'SELECT') {
-                el.disabled = isView;          // 셀렉트 박스
+                el.disabled = isView;
             }
         });
 
+        // 버튼 표시/숨김
         document.getElementById('editBtn').classList.toggle('hidden', !isView);
         document.getElementById('saveBtn').classList.toggle('hidden', isView);
         document.getElementById('cancelBtn').classList.toggle('hidden', isView);
+
+        // ★ 삭제/목록은 조회모드에서만 보이게
+        document.getElementById('deleteBtn').classList.toggle('hidden', !isView);
+        document.getElementById('listBtn').classList.toggle('hidden', !isView);
     }
+
 
     document.addEventListener('DOMContentLoaded', () => {
         // 타입 섹션 세팅

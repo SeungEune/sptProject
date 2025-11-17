@@ -13,10 +13,16 @@ public class EnterServiceImpl implements EnterService {
     @Resource(name = "enterDAO")
     private EnterDAO enterDAO;
 
-    @Override
-    public List<EnterVO> getEnterList() {
-        return enterDAO.selectEnterList();
+    // Service
+    public List<EnterVO> getEnterList(int page, int size) throws Exception {
+        int offset = (page - 1) * size;
+        return enterDAO.selectEnterList(offset, size);
     }
+
+    public int getEnterCount() throws Exception {
+        return enterDAO.selectEnterCount();
+    }
+
 
     @Override
     public void createEnter(EnterVO enter) {

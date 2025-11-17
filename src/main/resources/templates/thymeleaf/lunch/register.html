@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
@@ -16,136 +16,68 @@
 
 <div id="overlay" class="mobile-overlay"></div>
 
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-<header class="site-header">
-    <div class="header-container">
-        <a th:href="@{/}" class="logo">
-            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
-        </a>
-        <nav class="user-nav">
-            <a th:href="@{/mypage}">
-                <i class="fas fa-user"></i>
-                <span>마이페이지</span>
-            </a>
-            <a th:href="@{/logout}">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>로그아웃</span>
-            </a>
-        </nav>
-    </div>
-</header>
+    <div th:fragment="content">
+        <h1 class="content-title">점심/커피 내역 등록</h1>
 
-<div class="main-container">
+        <div class="content-body lunch-layout">
 
-    <aside class="sidebar" id="sidebar">
+            <form class="entry-form" th:action="@{/lunch/register.do}" method="post">
 
-        <button id="close-menu" class="mobile-close-btn">
-            <i class="fas fa-times"></i>
-        </button>
-
-        <nav class="sidebar-nav">
-            <div class="nav-group">
-                <h3 class="nav-title">계정관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/account/manage}">계정관리</a></li>
-                    <li><a th:href="@{/account/reset}">비밀번호 초기화</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">출입관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/access/manage}">계정관리</a></li>
-                    <li><a th:href="@{/access/reset}">비밀번호 초기화</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">장비관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">정산관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/lunch/register}" class="active">내역등록</a></li>
-                    <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
-                    <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">점심/커피 내역 등록</h1>
-
-            <div class="content-body">
-
-                <form class="entry-form" th:action="@{/lunch/register.do}" method="post">
-
-                    <div class="form-group">
-                        <label for="date-input">날짜</label>
-                        <input type="date" id="date-input" name="date"
-                               th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="store-name">가게명</label>
-                        <input type="text" id="store-name" name="storeName" placeholder="내용을 입력하세요" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="participant-search">참석자 선택<span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span></label>
-                        <input type="text" id="participant-search" onkeyup="filterParticipants()" placeholder="내용을 입력하세요">
-                        <div id="search-results" class="search-results-dropdown" style="display: none;"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="payer-search">계산자 선택<span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span></label>
-                        <input type="text" id="payer-search" onkeyup="filterPayers()" placeholder="내용을 입력하세요">
-                        <input type="hidden" id="payerId" name="payerId" required>
-                        <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
-                    </div>
-
-                    <fieldset class="form-group">
-                        <legend class="legend-title">유형 선택</legend>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="type-lunch" name="type" value="점심" checked>
-                                <label for="type-lunch">점심</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="type-coffee" name="type" value="커피">
-                                <label for="type-coffee">커피</label>
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <button type="submit" class="submit-btn">등록</button>
-                </form>
-
-                <div class="amount-panel">
-                    <h2 class="amount-panel-title">개인별 금액 입력</h2>
-                    <div class="amount-list" id="amount-list-container">
-                        <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
-                            참석자를 선택하면 여기에 입력칸이 생성됩니다.
-                        </p>
-                    </div>
+                <div class="form-group">
+                    <label for="date-input">날짜</label>
+                    <input type="date" id="date-input" name="date"
+                           th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
                 </div>
 
-            </div>
-        </div>
-    </main>
-</div>
+                <div class="form-group">
+                    <label for="store-name">가게명</label>
+                    <input type="text" id="store-name" name="storeName" placeholder="내용을 입력하세요" required>
+                </div>
 
-<footer class="site-footer-bottom">
-    <div class="footer-container">
-        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
-        <p class="footer-slogan">
-            <span class="line">전북 전주시 덕진구 만성북로 51-25, 3015호 스패셜티 (스페이스온 지식산업센터)</span>
-            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
-        </p>
+                <div class="form-group">
+                    <label for="participant-search">참석자 선택<span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span></label>
+                    <input type="text" id="participant-search" onkeyup="filterParticipants()" placeholder="내용을 입력하세요">
+                    <div id="search-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-search">계산자 선택<span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span></label>
+                    <input type="text" id="payer-search" onkeyup="filterPayers()" placeholder="내용을 입력하세요">
+                    <input type="hidden" id="payerId" name="payerId" required>
+                    <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
+
+                <fieldset class="form-group">
+                    <legend class="legend-title">유형 선택</legend>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="type-lunch" name="type" value="점심" checked>
+                            <label for="type-lunch">점심</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="type-coffee" name="type" value="커피">
+                            <label for="type-coffee">커피</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="submit-btn">등록</button>
+            </form>
+
+            <div class="amount-panel">
+                <h2 class="amount-panel-title">개인별 금액 입력</h2>
+                <div class="amount-list" id="amount-list-container">
+                    <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                        참석자를 선택하면 여기에 입력칸이 생성됩니다.
+                    </p>
+                </div>
+            </div>
+
+        </div>
     </div>
-</footer>
+</div>
 
 <script th:inline="javascript">
     // --- 유저 데이터 로드 ---

@@ -6,7 +6,7 @@
     <title>점심/커피 내역 등록</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
    <link rel="stylesheet" th:href="@{/css/account/manage.css}">
 </head>
@@ -115,43 +115,31 @@
                     </table>
 
                     <!-- ✅ 여기 추가 -->
+                    <!-- 페이지네이션 -->
                     <div class="pagination">
+
                         <!-- 이전 페이지 -->
                         <a th:if="${page > 1}"
-                           th:href="@{/account/manage(
-                    page=${page - 1},
-                    size=${size},
-                    option=${search.option},
-                    keyword=${search.keyword},
-                    jssfcCd=${search.jssfcCd},
-                    registMonth=${search.registMonth}
-                )}">&laquo;</a>
+                           th:href="@{'/enter/manage'(page=${page - 1})}">
+                            &laquo;
+                        </a>
 
-                        <!-- 페이지 번호 -->
+                        <!-- 페이지 번호들 -->
                         <a th:each="p : ${#numbers.sequence(1, totalPages)}"
+                           th:href="@{'/enter/manage'(page=${p})}"
                            th:text="${p}"
-                           th:href="@{/account/manage(
-                    page=${p},
-                    size=${size},
-                    option=${search.option},
-                    keyword=${search.keyword},
-                    jssfcCd=${search.jssfcCd},
-                    registMonth=${search.registMonth}
-                )}"
-                           th:classappend="${p == page} ? 'active'">
+                           th:classappend="${p == page} ? ' active' : ''">
                         </a>
 
                         <!-- 다음 페이지 -->
                         <a th:if="${page < totalPages}"
-                           th:href="@{/account/manage(
-                    page=${page + 1},
-                    size=${size},
-                    option=${search.option},
-                    keyword=${search.keyword},
-                    jssfcCd=${search.jssfcCd},
-                    registMonth=${search.registMonth}
-                )}">&raquo;</a>
+                           th:href="@{'/enter/manage'(page=${page + 1})}">
+                            &raquo;
+                        </a>
+
+
                     </div>
+
 
                     <div class="regist-area">
                         <button type="button" class="submit-btn" onclick="location.href='/account/create'">등록</button>
