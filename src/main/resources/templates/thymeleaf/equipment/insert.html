@@ -91,7 +91,7 @@
     </select>
 </div>
     <div style="margin-top: 10px;">
-        <button type="button">취소하기</button>
+        <button type="button" id="cancelBtn">취소하기</button>
         <button type="submit" id="inputBtn">등록하기</button>
     </div>
 </form>
@@ -181,6 +181,11 @@
                 accessMessage.style.color = 'red';
                 accessValue=false;
             });
+    });
+
+    // 취소하기 버튼
+    document.getElementById("cancelBtn").addEventListener('click', ()=>{
+        window.location.href= '/equipment/list.do';
     });
 
     serialBtn.addEventListener('click', () => {
