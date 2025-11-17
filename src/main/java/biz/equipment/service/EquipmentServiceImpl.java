@@ -17,15 +17,16 @@ import java.util.List;
 public class EquipmentServiceImpl implements EquipmentService {
 
     final EquipmentDAO equipmentDAO;
+    private final EquipmentMapStruct equipmentMapStruct;
 
     @Override
     public List<EquipmentResponse> getEquipments() {
-        return EquipmentMapStruct.INSTANCE.toDto(equipmentDAO.findAll());
+        return equipmentMapStruct.toDto(equipmentDAO.findAll());
     }
 
     @Override
     public EquipmentResponse getEquipment(Long id) {
-        return EquipmentMapStruct.INSTANCE.toDto(equipmentDAO.findById(id));
+        return equipmentMapStruct.toDto(equipmentDAO.findById(id));
     }
 
     @Override

@@ -12,10 +12,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface EquipmentMapStruct {
 
-    EquipmentMapStruct INSTANCE = Mappers.getMapper(EquipmentMapStruct.class);
+    EquipmentResponse toDto(EquipmentVO e);
 
-    EquipmentResponse toDto(EquipmentVO vo);
-//
     @Mapping(target = "serialNumber" ,source = "serialNumber")
     @Mapping(target = "accessNumber" ,source = "accessNumber")
     @Mapping(target = "director" ,source = "director")

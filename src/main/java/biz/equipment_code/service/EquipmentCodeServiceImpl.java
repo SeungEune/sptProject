@@ -18,15 +18,16 @@ import java.util.List;
 public class EquipmentCodeServiceImpl implements EquipmentCodeService {
 
     private final EquipmentCodeDAO equipmentCodeDAO;
+    private final EquipmentCodeMapStruct equipmentCodeMapStruct;
 
     @Override
     public List<EquipmentCodeResponse> getCodes() {
-        return EquipmentCodeMapStruct.INSTANCE.toDto(equipmentCodeDAO.findAll());
+        return equipmentCodeMapStruct.toDto(equipmentCodeDAO.findAll());
     }
 
     @Override
     public EquipmentCodeResponse getEquipmentCode(Long codeId) {
-        return EquipmentCodeMapStruct.INSTANCE.toDto(equipmentCodeDAO.findById(codeId));
+        return equipmentCodeMapStruct.toDto(equipmentCodeDAO.findById(codeId));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class EquipmentCodeServiceImpl implements EquipmentCodeService {
 
     @Override
     public List<EquipmentCodeResponse> getFilteredCode(List<String> name) {
-        return EquipmentCodeMapStruct.INSTANCE.toDto(equipmentCodeDAO.findByName(name));
+        return equipmentCodeMapStruct.toDto(equipmentCodeDAO.findByName(name));
     }
 
     @Override

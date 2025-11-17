@@ -11,8 +11,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface EquipmentCodeMapStruct {
 
-    EquipmentCodeMapStruct INSTANCE = Mappers.getMapper(EquipmentCodeMapStruct.class);
-
     EquipmentCodeResponse toDto(EquipmentCodeVO vo);
 
     @Mapping(target = "code" ,source = "code")
