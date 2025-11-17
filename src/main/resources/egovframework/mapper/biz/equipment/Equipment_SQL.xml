@@ -42,6 +42,18 @@
         WHERE ID = #{id,jdbcType=BIGINT}
     </delete>
 
+    <select id="findBySerialNumber" resultType="String">
+        SELECT SERIAL_NUMBER
+        FROM EQUIPMENT
+        WHERE SERIAL_NUMBER = #{serialNumber}
+    </select>
+
+    <select id="findByAccessNumber" resultType="String">
+        SELECT ACCESS_NUMBER
+        FROM EQUIPMENT
+        WHERE ACCESS_NUMBER = #{accessNumber}
+    </select>
+
     <!--전체 삭제-->
     <delete id="deleteAll">
         DELETE

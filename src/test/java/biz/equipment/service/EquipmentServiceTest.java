@@ -77,6 +77,16 @@ public class EquipmentServiceTest {
     }
 
     @Test
+    void 일련_번호_중복_조회를_성공한다(){
+        assertThat(equipmentService.checkSerialNumber("serialNumber1")).isNotNull();
+    }
+
+    @Test
+    void 자산_번호_중복_조회를_성공한다(){
+        assertThat(equipmentService.checkAccessNumber("accessNumber1")).isNotNull();
+    }
+
+    @Test
     void 장비_상태_변경을_성공한다(){
         equipmentService.updateStatus(testVO.getId(), Status.DISPOSAL);
         assertThat(equipmentDAO.findById(testVO.getId()).getStatus()).isEqualTo(Status.DISPOSAL);

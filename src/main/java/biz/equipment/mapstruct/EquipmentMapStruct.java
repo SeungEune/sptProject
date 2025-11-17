@@ -5,6 +5,7 @@ import biz.equipment.vo.EquipmentVO;
 import lombok.Data;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public interface EquipmentMapStruct {
 
     EquipmentResponse toDto(EquipmentVO e);
 
+    @Mapping(target="id", source ="id")
     @Mapping(target = "serialNumber" ,source = "serialNumber")
     @Mapping(target = "accessNumber" ,source = "accessNumber")
     @Mapping(target = "director" ,source = "director")

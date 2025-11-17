@@ -29,6 +29,10 @@ public interface EquipmentMapper {
     // 전체 삭제
     void deleteAll();
 
+    String findBySerialNumber(@Param("serialNumber") String serialNumber);
+
+    String findByAccessNumber(@Param("accessNumber") String accessNumber);
+
     // 담당자 변경
     void updateDirector(@Param("id") Long id, @Param("director") String director);
 

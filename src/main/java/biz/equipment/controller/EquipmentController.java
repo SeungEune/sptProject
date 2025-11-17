@@ -12,18 +12,19 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/equipment")
 public class EquipmentController {
 
     final private EquipmentService equipmentService;
     // 장비 조회
-    @GetMapping("/equipment/equipmentList.do")
+    @GetMapping("/list.do")
     public String getEquipmentCodes(Model model) {
         model.addAttribute("equipment", equipmentService.getEquipments()) ;
-        return "equipment/equipmentList";
+        return "equipment/list";
     }
 
     // 장비 단건 조회
-    @GetMapping("view.do")
+    @GetMapping("/view.do")
     public String getEquipmentCode(@RequestParam("id") Long id, Model model) {
         model.addAttribute(equipmentService.getEquipment(id));
         return "equipment/view";
@@ -38,7 +39,7 @@ public class EquipmentController {
     @PostMapping("/insert.do")
     public String insertEquipment(@ModelAttribute EquipmentRequest equipmentRequest) {
         equipmentService.insertEquipment(equipmentRequest);
-        return "redirect:/equipment/list.do";
+        return "redirect:equipment/list.do";
     }
 
     // 장비 수정
@@ -51,7 +52,7 @@ public class EquipmentController {
     @PostMapping("/update.do")
     public String updateEquipment(@ModelAttribute EquipmentUpdate equipmentUpdate) {
          equipmentService.updateEquipment(equipmentUpdate);
-         return "redirect:/equipment/list.do";
+         return "redirect:equipment/update.do";
     }
 
     // 장비 삭제
@@ -59,6 +60,19 @@ public class EquipmentController {
     public String deleteEquipment(Long id) {
         equipmentService.deleteEquipment(id);
         return "redirect:/equipment/list.do";
+    }
+
+    // 중복 조회
+    @GetMapping("/check-serialNumber")
+    public String checkSerialNumber(@RequestParam String number, Model model) {
+        model.addAttribute(equipmentService.checkSerialNumber(number));
+        return "/equipment/insert.do";
+    }
+
+    @GetMapping("/check-accessNumber")
+    public String checkAccessNumber(@RequestParam String number, Model model) {
+        model.addAttribute(equipmentService.checkAccessNumber(number));
+        return "/equipment/insert.do";
     }
 
     // 관리자 수정

@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 public class EquipmentResponse {
 
+    private Long id;
+
     private String code;
 
     private String name;

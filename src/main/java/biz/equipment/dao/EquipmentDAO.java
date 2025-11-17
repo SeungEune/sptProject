@@ -39,6 +39,14 @@ public class EquipmentDAO extends EgovComAbstractDAO {
         equipmentMapper.deleteAll();
     }
 
+    public String findBySerialNumber(String serialNumber) {
+        return equipmentMapper.findBySerialNumber(serialNumber);
+    }
+
+    public String findByAccessNumber(String accessNumber) {
+        return equipmentMapper.findByAccessNumber(accessNumber);
+    }
+
     public void updateDirector(Long id, String director) {
         equipmentMapper.updateDirector(id, director);
     }

@@ -45,6 +45,16 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    public String checkSerialNumber(String serialNumber) {
+        return equipmentDAO.findBySerialNumber(serialNumber);
+    }
+
+    @Override
+    public String checkAccessNumber(String accessNumber) {
+       return equipmentDAO.findByAccessNumber(accessNumber);
+    }
+
+    @Override
     public void updateDirector(Long id, String director) {
         equipmentDAO.updateDirector(id, director);
     }

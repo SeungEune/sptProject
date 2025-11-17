@@ -26,6 +26,11 @@ public interface EquipmentService {
     // 장비 분류코드 삭제
     void deleteEquipment(Long id);
 
+    // 코드 중복 검증
+    String checkSerialNumber(String serialNumber);
+
+    String checkAccessNumber(String accessNumber);
+
     // 담당자 변경
     void updateDirector(Long id, String director);
 
