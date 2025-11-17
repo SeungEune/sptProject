@@ -7,15 +7,14 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
     <style>
-        /* 삭제 버튼 빨간색 */
         .delete-btn {
             background-color: #dc2626 !important;
         }
         .delete-btn:hover {
             background-color: #b91c1c !important;
         }
-        /* 읽기 전용 스타일 */
         .readonly-form input[type="text"],
         .readonly-form input[type="date"],
         .readonly-form input[type="number"] {
@@ -24,83 +23,43 @@
         }
     </style>
 </head>
+
 <body class="page-wrapper">
 
+<!--모바일 메뉴 버튼 -->
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
 <div id="overlay" class="mobile-overlay"></div>
-<header class="site-header">
-    <div class="header-container">
-        <a th:href="@{/}" class="logo">
-            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
-        </a>
-        <nav class="user-nav">
-            <a th:href="@{/mypage}">
-                <i class="fas fa-user"></i>
-                <span>마이페이지</span>
-            </a>
-            <a th:href="@{/logout}">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>로그아웃</span>
-            </a>
-        </nav>
-    </div>
-</header>
+
+<!--공통 Header -->
+<header th:replace="cmm/header :: headerLayout"></header>
+
 <div class="main-container">
-    <aside class="sidebar" id="sidebar">
-        <button id="close-menu" class="mobile-close-btn">
-            <i class="fas fa-times"></i>
-        </button>
-        <nav class="sidebar-nav">
-            <div class="nav-group">
-                <h3 class="nav-title">계정관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/account/manage}">계정관리</a></li>
-                    <li><a th:href="@{/account/reset}">비밀번호 초기화</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">출입관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/access/manage}">계정관리</a></li>
-                    <li><a th:href="@{/access/reset}">비밀번호 초기화</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">장비관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">정산관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/lunch/register.do}">내역등록</a></li>
-                    <li><a th:href="@{/lunch/list.do}" class="active">내역조회</a></li>
-                    <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
+
+    <!--공통 Sidebar -->
+    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+
+    <!--본문-->
     <main class="content-area">
         <div class="content-inner">
             <h1 class="content-title">점심/커피 내역 삭제</h1>
 
             <div class="content-body">
 
-                <form class="entry-form readonly-form" th:action="@{/lunch/delete.do}" method="post">
-                    
-                    <input type="hidden" name="lunchId" th:value="${lunch.lunch_id}">
+                <form class="entry-form readonly-form"
+                      th:action="@{/lunch/delete.do}" method="post">
+
+                    <input type="hidden" name="lunchId" th:value="${lunch.lunchId}">
 
                     <div class="form-group">
                         <label for="date-input">날짜</label>
-                        <input type="date" id="date-input" name="date" th:value="${lunch.date}" disabled>
+                        <input type="date" id="date-input" th:value="${lunch.date}" disabled>
                     </div>
 
                     <div class="form-group">
                         <label for="store-name">가게명</label>
-                        <input type="text" id="store-name" name="storeName" th:value="${lunch.store_name}" disabled>
+                        <input type="text" id="store-name" th:value="${lunch.storeName}" disabled>
                     </div>
 
                     <div class="form-group">
@@ -110,29 +69,38 @@
 
                     <div class="form-group">
                         <label for="payer-name">계산자</label>
-                        <input type="text" id="payer-name" th:value="${lunch.payer_name}" disabled>
+                        <input type="text" id="payer-name" th:value="${lunch.payerName}" disabled>
                     </div>
 
                     <fieldset class="form-group">
                         <legend class="legend-title">유형</legend>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" id="type-lunch" name="type" value="점심" th:checked="${lunch.type == '점심'}" disabled>
+                                <input type="radio" id="type-lunch" value="점심"
+                                       th:checked="${lunch.type == '점심'}" disabled>
                                 <label for="type-lunch">점심</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" id="type-coffee" name="type" value="커피" th:checked="${lunch.type == '커피'}" disabled>
+                                <input type="radio" id="type-coffee" value="커피"
+                                       th:checked="${lunch.type == '커피'}" disabled>
                                 <label for="type-coffee">커피</label>
                             </div>
                         </div>
                     </fieldset>
 
-                    <button type="submit" class="submit-btn delete-btn" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+                    <button type="submit"
+                            class="submit-btn delete-btn"
+                            onclick="return confirm('정말 삭제하시겠습니까?');">
+                        삭제
+                    </button>
+
                 </form>
+
                 <div class="amount-panel">
                     <h2 class="amount-panel-title">개인별 금액</h2>
+
                     <div class="amount-list" id="amount-list-container">
-                        <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                        <p id="amount-placeholder" class="amount-placeholder">
                             참석자 정보를 불러오는 중...
                         </p>
                     </div>
@@ -143,82 +111,60 @@
     </main>
 </div>
 
-<footer class="site-footer-bottom">
-    <div class="footer-container">
-        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
-        <p class="footer-slogan">
-            <span class="line">전북 전주시 덕진구 만성북로 51-25, 3015호 스패셜티 (스페이스온 지식산업센터)</span>
-            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
-        </p>
-    </div>
-</footer>
+<!--공통 Footer -->
+<footer th:replace="cmm/footer :: footerLayout"></footer>
+
 
 <script th:inline="javascript">
-    // --- 유저 데이터 로드 ---
     const userList = /*[[${userList}]]*/ [];
-    
-    // --- 기존 참여자 데이터 로드 ---
     const existingParticipants = /*[[${lunch.participants}]]*/ '';
-    
-    // 페이지 로드 시 기존 참여자 표시 (읽기 전용)
+
     window.addEventListener('DOMContentLoaded', function() {
+
         const container = document.getElementById('amount-list-container');
         const placeholder = document.getElementById('amount-placeholder');
-        
+
         if (existingParticipants) {
+
             placeholder.style.display = 'none';
-            
-            const participants = existingParticipants.split(', ');
-            participants.forEach(function(item) {
+
+            const list = existingParticipants.split(', ');
+
+            list.forEach(item => {
                 const [userId, amount] = item.split(':');
-                const user = userList.find(u => u.userid === userId);
-                if (user) {
-                    const amountRow = document.createElement('div');
-                    amountRow.className = 'amount-row';
+                const user = userList.find(u => u.userId === userId);
 
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'name';
-                    nameSpan.innerText = user.usernm;
+                if (!user) return;
 
-                    const amountGroup = document.createElement('div');
-                    amountGroup.className = 'amount-input-group';
+                const row = document.createElement('div');
+                row.className = 'amount-row';
 
-                    const amountInput = document.createElement('input');
-                    amountInput.type = 'number';
-                    amountInput.value = amount;
-                    amountInput.disabled = true;
-                    amountInput.style.backgroundColor = '#f3f4f6';
-                    amountInput.style.cursor = 'not-allowed';
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = user.userName;
 
-                    const unitSpan = document.createElement('span');
-                    unitSpan.innerText = '원';
+                const group = document.createElement('div');
+                group.className = 'amount-input-group';
 
-                    amountGroup.appendChild(amountInput);
-                    amountGroup.appendChild(unitSpan);
+                const amountInput = document.createElement('input');
+                amountInput.type = 'number';
+                amountInput.value = amount;
+                amountInput.disabled = true;
+                amountInput.style.backgroundColor = '#f3f4f6';
+                amountInput.style.cursor = 'not-allowed';
 
-                    amountRow.appendChild(nameSpan);
-                    amountRow.appendChild(amountGroup);
+                const unitSpan = document.createElement('span');
+                unitSpan.textContent = '원';
 
-                    container.appendChild(amountRow);
-                }
+                group.appendChild(amountInput);
+                group.appendChild(unitSpan);
+
+                row.appendChild(nameSpan);
+                row.appendChild(group);
+
+                container.appendChild(row);
             });
         }
-    });
-
-    // --- 모바일 메뉴 토글 ---
-    document.getElementById('menu-toggle').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.add('show');
-        document.getElementById('overlay').classList.add('show');
-    });
-
-    document.getElementById('close-menu').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.remove('show');
-        document.getElementById('overlay').classList.remove('show');
-    });
-
-    document.getElementById('overlay').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.remove('show');
-        document.getElementById('overlay').classList.remove('show');
     });
 </script>
 

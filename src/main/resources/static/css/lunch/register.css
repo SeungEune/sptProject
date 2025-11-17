@@ -465,7 +465,6 @@ input, button {
         margin: 0 auto;
     }
 }
-/* --- ✅ [추가] 모바일 토글 버튼 스타일 --- */
 .mobile-menu-toggle {
     display: none; /* 평상시(PC)에는 숨김 */
     position: fixed;
@@ -502,7 +501,6 @@ input, button {
     z-index: 999;
 }
 
-/* --- ✅ [추가] 활성화(active) 상태 스타일 --- */
 .sidebar.active {
     transform: translateX(0); /* 사이드바 보이기 */
 }
