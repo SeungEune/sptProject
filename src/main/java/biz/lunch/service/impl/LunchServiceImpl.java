@@ -20,17 +20,17 @@ public class LunchServiceImpl implements LunchService {
     private LunchMapper lunchMapper;
 
     /**
-     * 요약 테이블 갱신
+     * 요약 테이블(데이터 변경(등록/수정/삭제)이 일어날 때마다 통계 테이블을 최신 상태로 갱신)
      */
     private void updateSummary(String dateStr) throws Exception {
         if (dateStr == null || dateStr.isEmpty()) {
             log.warn("date 파라미터가 null이거나 비어 있습니다. 요약 갱신을 건너뜁니다.");
             return;
         }
-
+        // 날짜 문자열에서 월만 추출
         String month = dateStr.substring(0, 7);
         log.info("요약 테이블 갱신 시작 (month={})", month);
-
+        // 매퍼를 호출하여 해당 월의 통계 데이터를 다시 계산해서 저장하도록 시킴
         Map<String, Object> map = new HashMap<>();
         map.put("month", month);
         lunchMapper.updateSummaryAfterChange(map);
@@ -42,38 +42,41 @@ public class LunchServiceImpl implements LunchService {
 
     @Override
     public List<Map<String, Object>> getUserList() throws Exception {
+        // 단순히 매퍼를 호출하여 DB에 있는 사용자 목록을 가져와 리턴
         return lunchMapper.getUserList();
     }
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int registerLunch(Map<String, Object> params) throws Exception {
         log.info("점심/커피 내역 등록 - params={}", params);
-
+        // 1. 총 금액 계산
         int totalAmount = 0;
         if (params.containsKey("participants")) {
             List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
             if (participants != null) {
                 for (Map<String, Object> p : participants) {
-                    // 컨트롤러에서 문자열로 넘어왔으므로 숫자로 변환
+                    // 각 참여자의 금액을 합산 (문자열 -> 정수 변환)
                     totalAmount += Integer.parseInt(p.get("individualAmount").toString());
                 }
             }
         }
         params.put("totalAmount", totalAmount);
-
+        // lunch_master에 데이터 삽입 (가게명, 결제자, 날짜 등)
         int masterResult = lunchMapper.registerLunch(params);
         if (masterResult > 0 && params.containsKey("lunchId")) {
 
             if (params.containsKey("participants")) {
-                // 리스트를 직접 가져와서 null이 아니고 비어있는지(!isEmpty) 확인
+                // 리스트를 직접 가져와서 null이 아니고 비어있는지 확인
                 List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
-
+                // 참여자가 있는 경우에만 일괄 삽입(Batch Insert) 수행
                 if (participants != null && !participants.isEmpty()) {
                     lunchMapper.insertParticipantsBatch(params);
                     log.debug("참여자 등록 완료");
                 } else {
                     // 참여자가 0명인 경우는 로그를 남기고 실행을 건너뜀
-                    log.warn("참여자가 0명이므로 insertParticipantsBatch를 건너뜁니다.");
+                    log.warn("참여자가 0명이므로 건너뜁니다.");
                 }
             }
 

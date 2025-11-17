@@ -30,11 +30,27 @@
         <div class="nav-group">
             <h3 class="nav-title">정산관리</h3>
             <ul class="nav-list">
-                <li><a th:href="@{/lunch/register}" class="active">내역등록</a></li>
-                <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
-                <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
+                <li>
+                    <a th:href="@{/lunch/register.do}"
+                       th:classappend="${#httpServletRequest.requestURI.endsWith('/lunch/register.do')} ? ' active'">
+                        내역등록
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/lunch/list.do}"
+                       th:classappend="${#httpServletRequest.requestURI.endsWith('/lunch/list.do')} ? ' active'">
+                        내역조회
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/lunch/statistics.do}"
+                       th:classappend="${#httpServletRequest.requestURI.endsWith('/lunch/statistics.do')} ? ' active'">
+                        통계조회
+                    </a>
+                </li>
             </ul>
         </div>
+
     </nav>
 </aside>
 </div>
