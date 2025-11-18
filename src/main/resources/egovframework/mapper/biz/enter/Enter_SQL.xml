@@ -86,18 +86,22 @@
     <update id="updateEnter" parameterType="biz.enter.vo.EnterVO">
         UPDATE tb_enter
         SET
-        <if test="type == 'EMP'">
-            user_id      = #{userId},
+        <!-- userId 가 있을 때만 바꾸고, 없으면 건너뜀 -->
+        <if test="userId != null and userId != ''">
+            user_id = #{userId},
         </if>
-            guest_nm     = #{guestNm},
-            guest_phone  = #{guestPhone},
-            guest_email  = #{guestEmail},
-            method_cd    = #{method},
-            status_cd    = #{status},
-            type_cd      = #{type},
-            end_guest_dt = #{endGuestDt, jdbcType=DATE}
+        guest_nm     = #{guestNm},
+        guest_phone  = #{guestPhone},
+        guest_email  = #{guestEmail},
+        method_cd    = #{method},
+        status_cd    = #{status},
+        type_cd      = #{type}
+        <if test="endGuestDt != null">
+         , end_guest_dt = #{endGuestDt, jdbcType=DATE}
+        </if>
         WHERE enter_id = #{enterId}
     </update>
+
 
     <delete id="deleteEnter" parameterType="Long">
         DELETE FROM tb_enter

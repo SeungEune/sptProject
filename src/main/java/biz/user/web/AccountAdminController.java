@@ -103,6 +103,9 @@ public class AccountAdminController {
         UserVO user = userService.getUser(userId);
         model.addAttribute("user", user);
         model.addAttribute("mode", "view");   // ★ 조회 모드
+
+        System.out.println("~~~~~~~~~~~~~~~~~~");
+        System.out.println(user);
         return "account/edit";
     }
     // 수정 화면(입력 가능)
