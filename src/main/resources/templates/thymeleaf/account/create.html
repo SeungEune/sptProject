@@ -14,8 +14,14 @@
     <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
     <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
 
-    <!-- ✅ 이 페이지 전용 -->
     <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
+
+    <style>
+        #id-chk-area{
+            width: 100%;
+            display: flex;
+        }
+    </style>
 
 </head>
 <body>
@@ -31,7 +37,7 @@
 <div th:replace="~{cmm/header :: headerLayout}"></div>
 
         <div th:fragment="content">
-            <h1 class="content-title">계정관리</h1>
+            <h1 class="content-title">계정등록</h1>
 
             <div class="content-body form">
 
@@ -89,7 +95,7 @@
                             <div class="form-actions">
                                 <div class="btn-area">
                                     <button type="submit" class="submit-btn">확인</button>
-                                    <button type="button" class="cancel-btn" onclick="location.href='/account/manage'">취소</button>
+                                    <button type="button" class="cancel-btn btn btn-cancel" onclick="location.href='/account/manage'">취소</button>
                                 </div>
                             </div>
                         </form>
