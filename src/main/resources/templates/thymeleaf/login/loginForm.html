@@ -2,34 +2,68 @@
 <html th:replace="~{cmm/layout/loginLayout :: layout(~{::content}, '로그인')}"
       xmlns:th="http://www.thymeleaf.org">
 <body th:fragment="content">
-    <div class="login-container">
-        <div class="login-box">
-            <h2>로그인</h2>
-            
-            <!-- 에러 메시지 표시 -->
-            <div th:if="${loginError}" class="error-message" th:text="${loginError}"></div>
-            
-            <form th:action="@{/login/actionLogin.do}" method="post">
-                <div class="form-group">
-                    <label for="userId">아이디</label>
-                    <input type="text" id="userId" name="userId" required autofocus>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">비밀번호</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                
-                <button type="submit" class="login-btn">로그인</button>
-            </form>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-            <div class="login-footer">
-                <p>Spatialt Common Framework</p>
+<link rel="stylesheet" th:href="@{/css/login.css}">
+
+<div class="login-container">
+    <div class="login-box">
+
+        <div style="text-align: center;">
+            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 로고" class="login-logo-img">
+        </div>
+
+        <div th:if="${loginError}" class="error-message-box" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>
+                <p class="error-title">로그인 실패</p>
+                <p class="error-text" th:text="${loginError}"></p>
             </div>
         </div>
+
+        <form class="mt-10" th:action="@{/login/actionLogin.do}" method="post">
+
+            <div class="form-group">
+                <label for="userId" class="form-label">아이디</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input id="userId" name="userId" type="text" required autofocus
+                           class="form-input" placeholder="아이디를 입력하세요">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">비밀번호</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input id="password" name="password" type="password" required
+                           class="form-input" placeholder="비밀번호를 입력하세요">
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem;">
+                <button type="submit" class="btn-login">
+                        <span class="btn-icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </span>
+                    로그인
+                </button>
+            </div>
+        </form>
+
+        <div class="login-footer">
+            <p>
+                © 2025 Spatialt Specialty Co., Ltd.<br>All rights reserved.
+            </p>
+        </div>
     </div>
-    <script th:src="@{/js/account/loginModal.js}"></script>
+</div>
+
+<script th:src="@{/js/account/loginModal.js}"></script>
 </body>
 </html>
-
