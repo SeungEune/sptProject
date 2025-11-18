@@ -31,12 +31,16 @@
             <!-- 검색 (월별 조회) -->
             <form th:action="@{/lunch/list.do}" method="get" class="mb-4">
 
-                <div class="relative w-full max-w-sm border border-gray-300 rounded bg-white px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50">
-                    <span id="date-range-text" class="font-bold text-gray-700 text-sm sm:text-base">날짜 계산 중...</span>
-                    <i class="far fa-calendar-alt text-gray-500 text-lg"></i>
+                <div class="relative w-full max-w-md border border-gray-300 rounded bg-white px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+
+                    <span id="date-range-text" class="font-bold text-gray-700 text-2xl">날짜 계산 중...</span>
+
+                    <i class="far fa-calendar-alt text-gray-500 text-2xl"></i>
+
                     <input type="month" id="searchMonthInput" name="date"
                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                            th:value="${lunchVO.date}"
+                           onclick="this.showPicker()"
                            onchange="updateDateRange(this.value); this.form.submit();" />
                 </div>
             </form>
