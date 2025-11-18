@@ -36,11 +36,10 @@
     <main class="content-area">
         <div class="content-inner" th:insert="${content}"></div>
             <!-- 여기 내용은 개별 페이지에서 덮어씌움 -->
-        </div>
     </main>
 </div>
 
-<!-- ✅ footer 조각 사용 -->
+<!-- footer 조각 사용 -->
 <div th:replace="~{cmm/footer :: footerLayout}"></div>
 
 <!-- loading -->
