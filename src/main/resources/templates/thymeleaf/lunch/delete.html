@@ -7,21 +7,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
-
-    <style>
-        .delete-btn {
-            background-color: #dc2626 !important;
-        }
-        .delete-btn:hover {
-            background-color: #b91c1c !important;
-        }
-        .readonly-form input[type="text"],
-        .readonly-form input[type="date"],
-        .readonly-form input[type="number"] {
-            background-color: #f3f4f6;
-            cursor: not-allowed;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -82,10 +68,8 @@
                     </div>
                 </fieldset>
 
-                <button type="submit"
-                        class="submit-btn delete-btn"
-                        onclick="return confirm('정말 삭제하시겠습니까?');">
-                    삭제
+                <button type="button"
+                        class="submit-btn btn-red" onclick="confirmDelete()">삭제
                 </button>
 
             </form>
@@ -107,6 +91,28 @@
 <script th:inline="javascript">
     const userList = /*[[${userList}]]*/ [];
     const existingParticipants = /*[[${lunch.participants}]]*/ '';
+
+    function confirmDelete() {
+        Swal.fire({
+            title: '점심/커피 내역 삭제',
+            text: '이 점심/커피 내역을 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+            allowOutsideClick: false,
+            // 스타일 지정
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn-red',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('.entry-form').submit();
+            }
+        });
+    }
 
     window.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('amount-list-container');

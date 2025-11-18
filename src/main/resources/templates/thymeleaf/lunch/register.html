@@ -9,6 +9,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -85,9 +86,8 @@
                     <!-- hidden fields -->
                     <div id="hidden-fields"></div>
 
-                    <button type="submit" class="submit-btn">등록</button>
+                    <button type="button" class="submit-btn" onclick="confirmAdd()">등록</button>
                 </form>
-
 
                 <!-- 오른쪽 금액 입력 패널 -->
                 <div class="amount-panel">
@@ -213,6 +213,7 @@
         document.getElementById('search-results').style.display = 'none';
     }
 
+
     // --- removeParticipant ---
     function removeParticipant(userId) {
         selectedParticipants.delete(userId);
@@ -269,6 +270,29 @@
         document.getElementById('payerId').value = userId;
         document.getElementById('payer-search').value = userName;
         document.getElementById('payer-results').style.display = 'none';
+    }
+
+    // 확인 모달
+    function confirmAdd() {
+        Swal.fire({
+            title: '내역 등록',
+            text: "현재 내용으로 새로 등록하시겠습니까?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '등록',
+            cancelButtonText: '취소',
+
+            //스타일 지정
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                 document.querySelector('.entry-form').submit();
+            }
+        });
     }
 
     // --- 사이드바 토글 ---

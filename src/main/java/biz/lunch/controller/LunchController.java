@@ -99,7 +99,6 @@ public class LunchController {
     public String updateLunch(@ModelAttribute LunchVO lunchVO) throws Exception {
         // List<ParticipantVO>로 변환
         lunchVO.makeParticipantList();
-
         lunchService.updateLunch(lunchVO);
         return "redirect:/lunch/list.do";
     }
@@ -116,7 +115,6 @@ public class LunchController {
         if (lunchList != null && !lunchList.isEmpty()) {
             model.addAttribute("lunch", lunchList.get(0));
         }
-
         model.addAttribute("userList", userList);
         return "lunch/delete";
     }
