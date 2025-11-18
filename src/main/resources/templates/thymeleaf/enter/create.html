@@ -19,13 +19,8 @@
     <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
     <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
 
-    <!-- ✅ 이 페이지 전용 -->
         <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
 
-    <style>
-        .form-section { margin-top: 20px; }
-        .hidden { display: none; }
-    </style>
 </head>
 <body>
 
@@ -51,19 +46,23 @@
                         <!-- 1) 유형 선택 -->
                         <div class="form-group">
                             <label>유형</label>
-                            <div>
-                                <label>
+                            <div class="radio-group">
+                                <label class="radio-option">
                                     <input type="radio"
                                            th:field="*{type}"
-                                           value="GUEST"> 게스트
+                                           value="GUEST">
+                                    <span>게스트</span>
                                 </label>
-                                <label style="margin-left:20px;">
+
+                                <label class="radio-option">
                                     <input type="radio"
                                            th:field="*{type}"
-                                           value="EMP"> 직원
+                                           value="EMP">
+                                    <span>직원</span>
                                 </label>
                             </div>
                         </div>
+
 
                         <!-- 2) 공통 출입수단 -->
                         <div class="form-group">
@@ -137,9 +136,11 @@
 
 
                         <div class="form-actions">
-                            <button type="submit" class="submit-btn">등록</button>
-                            <button type="button" class="cancel-btn"
-                                    onclick="location.href='/enter/manage'">취소</button>
+                            <div class="btn-area">
+                                <button type="submit" class="submit-btn">등록</button>
+                                <button type="button" class="cancel-btn btn btn-cancel"
+                                        onclick="location.href='/enter/manage'">취소</button>
+                            </div>
                         </div>
 
                     </form>
