@@ -42,7 +42,9 @@
                         <span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span>
                     </label>
                     <input type="text" id="participant-search"
-                           onkeyup="filterParticipants()" placeholder="내용을 입력하세요">
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
+                           onkeyup="filterParticipants()"
+                           placeholder="내용을 입력하세요">
                     <div id="search-results"
                          class="search-results-dropdown" style="display: none;"></div>
                 </div>
@@ -52,8 +54,11 @@
                         계산자 선택
                         <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
                     </label>
-                    <input type="text" id="payer-search" onkeyup="filterPayers()"
-                           placeholder="내용을 입력하세요" th:value="${lunch.payerName}">
+                    <input type="text" id="payer-search"
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
+                           onkeyup="filterPayers()"
+                           placeholder="내용을 입력하세요"
+                           th:value="${lunch.payerName}">
                     <input type="hidden" id="payerId" name="payerId"
                            th:value="${lunch.payerId}" required>
                     <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
@@ -79,7 +84,7 @@
 
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                         <button type="submit" class="submit-btn">수정</button>
-                        <button type="button" class="submit-btn delete-btn" onclick="goToDelete()">추가</button>
+                        <button type="button" class="submit-btn add-btn" onclick="registerAgain()">추가</button>
                     </div>
                 </form>
 
@@ -117,11 +122,20 @@
     // 기존 참여자 입력칸 자동 생성
     window.addEventListener('DOMContentLoaded', function() {
         if (existingParticipants) {
-            const participants = existingParticipants.split(', ');
+            // 콤마로 분리
+            const participants = existingParticipants.split(',');
             participants.forEach(function(item) {
-                const [userId, amount] = item.split(':');
-                const user = userList.find(u => u.userId === userId);
-                if (user) addParticipant(userId, user.userName, parseInt(amount));
+                // 콜론으로 분리
+                const parts = item.split(':');
+                if (parts.length === 2) {
+                    // trim()으로 공백 제거
+                    const userId = parts[0].trim();
+                    const amount = parseInt(parts[1].trim());
+
+                    // 유저 찾아서 추가
+                    const user = userList.find(u => u.userId === userId);
+                    if (user) addParticipant(userId, user.userName, amount);
+                }
             });
         }
     });
@@ -164,6 +178,7 @@
         const placeholder = document.getElementById('amount-placeholder');
         placeholder.style.display = 'none';
 
+        // --- UI 요소 생성 (화면 표시용) ---
         const row = document.createElement('div');
         row.className = 'amount-row';
         row.id = 'participant-row-' + userId;
@@ -175,17 +190,12 @@
         const group = document.createElement('div');
         group.className = 'amount-input-group';
 
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'participantUserIds';
-        hiddenInput.value = userId;
-
-        const amountInput = document.createElement('input');
-        amountInput.type = 'number';
-        amountInput.name = 'participantAmounts';
-        amountInput.placeholder = '금액입력';
-        amountInput.value = initialAmount;
-        amountInput.required = true;
+        // 화면용 금액 입력창 (name 속성 제거 - 중복 전송 방지)
+        const uiAmountInput = document.createElement('input');
+        uiAmountInput.type = 'number';
+        uiAmountInput.placeholder = '금액입력';
+        uiAmountInput.value = initialAmount;
+        uiAmountInput.required = true;
 
         const unitSpan = document.createElement('span');
         unitSpan.innerText = '원';
@@ -196,20 +206,56 @@
         removeBtn.innerHTML = '<i class="fas fa-times"></i>';
         removeBtn.onclick = () => removeParticipant(userId);
 
-        group.appendChild(hiddenInput);
-        group.appendChild(amountInput);
+        group.appendChild(uiAmountInput);
         group.appendChild(unitSpan);
         group.appendChild(removeBtn);
 
         row.appendChild(nameSpan);
         row.appendChild(group);
-
         container.appendChild(row);
+
+        // --- Hidden Fields 생성 (Form 내부 전송용) [핵심 수정] ---
+        const hiddenFields = document.getElementById("hidden-fields");
+
+        const hiddenUserInput = document.createElement("input");
+        hiddenUserInput.type = "hidden";
+        hiddenUserInput.name = "participantUserIds";
+        hiddenUserInput.value = userId;
+        hiddenUserInput.id = "hidden-user-" + userId;
+
+        const hiddenAmountInput = document.createElement("input");
+        hiddenAmountInput.type = "hidden";
+        hiddenAmountInput.name = "participantAmounts";
+        // 값이 없으면 '0'으로 처리하여 에러 방지
+        hiddenAmountInput.value = (initialAmount === '' ? '0' : initialAmount);
+        hiddenAmountInput.id = "hidden-amount-" + userId;
+
+        // UI 입력값 변경 시 Hidden 값 동기화
+        uiAmountInput.addEventListener("input", () => {
+            hiddenAmountInput.value = uiAmountInput.value === '' ? '0' : uiAmountInput.value;
+        });
+
+        hiddenFields.appendChild(hiddenUserInput);
+        hiddenFields.appendChild(hiddenAmountInput);
 
         document.getElementById('participant-search').value = '';
         document.getElementById('search-results').style.display = 'none';
     }
 
+    function registerAgain() {
+        // ① 현재 form 가져오기
+        const form = document.querySelector('.entry-form');
+
+        // ② action을 등록 URL로 변경
+        form.action = '/lunch/register.do';
+
+        // ③ lunchId input 제거 (기존 수정이 아니라 "새로운 등록"이기 때문)
+        const lunchIdInput = form.querySelector('input[name="lunchId"]');
+        if (lunchIdInput) lunchIdInput.remove();
+
+        // ④ 제출
+        form.submit();
+    }
     function removeParticipant(userId) {
         selectedParticipants.delete(userId);
         const row = document.getElementById('participant-row-' + userId);

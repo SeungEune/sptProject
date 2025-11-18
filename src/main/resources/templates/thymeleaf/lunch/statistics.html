@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!--모바일 토글 버튼 -->
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
@@ -27,17 +26,20 @@
 
         <div class="content-body lunch-layout" style="display: block;">
 
-            <form th:action="@{/lunch/statistics.do}" method="get"
-                  class="flex items-center gap-2 mb-4">
-                <input type="month" name="searchMonth"
-                       class="border border-gray-300 rounded p-2"
-                       th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
-                       onchange="this.form.submit()" />
+            <form th:action="@{/lunch/statistics.do}" method="get" class="mb-4">
+                <div class="relative w-full max-w-sm border border-gray-300 rounded bg-white px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+                    <span id="date-range-text" class="font-bold text-gray-700 text-sm sm:text-base">날짜 계산 중...</span>
+                    <i class="far fa-calendar-alt text-gray-500 text-lg"></i>
+
+                    <input type="month" id="searchMonthInput" name="date"
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                           th:value="${lunchVO.date}"
+                           onchange="updateDateRange(this.value); this.form.submit();" />
+                </div>
             </form>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                <!-- 사용자별 통계 -->
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <h2 class="text-xl font-semibold mb-4">사용자별 통계 (부담금 vs 결제금)</h2>
                     <canvas id="userSummaryChart"></canvas>
@@ -55,19 +57,16 @@
                     </div>
                 </div>
 
-                <!-- 일별 지출 추이 -->
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <h2 class="text-xl font-semibold mb-4">일별 지출 추이 (종합)</h2>
                     <canvas id="dailyExpenseChart"></canvas>
                 </div>
 
-                <!-- 일자별 지출 (점심/커피) -->
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <h2 class="text-xl font-semibold mb-4">일자별 지출 (점심/커피 구분)</h2>
                     <canvas id="dailyTypeChart"></canvas>
                 </div>
 
-                <!-- 사용자별 송금/수금 -->
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <h2 class="text-xl font-semibold mb-4">사용자별 송금/수금 총액</h2>
                     <canvas id="balanceChart"></canvas>
@@ -105,8 +104,36 @@
         if (overlay) overlay.addEventListener('click', closeSidebarFunc);
     }
 
-    //Chart.js 로직
+    // --- 날짜 UI 업데이트 함수 (유지) ---
+    function updateDateRange(dateStr) {
+        if (!dateStr) return;
+
+        const endDate = new Date(dateStr + "-25");
+        const startDate = new Date(endDate);
+        startDate.setMonth(startDate.getMonth() - 1);
+        startDate.setDate(26);
+
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth() + 1;
+        const startDay = startDate.getDate();
+
+        const endMonth = endDate.getMonth() + 1;
+        const endDay = endDate.getDate();
+
+        const text = `${startYear}년 ${startMonth}월 ${startDay}일 ~ ${endMonth}월 ${endDay}일`;
+        const textSpan = document.getElementById('date-range-text');
+        if (textSpan) textSpan.innerText = text;
+    }
+
+
+    // --- Chart.js 로직 ---
     document.addEventListener("DOMContentLoaded", function() {
+
+        // 초기 날짜 텍스트 세팅
+        const input = document.getElementById('searchMonthInput');
+        if(input && input.value) {
+            updateDateRange(input.value);
+        }
 
         const summaryList = /*[[${summaryList}]]*/ [];
         const lunchList = /*[[${lunchList}]]*/ [];
@@ -119,7 +146,8 @@
         const colorRed = 'rgba(255, 99, 132, 0.7)';
         const colorRedBorder = 'rgba(255, 99, 132, 1)';
 
-        // 사용자별 부담금/결제금
+
+        // --- 1. 사용자별 부담금/결제금 ---
         if (summaryList && summaryList.length > 0) {
             const ctxUser = document.getElementById('userSummaryChart').getContext('2d');
             const userLabels = summaryList.map(s => s.userName);
@@ -132,14 +160,14 @@
                     labels: userLabels,
                     datasets: [
                         {
-                            label: '총 부담금',
+                            label: '본인이 먹은 금액',
                             data: owed,
                             backgroundColor: colorBlueLight,
                             borderColor: colorBlueBorderLight,
                             borderWidth: 1
                         },
                         {
-                            label: '총 결제금',
+                            label: '본인이 결제한 금액',
                             data: paid,
                             backgroundColor: colorBlueDark,
                             borderColor: colorBlueBorderDark,
@@ -149,17 +177,17 @@
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
-                    },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
                     plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } }
                 }
             });
         }
 
-        // 일별 지출 추이
+        // --- 2. 일별 지출 추이 (합계 로직 제거 -> 개별 건 표시) ---
         if (lunchList && lunchList.length > 0) {
             const ctxDaily = document.getElementById('dailyExpenseChart').getContext('2d');
+
+            // [수정됨] 합계 계산 없이, 리스트 순서만 시간순(오래된 순)으로 뒤집어서 그대로 표시
             const list = [...lunchList].reverse();
 
             const labels = list.map(i => i.date.substring(5));
@@ -170,7 +198,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '일별 지출액',
+                        label: '지출 내역',
                         data: amounts,
                         fill: true,
                         backgroundColor: 'rgba(59, 130, 246, 0.2)',
@@ -185,18 +213,18 @@
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
-                    }
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
+                    plugins: { tooltip: { callbacks: { label: ctx => `금액: ${formatCurrency(ctx.raw)}` } } }
                 }
             });
         }
 
-        // 일자별 점심/커피 구분
+        // --- 3. 일자별 점심/커피 구분 (기존 로직 유지) ---
         if (lunchList && lunchList.length > 0) {
             const ctxType = document.getElementById('dailyTypeChart').getContext('2d');
 
             const map = new Map();
+            // 여기서는 날짜별로 점심/커피 총액을 보여주는 게 맞으므로 기존 합산 로직 유지
             const sorted = [...lunchList].reverse();
 
             for (const item of sorted) {
@@ -222,14 +250,12 @@
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
-                    }
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } }
                 }
             });
         }
 
-        // 사용자별 송금/수금 총액
+        // --- 4. 사용자별 송금/수금 총액 ---
         if (summaryList && summaryList.length > 0) {
             const ctxBalance = document.getElementById('balanceChart').getContext('2d');
 
@@ -252,9 +278,7 @@
                 },
                 options: {
                     responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } }
-                    },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -270,7 +294,6 @@
                 }
             });
         }
-
     });
 
 </script>

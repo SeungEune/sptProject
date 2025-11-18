@@ -29,10 +29,16 @@
         <div class="content-body lunch-layout" style="display: block;">
 
             <!-- 검색 (월별 조회) -->
-            <form th:action="@{/lunch/list.do}" method="get" class="flex items-center gap-2 mb-4">
-                <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
-                       th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
-                       onchange="this.form.submit()" />
+            <form th:action="@{/lunch/list.do}" method="get" class="mb-4">
+
+                <div class="relative w-full max-w-sm border border-gray-300 rounded bg-white px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+                    <span id="date-range-text" class="font-bold text-gray-700 text-sm sm:text-base">날짜 계산 중...</span>
+                    <i class="far fa-calendar-alt text-gray-500 text-lg"></i>
+                    <input type="month" id="searchMonthInput" name="date"
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                           th:value="${lunchVO.date}"
+                           onchange="updateDateRange(this.value); this.form.submit();" />
+                </div>
             </form>
 
             <!-- 테이블 -->
@@ -141,8 +147,7 @@
                                       th:action="@{/lunch/completeSettlement.do}"
                                       method="post"
                                       class="inline-block">
-                                    <input type="hidden" name="month"
-                                           th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                    <input type="hidden" name="month" th:value="${lunchVO.date}" />
                                     <input type="hidden" name="userId" th:value="${user.userId}" />
                                     <input type="hidden" name="action" value="complete" />
 
@@ -157,8 +162,7 @@
                                       th:action="@{/lunch/completeSettlement.do}"
                                       method="post"
                                       class="inline-block">
-                                    <input type="hidden" name="month"
-                                           th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
+                                    <input type="hidden" name="month" th:value="${lunchVO.date}" />
                                     <input type="hidden" name="userId" th:value="${user.userId}" />
                                     <input type="hidden" name="action" value="cancel" />
 
@@ -211,22 +215,57 @@
         if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
         if (overlay) overlay.addEventListener('click', closeSidebarFunc);
     }
+    function updateDateRange(dateStr) {
+        if (!dateStr) return;
 
+        // 1. 기준일 설정 (선택된 달의 25일)
+        // 예: 2025-11 -> 2025-11-25
+        const endDate = new Date(dateStr + "-25");
+
+        // 2. 시작일 계산 (한 달 전 26일)
+        const startDate = new Date(endDate);
+        startDate.setMonth(startDate.getMonth() - 1);
+        startDate.setDate(26);
+
+        // 3. 날짜 포맷팅 (YYYY년 M월 D일)
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth() + 1;
+        const startDay = startDate.getDate();
+
+        const endMonth = endDate.getMonth() + 1;
+        const endDay = endDate.getDate();
+
+        // 4. 텍스트 조합
+        // 결과 예시: "2025년 10월 26일 ~ 11월 25일"
+        const text = `${startYear}년 ${startMonth}월 ${startDay}일 ~ ${endMonth}월 ${endDay}일`;
+
+        // 5. 화면 업데이트
+        const textSpan = document.getElementById('date-range-text');
+        if (textSpan) {
+            textSpan.innerText = text;
+        }
+    }
     // --- DETAIL 칸 자동 채우기 ---
     document.addEventListener("DOMContentLoaded", function() {
         const headers = document.querySelectorAll('thead th[data-user-id]');
         const userIdsInOrder = Array.from(headers).map(th => th.getAttribute('data-user-id'));
         const rows = document.querySelectorAll('tbody tr[data-participants]');
+        const input = document.getElementById('searchMonthInput');
 
+        if(input && input.value) {
+            updateDateRange(input.value);
+        }
         rows.forEach(row => {
             const participantString = row.getAttribute('data-participants');
             if (!participantString) return;
 
             const participantMap = new Map();
-            participantString.split(', ').forEach(pair => {
+            participantString.split(',').forEach(pair => {
                 const parts = pair.split(':');
                 if (parts.length === 2) {
-                    participantMap.set(parts[0], parseInt(parts[1]).toLocaleString());
+                    const userId = parts[0].trim(); // 공백 제거
+                    const amount = parseInt(parts[1].trim());
+                    participantMap.set(userId, amount.toLocaleString());
                 }
             });
 

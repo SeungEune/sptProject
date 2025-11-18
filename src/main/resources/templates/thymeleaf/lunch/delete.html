@@ -58,7 +58,7 @@
 
                 <div class="form-group">
                     <label>참석자</label>
-                    <input type="text" disabled style="color: #6b7280;">
+                    <input type="text" id="participant-summary" disabled style="color: #6b7280;">
                 </div>
 
                 <div class="form-group">
@@ -109,22 +109,31 @@
     const existingParticipants = /*[[${lunch.participants}]]*/ '';
 
     window.addEventListener('DOMContentLoaded', function() {
-
         const container = document.getElementById('amount-list-container');
         const placeholder = document.getElementById('amount-placeholder');
+        const summaryInput = document.getElementById('participant-summary');
 
         if (existingParticipants) {
-
             placeholder.style.display = 'none';
 
-            const list = existingParticipants.split(', ');
+            // 콤마로 분리
+            const list = existingParticipants.split(',');
+            const names = []; // 이름 모으기용 배열
 
             list.forEach(item => {
-                const [userId, amount] = item.split(':');
-                const user = userList.find(u => u.userId === userId);
+                const parts = item.split(':');
+                if (parts.length !== 2) return;
 
+                // 공백 제거 (trim)
+                const userId = parts[0].trim();
+                const amount = parts[1].trim();
+
+                const user = userList.find(u => u.userId === userId);
                 if (!user) return;
 
+                names.push(user.userName); // 이름 저장
+
+                // UI 생성
                 const row = document.createElement('div');
                 row.className = 'amount-row';
 
@@ -141,6 +150,7 @@
                 amountInput.disabled = true;
                 amountInput.style.backgroundColor = '#f3f4f6';
                 amountInput.style.cursor = 'not-allowed';
+                amountInput.style.color = '#374151';
 
                 const unitSpan = document.createElement('span');
                 unitSpan.textContent = '원';
@@ -153,6 +163,18 @@
 
                 container.appendChild(row);
             });
+
+            // 왼쪽 참석자 입력칸에 요약 정보 표시
+            if (names.length > 0) {
+                if (names.length <= 2) {
+                    summaryInput.value = names.join(', ');
+                } else {
+                    summaryInput.value = `${names[0]}, ${names[1]} 외 ${names.length - 2}명`;
+                }
+            }
+        } else {
+            placeholder.textContent = "참석자가 없습니다.";
+            summaryInput.value = "없음";
         }
     });
 </script>
