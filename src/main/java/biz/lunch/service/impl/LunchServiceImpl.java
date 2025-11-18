@@ -50,7 +50,6 @@ public class LunchServiceImpl implements LunchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int registerLunch(LunchVO lunchVO) throws Exception {
-        log.info("점심/커피 내역 등록 - lunchVO={}", lunchVO);
         
         // 1. 총 금액 계산
         int totalAmount = 0;
@@ -88,7 +87,6 @@ public class LunchServiceImpl implements LunchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateLunch(LunchVO lunchVO) throws Exception {
-        log.info("점심/커피 내역 수정 - lunchVO={}", lunchVO);
         
         // 1. 총 금액 계산
         int totalAmount = 0;
@@ -110,7 +108,7 @@ public class LunchServiceImpl implements LunchService {
             lunchMapper.insertParticipantsBatch(lunchVO);
             log.debug("참여자 (수정) 등록 완료");
         } else {
-            log.warn("참여자가 0명이므로 insertParticipantsBatch를 건너뜁니다.");
+            log.warn("참여자가 0명이므로 건너뜁니다.");
         }
         
         // 5. 요약 테이블 갱신
@@ -126,7 +124,6 @@ public class LunchServiceImpl implements LunchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteLunch(int lunchId) throws Exception {
-        log.info("점심/커피 내역 삭제 요청 - lunchId={}", lunchId);
         
         if (lunchId <= 0) {
             throw new IllegalArgumentException("유효하지 않은 lunchId입니다.");
@@ -153,7 +150,6 @@ public class LunchServiceImpl implements LunchService {
      */
     @Override
     public List<LunchVO> getLunchList(LunchVO searchVO) throws Exception {
-        log.info("점심/커피 목록 조회 - searchVO={}", searchVO);
         
         // searchMonth가 있으면 정산 기간 계산 (전달 26일 ~ 당월 25일)
         if (searchVO != null && searchVO.getDate() != null && searchVO.getDate().length() == 7) {
@@ -178,7 +174,6 @@ public class LunchServiceImpl implements LunchService {
      */
     @Override
     public List<SummaryVO> getStatistics(String searchMonth) throws Exception {
-        log.info("점심/커피 통계 조회 - searchMonth={}", searchMonth);
         
         String startDate = null;
         String endDate = null;
