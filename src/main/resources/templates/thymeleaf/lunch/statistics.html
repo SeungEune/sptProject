@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="page-wrapper">
+<body>
 
 <!--모바일 토글 버튼 -->
 <button id="menu-toggle" class="mobile-menu-toggle">
@@ -19,79 +19,65 @@
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
-<!--공통 Header -->
-<header th:replace="cmm/header :: headerLayout"></header>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-<div class="main-container">
+    <div th:fragment="content">
 
-    <!--공통 Sidebar -->
-    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+        <h1 class="content-title">점심/커피 통계 조회</h1>
 
-    <!-- ============================= -->
-    <!--           본문 시작           -->
-    <!-- ============================= -->
-    <main class="content-area">
-        <div class="content-inner">
+        <div class="content-body lunch-layout" style="display: block;">
 
-            <h1 class="content-title">점심/커피 통계 조회</h1>
+            <form th:action="@{/lunch/statistics.do}" method="get"
+                  class="flex items-center gap-2 mb-4">
+                <input type="month" name="searchMonth"
+                       class="border border-gray-300 rounded p-2"
+                       th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
+                       onchange="this.form.submit()" />
+            </form>
 
-            <div class="content-body" style="display: block;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                <form th:action="@{/lunch/statistics.do}" method="get"
-                      class="flex items-center gap-2 mb-4">
-                    <input type="month" name="searchMonth"
-                           class="border border-gray-300 rounded p-2"
-                           th:value="${param.containsKey('searchMonth') ? param.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
-                           onchange="this.form.submit()" />
-                </form>
+                <!-- 사용자별 통계 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">사용자별 통계 (부담금 vs 결제금)</h2>
+                    <canvas id="userSummaryChart"></canvas>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                    <!-- 사용자별 통계 -->
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-semibold mb-4">사용자별 통계 (부담금 vs 결제금)</h2>
-                        <canvas id="userSummaryChart"></canvas>
-
-                        <div class="mt-6 border-t pt-4">
-                            <h3 class="text-lg font-semibold mb-2">사용자별 총 부담금</h3>
-                            <ul class="divide-y divide-gray-200">
-                                <li th:each="user : ${summaryList}"
-                                    class="flex justify-between items-center py-2">
-                                    <span class="font-medium text-gray-800" th:text="${user.userName}"></span>
-                                    <span class="text-gray-600"
-                                          th:text="${#numbers.formatInteger(user.totalOwed, 0, 'COMMA')} + '원'"></span>
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="mt-6 border-t pt-4">
+                        <h3 class="text-lg font-semibold mb-2">사용자별 총 부담금</h3>
+                        <ul class="divide-y divide-gray-200">
+                            <li th:each="user : ${summaryList}"
+                                class="flex justify-between items-center py-2">
+                                <span class="font-medium text-gray-800" th:text="${user.userName}"></span>
+                                <span class="text-gray-600"
+                                      th:text="${#numbers.formatInteger(user.totalOwed, 0, 'COMMA')} + '원'"></span>
+                            </li>
+                        </ul>
                     </div>
+                </div>
 
-                    <!-- 일별 지출 추이 -->
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-semibold mb-4">일별 지출 추이 (종합)</h2>
-                        <canvas id="dailyExpenseChart"></canvas>
-                    </div>
+                <!-- 일별 지출 추이 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">일별 지출 추이 (종합)</h2>
+                    <canvas id="dailyExpenseChart"></canvas>
+                </div>
 
-                    <!-- 일자별 지출 (점심/커피) -->
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-semibold mb-4">일자별 지출 (점심/커피 구분)</h2>
-                        <canvas id="dailyTypeChart"></canvas>
-                    </div>
+                <!-- 일자별 지출 (점심/커피) -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">일자별 지출 (점심/커피 구분)</h2>
+                    <canvas id="dailyTypeChart"></canvas>
+                </div>
 
-                    <!-- 사용자별 송금/수금 -->
-                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                        <h2 class="text-xl font-semibold mb-4">사용자별 송금/수금 총액</h2>
-                        <canvas id="balanceChart"></canvas>
-                    </div>
-
+                <!-- 사용자별 송금/수금 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">사용자별 송금/수금 총액</h2>
+                    <canvas id="balanceChart"></canvas>
                 </div>
 
             </div>
-        </div>
-    </main>
-</div>
 
-<!--공통 Footer -->
-<footer th:replace="cmm/footer :: footerLayout"></footer>
+        </div>
+    </div>
+</div>
 
 <script th:inline="javascript">
 
