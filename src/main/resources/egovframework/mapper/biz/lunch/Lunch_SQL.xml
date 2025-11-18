@@ -66,7 +66,7 @@
         m.type,
         m.payer_id AS payerId,
         u.user_nm AS payerName,
-        STRING_AGG(p.user_id || ':' || p.individual_amount, ', ') AS participants,
+        STRING_AGG(p.user_id || ':' || p.individual_amount, ',') AS participants,
         SUM(p.individual_amount) AS totalParticipantAmount
         FROM lunch_master m
         JOIN tb_user u ON m.payer_id = u.user_id

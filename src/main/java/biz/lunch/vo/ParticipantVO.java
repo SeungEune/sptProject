@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ParticipantVO {
     private Integer lunchId;
     private String userId;
-    private String userName;  // 조회용 (JOIN 결과)
+    private String userName;
     private Integer individualAmount;
     private String isPaid;  // 'Y' or 'N'
     private LocalDateTime paidAt;
