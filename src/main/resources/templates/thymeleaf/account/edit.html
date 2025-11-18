@@ -5,141 +5,132 @@
     <title>계정 수정</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+    <!-- 공통 main/header/footer.css 는 mainLayout에서 이미 포함하니까 여기선 빼기 -->
+<!--    <link rel="stylesheet" th:href="@{/css/account/mypage.css}">-->
+    <!-- ✅ 공통 기초 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <!-- 대시보드 / toc 는 안 써도 됨 -->
+
+    <!-- ✅ 레이아웃 & 헤더 -->
+    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
+    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
+
+    <!-- ✅ 이 페이지 전용 -->
     <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
 
-    <style>
-        .edit{
-            width: 8vw;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .btn-cancel{
-            background: #FFFFFF;
-        }
-    </style>
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
+<!-- ✅ 여기: mainLayout 사용 -->
 <div th:replace="~{cmm/header :: headerLayout}"></div>
 
-<div class="main-container">
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">계정 수정</h1>
+    <div th:fragment="content">
+        <h1 class="content-title">계정 수정</h1>
 
-            <div class="content-body form">
-                <section id="user-profile-form">
-                    <div class="form-container">
+        <div class="content-body form">
+            <section id="user-profile-form">
+                <div class="form-container">
 
-                        <form class="profile-form"
-                              th:action="@{/account/edit/{id}(id=${user.userId})}"
-                              th:object="${user}"
-                              method="post">
+                    <form class="profile-form"
+                          th:action="@{/account/edit/{id}(id=${user.userId})}"
+                          th:object="${user}"
+                          method="post">
 
-                            <!-- 아이디 (항상 readonly) -->
-                            <div class="form-group">
-                                <label for="user-id">아이디</label>
-                                <input id="user-id" th:field="*{userId}" type="text" readonly>
+                        <!-- 아이디 -->
+                        <div class="form-group">
+                            <label for="user-id">아이디</label>
+                            <input id="user-id" th:field="*{userId}" type="text" readonly>
+                        </div>
+
+                        <!-- 비밀번호 (edit 모드일 때만) -->
+                        <div class="form-group" th:if="${mode == 'edit'}">
+                            <label for="password">비밀번호</label>
+                            <input id="password" th:field="*{password}" type="password">
+                            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                        </div>
+
+                        <div class="form-group" th:if="${mode == 'edit'}">
+                            <label for="passwordChk">비밀번호 확인</label>
+                            <input id="passwordChk" th:field="*{passwordChk}" type="password">
+                            <div th:if="${#fields.hasErrors('passwordChk')}" th:errors="*{passwordChk}"></div>
+                        </div>
+
+                        <!-- 직책 -->
+                        <div class="form-group">
+                            <label for="search-option-position">직책옵션</label>
+                            <select id="search-option-position"
+                                    th:field="*{jssfcCd}"
+                                    th:disabled="${mode == 'view'}">
+                                <option value="HEAD">사장</option>
+                                <option value="PM">부장</option>
+                                <option value="PL">과장</option>
+                                <option value="AS">대리</option>
+                                <option value="NEW">담당</option>
+                            </select>
+                        </div>
+
+                        <!-- 이름 -->
+                        <div class="form-group">
+                            <label for="name">이름</label>
+                            <input id="name" th:field="*{name}" type="text"
+                                   th:readonly="${mode == 'view'}">
+                        </div>
+
+                        <!-- 전화번호 -->
+                        <div class="form-group">
+                            <label for="phone">전화번호</label>
+                            <input id="phone" th:field="*{phone}" type="tel"
+                                   th:readonly="${mode == 'view'}">
+                        </div>
+
+                        <!-- 이메일 -->
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input id="email" th:field="*{email}" type="email"
+                                   th:readonly="${mode == 'view'}">
+                        </div>
+
+                        <!-- 버튼 영역 -->
+                        <div class="form-actions">
+                            <div class="btn-area edit" th:if="${mode == 'view'}">
+                                <button type="button" class="cancel-btn btn btn-cancel"
+                                        onclick="location.href='/account/manage'">목록</button>
+
+                                <button type="button" class="submit-btn"
+                                        th:onclick="|location.href='@{/account/edit/{id}/update(id=${user.userId})}'|">
+                                    수정
+                                </button>
+
+                                <button type="button" class="submit-btn"
+                                        th:onclick="|location.href='@{/account/delete/{id}/confirm(id=${user.userId})}'|">
+                                    삭제
+                                </button>
                             </div>
 
-                            <!-- 비밀번호 : 조회 모드에서는 빈칸, 수정 모드에서만 입력 -->
-                            <div class="form-group" th:if="${mode == 'edit'}">
-                                <label for="password">비밀번호</label>
-                                <input id="password" th:field="*{password}" type="password">
-                                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            <div class="btn-area edit" th:if="${mode == 'edit'}">
+                                <button type="submit" class="submit-btn">확인</button>
+                                <button type="button" class="cancel-btn btn btn-cancel"
+                                        th:onclick="|location.href='@{/account/edit/{id}(id=${user.userId})}'|">
+                                    취소
+                                </button>
                             </div>
+                        </div>
 
-                            <div class="form-group" th:if="${mode == 'edit'}">
-                                <label for="passwordChk">비밀번호 확인</label>
-                                <input id="passwordChk" th:field="*{passwordChk}" type="password">
-                                <div th:if="${#fields.hasErrors('passwordChk')}" th:errors="*{passwordChk}"></div>
-                            </div>
+                    </form>
 
-                            <!-- 직책 -->
-                            <div class="form-group">
-                                <label for="search-option-position">직책옵션</label>
-                                <select id="search-option-position"
-                                        th:field="*{jssfcCd}"
-                                        th:disabled="${mode == 'view'}">
-                                    <option value="HEAD">사장</option>
-                                    <option value="PM">부장</option>
-                                    <option value="PL">과장</option>
-                                    <option value="AS">대리</option>
-                                    <option value="NEW">담당</option>
-                                </select>
-                            </div>
-
-                            <!-- 이름 -->
-                            <div class="form-group">
-                                <label for="name">이름</label>
-                                <input id="name" th:field="*{name}" type="text"
-                                       th:readonly="${mode == 'view'}">
-                            </div>
-
-                            <!-- 전화번호 -->
-                            <div class="form-group">
-                                <label for="phone">전화번호</label>
-                                <input id="phone" th:field="*{phone}" type="tel"
-                                       th:readonly="${mode == 'view'}">
-                            </div>
-
-                            <!-- 이메일 -->
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input id="email" th:field="*{email}" type="email"
-                                       th:readonly="${mode == 'view'}">
-                            </div>
-
-                            <!-- 버튼 영역 -->
-                            <div class="form-actions">
-                                <div class="btn-area">
-
-                                    <!-- 조회 모드 버튼 -->
-                                    <div class="edit" th:if="${mode == 'view'}">
-                                        <button type="button" class="cancel-btn btn btn-cancel"
-                                                onclick="location.href='/account/manage'">목록</button>
-
-                                        <!-- 수정 버튼: 수정 모드 URL로 이동 -->
-                                        <button type="button" class="submit-btn"
-                                                th:onclick="|location.href='@{/account/edit/{id}/update(id=${user.userId})}'|">
-                                            수정
-                                        </button>
-
-                                        <button type="button" class="submit-btn"
-                                                th:onclick="|location.href='@{/account/delete/{id}/confirm(id=${user.userId})}'|">
-                                            삭제
-                                        </button>
-
-
-                                    </div>
-
-                                    <!-- 수정 모드 버튼 -->
-                                    <div class="edit" th:if="${mode == 'edit'}">
-                                        <button type="submit" class="submit-btn">확인</button>
-
-                                        <button type="button" class="cancel-btn btn btn-cancel"
-                                                th:onclick="|location.href='@{/account/edit/{id}(id=${user.userId})}'|">
-                                            취소
-                                        </button>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </form>
-
-
-                    </div>
-                </section>
-            </div>
+                </div>
+            </section>
         </div>
-    </main>
+    </div>
+
 </div>
+
 </body>
 </html>

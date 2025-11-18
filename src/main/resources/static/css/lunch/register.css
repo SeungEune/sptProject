@@ -1,174 +1,7 @@
-:root {
-    --color-primary: #0088ff;
-    --color-text-primary: #1e2124;
-    --color-text-secondary: #464c53;
-    --color-text-placeholder: #8a949e;
-    --color-text-light: #777777;
-    --color-white: #ffffff;
-    --color-border: #58616a;
-    --color-border-light: #e5e7eb;
-    --color-bg-gray: #eaeaea;
-    --color-bg-footer: #f4f5f6;
-    --font-abel: 'Abel', sans-serif;
-    --font-inter: 'Inter', sans-serif;
-    --font-abeezee: 'ABeeZee', sans-serif;
-    --font-noto: 'Noto Sans KR', sans-serif;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: var(--font-abel);
-    background-color: var(--color-white);
-    color: var(--color-text-primary);
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-input, button {
-    font-family: inherit;
-}
-
-.page-wrapper {
-    width: 100%;
-    max-width: none;
-    margin: 0 auto;
-    background-color: var(--color-white);
-    min-height: 100vh;
-}
-
-
-.site-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0;
-    border-bottom: 1px solid var(--color-border-light);
-    min-height: 94px;
-}
-.header-container {
-    width: 100%;
-    max-width: 1680px;
-    margin: 0 auto;
-    padding: 0 30px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.site-header .logo img {
-    height: 58px;
-    width: auto;
-    display: block;
-}
-.user-nav {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-}
-.user-nav a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Segoe UI Symbol', sans-serif;
-    font-size: 16px;
-    color: #374151;
-}
-.user-nav a i {
-    font-size: 16px;
-}
-
-@media (max-width: 768px) {
-    .site-header {
-        flex-direction: column;
-        gap: 15px;
-    }
-}
 
 
 
-.main-container {
-    display: flex;
-    background-color: transparent;
-    padding: 0 64px;
-    justify-content: center;
-    gap: 24px;
-}
-.sidebar {
-    width: 256px;
-    flex-shrink: 0;
-    background-color: var(--color-white);
-    padding: 28px;
-}
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-.nav-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.nav-title {
-    margin: 0;
-    font-family: var(--font-inter);
-    font-weight: 300;
-    font-size: 14px;
-    color: var(--color-text-secondary);
-}
-.nav-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.nav-list a {
-    display: block;
-    padding: 5px 16px;
-    font-size: 17px;
-    color: var(--color-text-secondary);
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-.nav-list a:hover, .nav-list a.active {
-    background-color: #f0f0f0;
-    font-weight: bold;
-}
-.content-area {
-    flex-grow: 1;
-    padding: 24px;               /* 바깥 회색 여백 */
-    min-height: calc(100vh - 94px - 111px);
-    max-width: 1440px;
-    margin: 0;
-    background-color: var(--color-white); /* 회색은 여기만 적용 */
-    border-radius: 8px;
-    box-sizing: border-box;
-}
-.content-inner {
-    background-color: var(--color-white);
-    padding: 24px 40px; /* 기존 content-area의 내부 패딩 */
-    border-radius: 6px;
-    box-shadow: none; /* 필요시 그림자 추가 가능 */
-    max-width: 100%;
-    margin: 0;
-}
-.content-title {
-    margin: 0 0 28px 0;
-    font-family: var(--font-abeezee);
-    font-size: 24px;
-    font-weight: 400;
-    color: #131416;
-}
-.content-body {
+.content-body.lunch-layout {
     display: grid;
     grid-template-columns: 1fr 1fr; /* 왼쪽 폼: 최소300~최대420, 오른쪽: 남는공간 */
     gap: 20px;
@@ -187,7 +20,9 @@ input, button {
     gap: 8px;
     position: relative; /* 검색 결과를 위해 추가 */
 }
-.form-group label, .legend-title {
+
+.form-group label,
+.legend-title {
     font-size: 15px;
     font-weight: 400;
     color: var(--color-text-primary);
@@ -200,8 +35,7 @@ input, button {
     margin-top: 4px;
 }
 .form-group input[type="text"],
-.form-group input[type="date"] /* date 타입도 동일하게 스타일 */
-{
+.form-group input[type="date"] {
     width: 100%;
     height: 56px;
     padding: 0 16px;
@@ -211,11 +45,13 @@ input, button {
     font-size: 14px;
     color: var(--color-text-primary);
 }
+
 .form-group input[type="text"]::placeholder {
     color: var(--color-text-placeholder);
     font-size: 19px;
 }
 
+/* 검색 결과 드롭다운 */
 .search-results-dropdown {
     position: absolute;
     top: 100%;
@@ -359,19 +195,21 @@ input, button {
     color: var(--color-text-primary);
 }
 
+/* 항목 삭제 버튼 */
 .remove-btn {
     background: none;
     border: none;
-    color: #ef4444; /* red-600 */
+    color: #ef4444;
     cursor: pointer;
     font-size: 16px;
     margin-left: 10px;
     padding: 5px;
 }
 .remove-btn:hover {
-    color: #b91c1c; /* red-800 */
+    color: #b91c1c;
 }
 
+/* 빈 상태 문구 */
 .amount-placeholder {
     font-size: 16px;
     color: var(--color-text-secondary);
@@ -379,9 +217,9 @@ input, button {
     margin-top: 20px;
 }
 
-
+/* 반응형 */
 @media (max-width: 1200px) {
-    .content-body {
+    .content-body.lunch-layout {
         display: flex;
         flex-direction: column;
         align-items: stretch;

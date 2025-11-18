@@ -6,9 +6,9 @@
     <title>점심/커피 내역 등록</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
@@ -16,83 +16,18 @@
 
 <div id="overlay" class="mobile-overlay"></div>
 
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-<header class="site-header">
-    <div class="header-container">
-        <a th:href="@{/}" class="logo">
-            <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
-        </a>
-        <nav class="user-nav">
-            <a th:href="@{/mypage}">
-                <i class="fas fa-user"></i>
-                <span>마이페이지</span>
-            </a>
-            <a th:href="@{/logout}">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>로그아웃</span>
-            </a>
-        </nav>
-    </div>
-</header>
+    <div th:fragment="content">
+        <h1 class="content-title">대시보드</h1>
 
-<div class="main-container">
+        <div class="content-body">
+            <p>대시보드페이지</p>
 
-    <aside class="sidebar" id="sidebar">
-
-        <button id="close-menu" class="mobile-close-btn">
-            <i class="fas fa-times"></i>
-        </button>
-
-        <nav class="sidebar-nav">
-            <div class="nav-group">
-                <h3 class="nav-title">계정관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/account/manage}">계정관리</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">출입관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/access/manage}">출입관리</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">장비관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/equipment/manage}">장비관리</a></li>
-                </ul>
-            </div>
-            <div class="nav-group">
-                <h3 class="nav-title">정산관리</h3>
-                <ul class="nav-list">
-                    <li><a th:href="@{/lunch/register.do}" class="active">내역등록</a></li>
-                    <li><a th:href="@{/lunch/list.do}">내역조회</a></li>
-                    <li><a th:href="@{/lunch/statistics.do}">통계조회</a></li>
-                </ul>
-            </div>
-        </nav>
-    </aside>
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">대시보드</h1>
-
-            <div class="content-body">
-                <p>대시보드페이지</p>
-
-            </div>
         </div>
-    </main>
+    </div>
 </div>
 
-<footer class="site-footer-bottom">
-    <div class="footer-container">
-        <img th:src="@{/images/logo.png}" alt="ST 스패셜티 Logo">
-        <p class="footer-slogan">
-            <span class="line">전북 전주시 덕진구 만성북로 51-25, 3015호 스패셜티 (스페이스온 지식산업센터)</span>
-            <span class="line">&copy; 2024 Spatialt Specialty Co., Ltd. All rights reserved.</span>
-        </p>
-    </div>
-</footer>
 
 </body>
 </html>
