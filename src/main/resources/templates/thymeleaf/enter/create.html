@@ -29,7 +29,7 @@
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
-<div th:replace="~{cmm/header :: headerLayout}"></div>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
     <div th:fragment="content">
         <h1 class="content-title">출입관리 등록</h1>
@@ -70,7 +70,6 @@
                             <select th:field="*{method}">
                                 <option value="CARD">카드</option>
                                 <option value="FINGER">지문</option>
-                                <option value="QR">QR</option>
                             </select>
                         </div>
 
@@ -110,23 +109,24 @@
                             </div>
 
                             <!-- (선택) 이름/전화/이메일은 자동으로 들어오는 값이라면 readonly 로 둘 수도 있음 -->
-                            <div class="form-group">
+                            <div class="form-group hidden">
                                 <label for="emp-name">이름</label>
                                 <input id="emp-name" th:field="*{name}" type="text" readonly>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group hidden">
                                 <label for="emp-phone">전화번호</label>
                                 <input id="emp-phone" th:field="*{phone}" type="tel" readonly>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group hidden">
                                 <label for="emp-email">Email</label>
                                 <input id="emp-email" th:field="*{email}" type="email" readonly>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group hidden">
                                 <label for="jssfc">직책</label>
-                                <select id="jssfc" th:field="*{jssfcCd}" disabled>
+                                <select id="jssfc" th:field="*{jssfcCd}">
                                     <option value="HEAD">사장</option>
                                     <option value="PM">부장</option>
+                                    <option value="SM">차장</option>
                                     <option value="PL">과장</option>
                                     <option value="AS">대리</option>
                                     <option value="NEW">담당</option>
@@ -149,6 +149,7 @@
             </section>
         </div>
     </div>
+</div>
 
 <script>
     function toggleTypeSection() {

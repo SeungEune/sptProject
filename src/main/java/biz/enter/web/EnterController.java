@@ -42,16 +42,14 @@ public class EnterController {
 
     /** 등록 폼 */
     @GetMapping("/enter/create")
-    public String createForm(Model model) throws Exception {
+    public String createForm(@ModelAttribute("enter") EnterVO enter,Model model) throws Exception {
 
-        // 폼 바인딩용 EnterVO
-        model.addAttribute("enter", new EnterVO());
+        if(enter.getType()==null){
+            enter.setType("EMP");
+        }
 
-        UserSearchCond cond = new UserSearchCond();
-        cond.setOption("all");
+        List<UserVO>users = userService.getUserTotalList();
 
-        // ★ 직원 목록 (아이디/이름 등)
-        List<UserVO> users = userService.getUserList(cond);
         model.addAttribute("userList", users);
 
         return "enter/create";   // 지금 쓰고 있는 템플릿 이름
@@ -67,16 +65,11 @@ public class EnterController {
         }
 
         if (binding.hasErrors()) {
-            System.out.println("~~~~~");
             return "enter/create";
         }
         else{
-            System.out.println("#####");
         }
-        System.out.println(enter);
-        System.out.println("~~~~~~~~~");
         enterService.createEnter(enter);
-        System.out.println("!!!!");
         return "redirect:/enter/manage";
     }
 
@@ -90,20 +83,14 @@ public class EnterController {
         EnterVO enter = enterService.getEnter(enterId);
         model.addAttribute("enter", enter);
 
-        UserSearchCond cond = new UserSearchCond();
-        cond.setOption("all");
-
-        // 직원 선택용 리스트 (EMP일 때 셀렉트 박스 채우려고)
-        List<UserVO> users = userService.getUserList(cond);
-        model.addAttribute("userList", users);
-
         return "enter/edit";   // 아래에서 만들 템플릿
     }
 
     @PostMapping("/enter/edit/{id}")
     public String update(@PathVariable("id") Long enterId,
                          @ModelAttribute("enter") EnterVO enter) throws Exception {
-
+        System.out.println("$$$$");
+        System.out.println(enter);
         enter.setEnterId(enterId);   // 혹시 폼에 없으면 보정
         enterService.updateEnter(enter);
 
@@ -120,6 +107,8 @@ public class EnterController {
     // 실제 삭제 처리 (POST 권장)
     @PostMapping("/enter/delete/{id}")
     public String delete(@PathVariable("id") Long enterId) throws Exception {
+        System.out.println("@@@@@@@@@@@");
+        System.out.println(enterId);
         enterService.deleteEnter(enterId);
         return "redirect:/enter/manage";
     }

@@ -38,12 +38,47 @@
         FROM tb_user u
         WHERE u.use_yn = 'Y'
 
-        <!-- (여기에 기존 검색 조건들 그대로) -->
-        <!-- option/keyword, jssfcCd, registMonth 조건들... -->
+        <!-- ① 검색어(option + keyword) -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="option == 'id'">
+                    AND u.user_id ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'tel'">
+                    AND u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'email'">
+                    AND u.email_adres ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'name'">
+                    AND u.user_nm ILIKE '%' || #{keyword} || '%'
+                </when>
+                <!-- option == 'all' 이면 여러 컬럼 OR 검색 -->
+                <otherwise>
+                    AND (
+                    u.user_id     ILIKE '%' || #{keyword} || '%'
+                    OR u.user_nm     ILIKE '%' || #{keyword} || '%'
+                    OR u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                    OR u.email_adres ILIKE '%' || #{keyword} || '%'
+                    )
+                </otherwise>
+            </choose>
+        </if>
+
+        <!-- ② 직책 코드 필터 -->
+        <if test="jssfcCd != null and jssfcCd != ''">
+            AND u.jssfc_cd = #{jssfcCd}
+        </if>
+
+        <!-- ③ 등록월 필터 (YYYY-MM 형식) -->
+        <if test="registMonth != null and registMonth != ''">
+            AND to_char(u.regist_dt, 'YYYY-MM') = #{registMonth}
+        </if>
 
         ORDER BY u.regist_dt DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
+
 
     <!-- 총 개수 -->
     <select id="countUserList"
@@ -54,8 +89,54 @@
         FROM tb_user u
         WHERE u.use_yn = 'Y'
 
-        <!-- 위와 똑같은 검색 조건들 복붙 -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="option == 'id'">
+                    AND u.user_id ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'tel'">
+                    AND u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'email'">
+                    AND u.email_adres ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'name'">
+                    AND u.user_nm ILIKE '%' || #{keyword} || '%'
+                </when>
+                <otherwise>
+                    AND (
+                    u.user_id     ILIKE '%' || #{keyword} || '%'
+                    OR u.user_nm     ILIKE '%' || #{keyword} || '%'
+                    OR u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                    OR u.email_adres ILIKE '%' || #{keyword} || '%'
+                    )
+                </otherwise>
+            </choose>
+        </if>
+
+        <if test="jssfcCd != null and jssfcCd != ''">
+            AND u.jssfc_cd = #{jssfcCd}
+        </if>
+
+        <if test="registMonth != null and registMonth != ''">
+            AND to_char(u.regist_dt, 'YYYY-MM') = #{registMonth}
+        </if>
+
     </select>
+
+    <select id="selectUserTotalList" resultType="biz.user.vo.UserVO">
+        SELECT
+            user_id      AS userId,
+            user_nm      AS name,
+            user_password AS password,
+            email_adres  AS email,
+            moblphon_no  AS phone,
+            jssfc_cd     AS jssfcCd,
+            register_id  AS registerId,
+            regist_dt    AS registDt
+        FROM tb_user
+    </select>
+
 
 
     <!-- 한 명 조회 -->
@@ -92,6 +173,14 @@
         DELETE FROM tb_user
         WHERE user_id = #{userId}
     </delete>
+
+    <!-- 권한 -->
+    <select id="selectUserRoles" parameterType="string" resultType="string">
+        SELECT role_cd
+        FROM tb_user_role
+        WHERE user_id = #{userId}
+    </select>
+
 
 
 </mapper>

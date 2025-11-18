@@ -27,7 +27,7 @@
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
-<div th:replace="~{cmm/header :: headerLayout}"></div>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
     <div th:fragment="content">
         <h1 class="content-title">출입관리 상세</h1>
@@ -49,7 +49,8 @@
                                     <input type="radio"
                                            name="type"
                                            value="GUEST"
-                                           th:checked="${enter.type} == 'GUEST'">
+                                           th:checked="${enter.type} == 'GUEST'"
+                                           disabled>
                                     <span>게스트</span>
                                 </label>
 
@@ -57,11 +58,16 @@
                                     <input type="radio"
                                            name="type"
                                            value="EMP"
-                                           th:checked="${enter.type} == 'EMP'">
+                                           th:checked="${enter.type} == 'EMP'"
+                                           disabled>
                                     <span>직원</span>
                                 </label>
                             </div>
+
+                            <!-- ✅ 실제로 서버로 전송될 값 -->
+                            <input type="hidden" th:field="*{type}">
                         </div>
+
 
 
                         <!-- 2) 출입수단 -->
@@ -70,7 +76,6 @@
                             <select th:field="*{method}">
                                 <option value="CARD">카드</option>
                                 <option value="FINGER">지문</option>
-                                <option value="QR">QR</option>
                             </select>
                         </div>
 
@@ -98,13 +103,7 @@
                         <div id="emp-section" class="form-section">
                             <div class="form-group">
                                 <label for="user-id">직원 아이디</label>
-                                <select id="user-id" th:field="*{userId}">
-                                    <option value="">-- 직원 선택 --</option>
-                                    <option th:each="u : ${userList}"
-                                            th:value="${u.userId}"
-                                            th:text="${u.userId + ' / ' + u.name}">
-                                    </option>
-                                </select>
+                                <input id="user-id" th:field="*{userId}" class="emp-fixed">
                             </div>
 
                             <div class="form-group">
@@ -117,21 +116,22 @@
 
                             <div class="form-group">
                                 <label for="emp-name">이름</label>
-                                <input id="emp-name" th:field="*{name}" type="text" readonly>
+                                <input id="emp-name" th:field="*{name}" type="text" readonly class="emp-fixed">
                             </div>
                             <div class="form-group">
                                 <label for="emp-phone">전화번호</label>
-                                <input id="emp-phone" th:field="*{phone}" type="tel" readonly>
+                                <input id="emp-phone" th:field="*{phone}" type="tel" readonly class="emp-fixed">
                             </div>
                             <div class="form-group">
                                 <label for="emp-email">Email</label>
-                                <input id="emp-email" th:field="*{email}" type="email" readonly>
+                                <input id="emp-email" th:field="*{email}" type="email" readonly class="emp-fixed">
                             </div>
                             <div class="form-group">
                                 <label for="jssfc">직책</label>
-                                <select id="jssfc" th:field="*{jssfcCd}">
+                                <select id="jssfc" th:field="*{jssfcCd}" class="emp-fixed" disabled>
                                     <option value="HEAD">사장</option>
                                     <option value="PM">부장</option>
+                                    <option value="SM">차장</option>
                                     <option value="PL">과장</option>
                                     <option value="AS">대리</option>
                                     <option value="NEW">담당</option>
@@ -152,10 +152,10 @@
                                 <button type="submit" id="saveBtn" class="submit-btn hidden">확인</button>
                                 <button type="button" id="cancelBtn" class="cancel-btn btn btn-cancel hidden">취소</button>
 
-                                <button type="button" id="deleteBtn" class="submit-btn"
-                                        th:onclick="|location.href='@{/enter/delete/{id}/confirm(id=${enter.enterId})}'|">
+                                <button type="button" class="submit-btn" id="deleteBtn">
                                     삭제
                                 </button>
+
                             </div>
 
 
@@ -163,10 +163,19 @@
 
                     </form>
 
+                    <!-- 상세 페이지 제일 아래쪽 정도에 추가 -->
+                    <form id="deleteForm"
+                          th:action="@{/enter/delete/{id}(id=${enter.enterId})}"
+                          method="post">
+                        <!-- CSRF 쓰면 토큰 hidden -->
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" th:if="${_csrf != null}">
+                    </form>
+
                 </div>
             </section>
         </div>
     </div>
+</div>
 
 <script>
     // 게스트/직원 섹션 토글 (create 화면이랑 동일)
@@ -188,31 +197,42 @@
         const form   = document.querySelector('.profile-form');
         const inputs = form.querySelectorAll('input, select');
 
-        const isView = (mode === 'view');   // true면 조회모드, false면 수정모드
+        const isView = (mode === 'view');
 
         inputs.forEach(el => {
             if (el.type === 'hidden') return;
 
+            // 🔒 항상 잠겨 있어야 하는 필드
+            if (el.classList.contains('emp-fixed')) {
+                if (el.tagName === 'INPUT') {
+                    el.readOnly = true;
+                } else if (el.tagName === 'SELECT') {
+                    el.disabled = true;
+                }
+                return;
+            }
+
+            // 🔁 나머지는 모드에 따라 토글
             if (el.tagName === 'INPUT') {
                 if (el.type === 'radio') {
-                    el.disabled = isView;
-                } else {
-                    el.readOnly = isView;
+                    el.disabled = true;      // 항상 막기
+                } else if (el.type !== 'hidden') {
+                    el.readOnly = isView;    // hidden 은 위에서 이미 return 처리
                 }
-            } else if (el.tagName === 'SELECT') {
+            }
+            else if (el.tagName === 'SELECT') {
                 el.disabled = isView;
             }
         });
 
-        // 버튼 표시/숨김
         document.getElementById('editBtn').classList.toggle('hidden', !isView);
         document.getElementById('saveBtn').classList.toggle('hidden', isView);
         document.getElementById('cancelBtn').classList.toggle('hidden', isView);
-
-        // ★ 삭제/목록은 조회모드에서만 보이게
         document.getElementById('deleteBtn').classList.toggle('hidden', !isView);
         document.getElementById('listBtn').classList.toggle('hidden', !isView);
     }
+
+
 
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -234,6 +254,30 @@
             location.reload();
         });
     });
+</script>
+
+<script th:inline="javascript">
+    const enterId = /*[[${enter.enterId}]]*/ '';
+
+    document.getElementById('deleteBtn').addEventListener('click', function () {
+        openDeleteModal(enterId);
+    });
+
+    function openDeleteModal(enterId) {
+        Swal.fire({
+            title: '출입 삭제',
+            text: enterId + ' 출입을 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm').submit();
+            }
+        });
+    }
 </script>
 
 </body>

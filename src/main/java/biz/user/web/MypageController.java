@@ -36,9 +36,9 @@ public class MypageController {
     }
     @PostMapping("/mypage/update/{id}")
     public String update(@PathVariable("id") String userId,
-                       @Valid @ModelAttribute("user") UserVO user,
-                       BindingResult binding,
-                       Model model) throws Exception {
+                         @Valid @ModelAttribute("user") UserVO user,
+                         BindingResult binding,
+                         Model model) throws Exception {
 
         // 비밀번호 확인
         if (!user.getPassword().equals(user.getPasswordChk())) {
@@ -46,13 +46,13 @@ public class MypageController {
         }
 
         if (binding.hasErrors()) {
-            // ★ 다시 수정 모드로 돌려줘야 버튼이 뜸
-            //model.addAttribute("mode", "edit");
-            return "account/mypage";
+            // 에러 나면 다시 "수정 화면" 으로
+            return "account/updateMypage";
         }
 
         user.setUserId(userId);
         userService.updateUser(user);
         return "redirect:/mypage";
     }
+
 }

@@ -75,8 +75,23 @@
                         <!-- 출입수단 -->
                         <td th:text="${enter.method}"></td>
 
-                        <!-- 직책: 게스트면 '-' 표시 -->
-                        <td th:text="${enter.type == 'GUEST'} ? '' : ${enter.jssfcCd}"></td>
+                        <td th:switch="${enter.type == 'GUEST' ? 'GUEST' : enter.jssfcCd}">
+                            <!-- 게스트면 빈 칸 -->
+                            <span th:case="'GUEST'"></span>
+
+                            <!-- 코드 → 한글 매핑 -->
+                            <span th:case="'HEAD'">사장</span>
+                            <span th:case="'PM'">부장</span>
+                            <span th:case="'SM'">차장</span>
+                            <span th:case="'PL'">과장</span>
+                            <span th:case="'AS'">대리</span>
+                            <span th:case="'NEW'">담당</span>
+
+                            <!-- 기타 코드 -->
+                            <span th:case="*"></span>
+                        </td>
+
+
 
                         <td th:text="${enter.status}"></td>
                         <td th:text="${enter.type}"></td>

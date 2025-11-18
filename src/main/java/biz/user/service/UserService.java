@@ -15,4 +15,8 @@ public interface UserService {
     void deleteUser(String userId) throws Exception;
 
     int getUserCount(UserSearchCond cond) throws Exception;
+
+    List<UserVO> getUserTotalList();
+
+    List<String> getUserRoles(String userId) throws Exception;
 }
