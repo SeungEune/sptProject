@@ -57,7 +57,7 @@ public class EquipmentController {
     }
 
     // 장비 삭제
-    @DeleteMapping("/delete.do")
+    @GetMapping("/delete.do")
     public String deleteEquipment(Long id) {
         equipmentService.deleteEquipment(id);
         return "redirect:/equipment/list.do";
