@@ -453,7 +453,7 @@ div:where(.swal2-actions) button {
     color: white !important; /* 글자 흰색 */
 }
 
-/* ★ 4. 색상별 전용 클래스 추가 (여기가 핵심!) ★ */
+/* 색상별 전용 클래스 추가 */
 .btn-blue { background-color: #2563eb !important; } /* 수정용 파랑 */
 .btn-red { background-color: #dc2626 !important; }   /* 삭제용 빨강 */
 .btn-gray { background-color: #6b7280 !important; }  /* 취소용 회색 */
