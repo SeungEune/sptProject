@@ -16,39 +16,9 @@
 
     <!-- ✅ 이 페이지 전용 -->
     <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
-    <style>
-        #id-chk-area{
-            display: flex;
-        }
-        .btn-area{
-            display: flex !important;
-        }
 
-        .cancel-btn{
-            margin-left: 20px;
-            width: 60px;
-            background-color: #FFFFFF;
-            border-radius: 8px;
-            height: 32px;
-            border: 1px solid black;
-            cursor: pointer;
-            color: black;
-            font-family: 'Abel', sans-serif;
-            font-weight: 400;
-            font-size: 19px;
-            line-height: 28.5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.2s;
-        }
-
-        .cancel-btn:hover{
-            opacity: 0.9;
-        }
-    </style>
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
@@ -60,11 +30,7 @@
 <!-- header -->
 <div th:replace="~{cmm/header :: headerLayout}"></div>
 
-<div class="main-container">
-
-
-    <main class="content-area">
-        <div class="content-inner">
+        <div th:fragment="content">
             <h1 class="content-title">계정관리</h1>
 
             <div class="content-body form">
@@ -133,8 +99,6 @@
 
             </div>
         </div>
-    </main>
-</div>
 
 
 <script>
