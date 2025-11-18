@@ -36,7 +36,7 @@ public class LunchVO {
     private List<Integer> participantAmounts;
 
     /**
-     * 화면에서 받은 배열(List<String>, List<Integer>) 데이터를 DB 처리용 List<ParticipantVO>로 변환하여 세팅하는 메서드
+     * 화면에서 받은 배열(List<String>, List<Integer>) 데이터를 DB 처리용 List<ParticipantVO>로 변환하여 세팅
      */
     public void makeParticipantList() {
         // 초기화

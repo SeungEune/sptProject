@@ -1,5 +1,6 @@
 package biz.lunch.controller;
 
+import biz.lunch.component.LunchViewProcessor;
 import biz.lunch.service.LunchService;
 import biz.lunch.vo.LunchVO;
 import biz.lunch.vo.SummaryVO;
@@ -24,7 +25,7 @@ import java.util.*;
 public class LunchController {
 
     private final LunchService lunchService;
-
+    private final LunchViewProcessor viewProcessor;
     /**
      * 등록 화면
      */
@@ -50,89 +51,34 @@ public class LunchController {
 
     /**
      * 내역 조회
-     * - 검색 조건도 LunchVO로 통일하여 받음
      */
     @GetMapping("/list.do")
     public String getLunchList(@ModelAttribute LunchVO searchVO, Model model) throws Exception {
-        // 날짜(searchMonth) 기본값 설정
+
+        // 날짜 기본값 설정
         if (searchVO.getDate() == null || searchVO.getDate().isEmpty()) {
             searchVO.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")));
         }
-        String searchMonth = searchVO.getDate();
 
-        log.info("점심/커피 목록 조회: searchMonth={}", searchMonth);
-
-        // 데이터 조회
+        // DB 데이터 조회
         List<LunchVO> lunchList = lunchService.getLunchList(searchVO);
-        List<SummaryVO> summaryList = lunchService.getStatistics(searchMonth);
+        List<SummaryVO> summaryList = lunchService.getStatistics(searchVO.getDate());
+        List<Map<String, Object>> flatLunchList = viewProcessor.convertToFlatList(lunchList);
 
-        // [화면 표시용 로직] 날짜 기준 그룹핑 및 RowSpan 계산 (기존 로직 유지)
-        Map<String, List<LunchVO>> byDate = new LinkedHashMap<>();
-        for (LunchVO item : lunchList) {
-            if (item.getDate() == null) continue;
-            byDate.computeIfAbsent(item.getDate(), k -> new ArrayList<>()).add(item);
-        }
-
-        List<Map<String, Object>> flatLunchList = new ArrayList<>();
-        final String REPRESENTATIVE_NAME = "이승은";
-
-        for (Map.Entry<String, List<LunchVO>> entry : byDate.entrySet()) {
-            List<LunchVO> itemsForDate = entry.getValue();
-            List<Map<String, Object>> dailyRows = new ArrayList<>();
-
-            for (LunchVO item : itemsForDate) {
-                String payerName = item.getPayerName() != null ? item.getPayerName() : "";
-                boolean isRepresentative = REPRESENTATIVE_NAME.equals(payerName);
-
-                // DETAIL 행
-                Map<String, Object> detailRow = new HashMap<>();
-                detailRow.put("lunchId", item.getLunchId());
-                detailRow.put("date", item.getDate());
-                detailRow.put("storeName", item.getStoreName());
-                detailRow.put("totalAmount", item.getTotalAmount());
-                detailRow.put("type", item.getType());
-                detailRow.put("payerId", item.getPayerId());
-                detailRow.put("payerName", item.getPayerName());
-                detailRow.put("participants", item.getParticipants());
-                detailRow.put("rowType", "DETAIL");
-                dailyRows.add(detailRow);
-
-                // PAY 행 (대표자가 아닐 경우 추가)
-                if (!isRepresentative) {
-                    Map<String, Object> payRow = new HashMap<>(detailRow);
-                    payRow.put("rowType", "PAY");
-                    dailyRows.add(payRow);
-                }
-            }
-
-            // RowSpan 처리
-            int rowSpan = dailyRows.size();
-            for (int i = 0; i < dailyRows.size(); i++) {
-                Map<String, Object> row = dailyRows.get(i);
-                row.put("isFirstOfDate", i == 0);
-                if (i == 0) {
-                    row.put("dateRowSpan", rowSpan);
-                }
-                flatLunchList.add(row);
-            }
-        }
-
-        model.addAttribute("lunchList", lunchList);
-        model.addAttribute("flatLunchList", flatLunchList);
+        // View 전달
+        model.addAttribute("lunchList", lunchList);       // 원본 데이터
+        model.addAttribute("flatLunchList", flatLunchList); // 화면에 뿌릴 가공된 데이터
         model.addAttribute("summaryList", summaryList);
-        model.addAttribute("searchMonth", searchMonth);
+        model.addAttribute("lunchVO", searchVO);          // 검색 조건 유지
 
         return "lunch/list";
     }
 
     /**
      * 수정 화면
-     * - lunchId를 LunchVO로 받음
      */
     @GetMapping("/update.do")
     public String updateLunch(@ModelAttribute LunchVO searchVO, Model model) throws Exception {
-        log.info("점심/커피 수정 화면 요청: lunchId={}", searchVO.getLunchId());
-
         // 사용자 목록
         List<UserVO> userList = lunchService.getUserList();
 
@@ -154,7 +100,6 @@ public class LunchController {
         // List<ParticipantVO>로 변환
         lunchVO.makeParticipantList();
 
-        log.info("점심/커피 수정 요청: {}", lunchVO);
         lunchService.updateLunch(lunchVO);
         return "redirect:/lunch/list.do";
     }
@@ -164,7 +109,6 @@ public class LunchController {
      */
     @GetMapping("/delete.do")
     public String deleteLunch(@ModelAttribute LunchVO searchVO, Model model) throws Exception {
-        log.info("점심/커피 삭제 화면 요청: lunchId={}", searchVO.getLunchId());
 
         List<UserVO> userList = lunchService.getUserList();
         List<LunchVO> lunchList = lunchService.getLunchList(searchVO);
@@ -182,7 +126,6 @@ public class LunchController {
      */
     @PostMapping("/delete.do")
     public String deleteLunch(@ModelAttribute LunchVO lunchVO) throws Exception {
-        log.info("점심/커피 삭제 요청: lunchId={}", lunchVO.getLunchId());
         lunchService.deleteLunch(lunchVO.getLunchId());
         return "redirect:/lunch/list.do";
     }
@@ -198,14 +141,11 @@ public class LunchController {
         }
         String searchMonth = searchVO.getDate();
 
-        log.info("점심/커피 통계 조회: searchMonth={}", searchMonth);
-
         List<LunchVO> lunchList = lunchService.getLunchList(searchVO);
         List<SummaryVO> summaryList = lunchService.getStatistics(searchMonth);
 
         model.addAttribute("lunchList", lunchList);
         model.addAttribute("summaryList", summaryList);
-        model.addAttribute("searchMonth", searchMonth);
 
         return "lunch/statistics";
     }
@@ -219,12 +159,10 @@ public class LunchController {
             @RequestParam("userId") String userId,
             @RequestParam(required = false, defaultValue = "complete") String action) throws Exception {
 
-        log.info("정산 완료/취소 통합 처리 요청: month={}, userId={}, action={}", month, userId, action);
-
         lunchService.completeSettlement(month, userId, action);
 
         if (month != null && !month.isEmpty()) {
-            return "redirect:/lunch/list.do?searchMonth=" + month;
+            return "redirect:/lunch/list.do?date=" + month;
         } else {
             return "redirect:/lunch/list.do";
         }
