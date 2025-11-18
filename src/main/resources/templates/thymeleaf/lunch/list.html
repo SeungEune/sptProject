@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
     <link rel="stylesheet" th:href="@{/css/lunch/list.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -155,8 +156,8 @@
                                     <input type="hidden" name="userId" th:value="${user.userId}" />
                                     <input type="hidden" name="action" value="complete" />
 
-                                    <button type="submit"
-                                            class="bg-blue-500 text-white px-6 py-3 rounded text-xl hover:bg-blue-600">
+                                    <button type="button"
+                                            class="bg-blue-500 text-white px-6 py-3 rounded text-xl hover:bg-blue-600" onclick="confirmAdd(this.form)">
                                         정산완료
                                     </button>
 
@@ -171,8 +172,8 @@
                                     <input type="hidden" name="userId" th:value="${user.userId}" />
                                     <input type="hidden" name="action" value="cancel" />
 
-                                    <button type="submit"
-                                            class="bg-gray-500 text-white px-6 py-3 rounded text-xl hover:bg-gray-600">
+                                    <button type="button"
+                                            class="bg-gray-500 text-white px-6 py-3 rounded text-xl hover:bg-gray-600" onclick="confirmDelete(this.form)">
                                         정산취소
                                     </button>
                                 </form>
@@ -249,6 +250,46 @@
         if (textSpan) {
             textSpan.innerText = text;
         }
+    }
+
+    function confirmAdd(form) {
+        return Swal.fire({
+            title: '정산 완료',
+            text: '정산을 완료하시겠습니까?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요',
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+    function confirmDelete(form) {
+        return Swal.fire({
+            title: '정산 취소',
+            text: '정산을 취소하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요',
+            allowOutsideClick: false,
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn-red',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
     }
     // --- DETAIL 칸 자동 채우기 ---
     document.addEventListener("DOMContentLoaded", function() {

@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -83,8 +84,8 @@
                 <div id="hidden-fields"></div>
 
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                        <button type="submit" class="submit-btn">수정</button>
-                        <button type="button" class="submit-btn add-btn" onclick="registerAgain()">추가</button>
+                        <button type="button" class="submit-btn" onclick="confirmUpdate()">수정</button>
+                        <button type="button" class="submit-btn add-btn" onclick="confirmAdd()">추가</button>
                     </div>
                 </form>
 
@@ -242,20 +243,52 @@
         document.getElementById('search-results').style.display = 'none';
     }
 
-    function registerAgain() {
-        // ① 현재 form 가져오기
-        const form = document.querySelector('.entry-form');
+    // 1. 수정 확인
+    function confirmUpdate() {
+        Swal.fire({
+            title: '내역 수정',
+            text: "내역을 수정하시겠습니까?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '수정',
+            cancelButtonText: '취소',
 
-        // ② action을 등록 URL로 변경
-        form.action = '/lunch/register.do';
-
-        // ③ lunchId input 제거 (기존 수정이 아니라 "새로운 등록"이기 때문)
-        const lunchIdInput = form.querySelector('input[name="lunchId"]');
-        if (lunchIdInput) lunchIdInput.remove();
-
-        // ④ 제출
-        form.submit();
+            //스타일 지정
+            buttonsStyling: false, // 기본 스타일 끄기
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('.entry-form').submit();
+            }
+        });
     }
+
+    // 2. 추가 확인
+    function confirmAdd() {
+        Swal.fire({
+            title: '내역 등록',
+            text: "현재 내용으로 새로 등록하시겠습니까?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '등록',
+            cancelButtonText: '취소',
+
+            //스타일 지정
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                    document.querySelector('.entry-form').submit();
+            }
+        });
+    }
+
     function removeParticipant(userId) {
         selectedParticipants.delete(userId);
         const row = document.getElementById('participant-row-' + userId);
