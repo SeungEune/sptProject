@@ -55,7 +55,7 @@
                             <td th:text="${item.director}"></td>
                             <td th:text="${item.status}"></td>
                             <td>
-                                <a th:href="@{/equipment/update.do(id=${item.id})}">수정</a>
+                                <a th:href="@{/equipment/update.do(id=${item.id}, accessNumber=${item.accessNumber}, serialNumber=${item.serialNumber}, director=${item.director}, status=${item.status})}">수정</a>
                                 <a href="#" class="delete-btn" th:data-id="${item.id}">삭제</a>
 
                             </td>

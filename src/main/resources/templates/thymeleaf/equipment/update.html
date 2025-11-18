@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>장비 수정</title>
+    <title>장비 등록</title>
     <style>
         .accordion-item {
             margin-top: 20px;
@@ -45,68 +45,196 @@
 
 <h1>장비 수정</h1>
 
-<div th:replace="equipment/inputField :: inputField('일련번호', 'serialNumber', 'serialNumber', '일련번호를 입력해주세요')"></div>
-<div th:replace="equipment/inputField :: inputField('자산번호', 'accessNumber', 'accessNumber', '자산번호를 입력해주세요')"></div>
-
-<!-- 담당자 검색 아코디언 -->
-<div class="accordion-item">
-    <label>담당자</label><br>
+<form id="form">
     <div>
-        <input placeholder="담당자 이름을 입력해주세요">
-        <button class="accordion-header">
+        <label for="serialNumber">일련번호</label><br>
+        <input type="text" id="serialNumber" name="serialNumber" placeholder="일련번호를 입력해주세요" th:value="${param.serialNumber}">
+        <button type="button" id="serialBtn">중복 확인</button>
+        <p id="serialMessage" style="color: red; margin-top: 4px;"></p>
+    </div>
+
+    <div>
+        <label for="accessNumber">자산번호</label><br>
+        <input type="text" id="accessNumber" name="accessNumber" placeholder="자산번호를 입력해주세요" th:value="${param.accessNumber}">
+        <button type="button" id="accessBtn">중복 확인</button>
+        <p id="accessMessage" style="color: red; margin-top: 4px;"></p>
+    </div>
+
+    <!-- 담당자 아코디언 -->
+    <div class="accordion-item">
+        <label for="managerInput">담당자</label><br>
+        <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director" th:value="${param.director}">
+        <button type="button" class="accordion-header">
             <span class="arrow">▼</span>
         </button>
         <div class="accordion-content">
             <ul id="managerList">
                 <li>홍길동 (사용중)</li>
                 <li>김영희 (미사용)</li>
+                <li>박철수 (사용중)</li>
             </ul>
         </div>
     </div>
-</div>
 
-<div>
-    <label for="statusSelect">상태</label>
-    <br>
-    <select id="statusSelect" name="status">
-        <option value="active" selected>사용중</option>
-        <option value="inactive">미사용</option>
-        <option value="repair">보수중</option>
-    </select>
-</div>
+    <div>
+        <label for="statusSelect">상태</label><br>
+        <select id="statusSelect" name="status">
+            <option value="USE" th:selected = "${param.status == 'USE'}">사용중</option>
+            <option value="STORAGE" th:selected = "${param.status == 'STORAGE'}">보관중</option>
+            <option value="REPAIR" th:selected = "${param.status == 'REPAIR'}" >수리중</option>
+            <option value="DISPOSAL" th:selected = "${param.status == 'DISPOSAL'}" >폐기</option>
+        </select>
+    </div>
 
-<div>
-    <button>취소하기</button>
-    <button>등록하기</button>
-</div>
+    <div style="margin-top: 10px;">
+        <button type="button" id="cancelBtn">취소하기</button>
+        <button type="submit" id="inputBtn">등록하기</button>
+    </div>
+</form>
 
 <script>
-    const header = document.querySelector('.accordion-header');
-    const content = document.querySelector('.accordion-content');
-    const arrow = header.querySelector('.arrow');
+    // ========================= 전역 변수 =========================
+    let serialValue = false;
+    let accessValue = false;
 
-    header.addEventListener('click', () => {
-        const isOpen = content.style.display === 'block';
-        content.style.display = isOpen ? 'none' : 'block';
-        arrow.textContent = isOpen ? '▼' : '▲';
+    const serialInput = document.getElementById('serialNumber');
+    const accessInput = document.getElementById('accessNumber');
+    const serialMessage = document.getElementById('serialMessage');
+    const accessMessage = document.getElementById('accessMessage');
+
+    const serialInit = serialInput.value;
+    const accessInit = accessInput.value;
+    const managerInput = document.getElementById('managerInput');
+
+    // ========================= 일련번호 중복 체크 =========================
+    document.getElementById('serialBtn').addEventListener('click', () => {
+        const serial = serialInput.value.trim();
+
+        if(serial === '') {
+            serialMessage.textContent = "일련번호를 입력해주세요";
+            serialMessage.style.color = 'red';
+            serialValue = false;
+            return;
+        }
+
+        fetch(`/equipment/check-serialNumber?serialNumber=${encodeURIComponent(serial)}`)
+            .then(res => res.text())
+            .then(result => {
+                if(serialInit === serialInput.value) {
+                    serialMessage.textContent = "사용 가능";
+                    serialMessage.style.color = 'blue';
+                    serialValue = true;
+                    return;
+                }
+
+                if(result === 'true') {
+                    serialMessage.textContent = "사용 불가";
+                    serialMessage.style.color = 'red';
+                    serialValue = false;
+                } else {
+                    serialMessage.textContent = "사용 가능";
+                    serialMessage.style.color = 'blue';
+                    serialValue = true;
+                }
+            });
     });
 
-    // 검색 input 이벤트 (실제 서버 fetch로 연결 가능)
-    const managerInput = document.getElementById('managerInput');
+    // ========================= 자산번호 중복 체크 =========================
+    document.getElementById('accessBtn').addEventListener('click', () => {
+        const access = accessInput.value.trim();
+
+        if(access === '') {
+            accessMessage.textContent = "자산번호를 입력해주세요";
+            accessMessage.style.color = 'red';
+            accessValue = false;
+            return;
+        }
+
+        fetch(`/equipment/check-accessNumber?accessNumber=${encodeURIComponent(access)}`)
+            .then(res => res.text())
+            .then(result => {
+                if(accessInit === accessInput.value) {
+                    accessMessage.textContent = "사용 가능";
+                    accessMessage.style.color = 'blue';
+                    accessValue = true;
+                    return;
+                }
+
+                if(result === 'true') {
+                    accessMessage.textContent = "사용 불가";
+                    accessMessage.style.color = 'red';
+                    accessValue = false;
+                } else {
+                    accessMessage.textContent = "사용 가능";
+                    accessMessage.style.color = 'blue';
+                    accessValue = true;
+                }
+            });
+    });
+
+    // ========================= 등록하기 =========================
+    document.getElementById('form').addEventListener('submit', e => {
+        e.preventDefault();
+
+        if(!serialValue) {
+            alert("일련번호 중복 확인이 필요합니다.");
+            return;
+        }
+
+        if(!accessValue) {
+            alert("자산번호 중복 확인이 필요합니다.");
+            return;
+        }
+
+        if(managerInput.value.trim() === '') {
+            alert("담당자를 지정해주세요");
+            return;
+        }
+
+        const formData = new FormData(e.target);
+
+        fetch('/equipment/update.do', {
+            method: 'PUT',
+            body: formData
+        })
+            .then(() => {
+                alert('장비 수정 완료');
+                window.location.href = '/equipment/list.do';
+            })
+            .catch(() => alert('등록 중 오류 발생'));
+    });
+
+    // ========================= 취소하기 =========================
+    document.getElementById("cancelBtn").addEventListener('click', ()=>{
+        window.location.href= '/equipment/list.do';
+    });
+
+    // ========================= 아코디언 열기/닫기 =========================
+    document.querySelectorAll('.accordion-header').forEach(header => {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector('.arrow');
+        header.addEventListener('click', () => {
+            const isOpen = content.style.display === 'block';
+            content.style.display = isOpen ? 'none' : 'block';
+            arrow.textContent = isOpen ? '▼' : '▲';
+        });
+    });
+
+    // ========================= 담당자 검색 =========================
     const managerList = document.getElementById('managerList');
+    const allManagers = ['홍길동 (사용중)', '김영희 (미사용)', '박철수 (사용중)'];
 
     managerInput.addEventListener('input', () => {
         const name = managerInput.value.trim();
-
-        // 예시: 입력값이 있으면 필터링
-        const items = ['홍길동 (사용중)', '김영희 (미사용)', '박철수 (사용중)'];
         managerList.innerHTML = '';
-
-        items
+        allManagers
             .filter(item => item.includes(name))
             .forEach(item => {
                 const li = document.createElement('li');
                 li.textContent = item;
+                li.addEventListener('click', () => {
+                    managerInput.value = item.replace(/\s?\(.*?\)/, ""); // 이름만 입력
+                });
                 managerList.appendChild(li);
             });
     });
