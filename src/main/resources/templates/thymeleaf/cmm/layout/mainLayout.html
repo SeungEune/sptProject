@@ -22,6 +22,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <!-- header -->
@@ -36,11 +38,10 @@
     <main class="content-area">
         <div class="content-inner" th:insert="${content}"></div>
             <!-- 여기 내용은 개별 페이지에서 덮어씌움 -->
-        </div>
     </main>
 </div>
 
-<!-- ✅ footer 조각 사용 -->
+<!-- footer 조각 사용 -->
 <div th:replace="~{cmm/footer :: footerLayout}"></div>
 
 <!-- loading -->

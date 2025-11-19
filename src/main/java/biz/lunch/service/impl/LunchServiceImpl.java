@@ -2,16 +2,19 @@ package biz.lunch.service.impl;
 
 import biz.lunch.dao.LunchMapper;
 import biz.lunch.service.LunchService;
+import biz.lunch.vo.LunchVO;
+import biz.lunch.vo.ParticipantVO;
+import biz.lunch.vo.SummaryVO;
+import biz.lunch.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.YearMonth;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.time.LocalDate;
+import java.util.List;
+
 @Slf4j
 @Service("lunchService")
 public class LunchServiceImpl implements LunchService {
@@ -20,7 +23,7 @@ public class LunchServiceImpl implements LunchService {
     private LunchMapper lunchMapper;
 
     /**
-     * 요약 테이블(데이터 변경(등록/수정/삭제)이 일어날 때마다 통계 테이블을 최신 상태로 갱신)
+     * 요약 테이블 자동 갱신
      */
     private void updateSummary(String dateStr) throws Exception {
         if (dateStr == null || dateStr.isEmpty()) {
@@ -30,62 +33,51 @@ public class LunchServiceImpl implements LunchService {
         // 날짜 문자열에서 월만 추출
         String month = dateStr.substring(0, 7);
         log.info("요약 테이블 갱신 시작 (month={})", month);
-        // 매퍼를 호출하여 해당 월의 통계 데이터를 다시 계산해서 저장하도록 시킴
-        Map<String, Object> map = new HashMap<>();
-        map.put("month", month);
-        lunchMapper.updateSummaryAfterChange(map);
+        lunchMapper.updateSummaryAfterChange(month);
+    }
+
+    /**
+     * 사용자 목록 조회
+     */
+    @Override
+    public List<UserVO> getUserList() throws Exception {
+        return lunchMapper.getUserList();
     }
 
     /**
      * 점심/커피 내역 등록
      */
-
-    @Override
-    public List<Map<String, Object>> getUserList() throws Exception {
-        // 단순히 매퍼를 호출하여 DB에 있는 사용자 목록을 가져와 리턴
-        return lunchMapper.getUserList();
-    }
-
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int registerLunch(Map<String, Object> params) throws Exception {
-        log.info("점심/커피 내역 등록 - params={}", params);
+    public int registerLunch(LunchVO lunchVO) throws Exception {
+        
         // 1. 총 금액 계산
         int totalAmount = 0;
-        if (params.containsKey("participants")) {
-            List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
-            if (participants != null) {
-                for (Map<String, Object> p : participants) {
-                    // 각 참여자의 금액을 합산 (문자열 -> 정수 변환)
-                    totalAmount += Integer.parseInt(p.get("individualAmount").toString());
-                }
+        if (lunchVO.getParticipantList() != null) {
+            for (ParticipantVO p : lunchVO.getParticipantList()) {
+                totalAmount += p.getIndividualAmount();
             }
         }
-        params.put("totalAmount", totalAmount);
-        // lunch_master에 데이터 삽입 (가게명, 결제자, 날짜 등)
-        int masterResult = lunchMapper.registerLunch(params);
-        if (masterResult > 0 && params.containsKey("lunchId")) {
-
-            if (params.containsKey("participants")) {
-                // 리스트를 직접 가져와서 null이 아니고 비어있는지 확인
-                List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
-                // 참여자가 있는 경우에만 일괄 삽입(Batch Insert) 수행
-                if (participants != null && !participants.isEmpty()) {
-                    lunchMapper.insertParticipantsBatch(params);
-                    log.debug("참여자 등록 완료");
-                } else {
-                    // 참여자가 0명인 경우는 로그를 남기고 실행을 건너뜀
-                    log.warn("참여자가 0명이므로 건너뜁니다.");
-                }
+        lunchVO.setTotalAmount(totalAmount);
+        
+        // 2. lunch_master에 데이터 삽입
+        int masterResult = lunchMapper.registerLunch(lunchVO);
+        
+        if (masterResult > 0 && lunchVO.getLunchId() != null) {
+            // 3. 참여자 등록
+            if (lunchVO.getParticipantList() != null && !lunchVO.getParticipantList().isEmpty()) {
+                lunchMapper.insertParticipantsBatch(lunchVO);
+                log.debug("참여자 등록 완료");
+            } else {
+                log.warn("참여자가 0명이므로 건너뜁니다.");
             }
-
-            // 등록된 날짜 기준으로 summary 갱신
-            updateSummary((String) params.get("date"));
+            
+            // 4. 요약 테이블 갱신
+            updateSummary(lunchVO.getDate());
         } else {
             throw new Exception("lunch_master 등록 실패");
         }
-
+        
         return masterResult;
     }
 
@@ -94,41 +86,35 @@ public class LunchServiceImpl implements LunchService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateLunch(Map<String, Object> params) throws Exception {
-        log.info("점심/커피 내역 수정 - params={}", params);
+    public int updateLunch(LunchVO lunchVO) throws Exception {
+        
+        // 1. 총 금액 계산
         int totalAmount = 0;
-        if (params.containsKey("participants")) {
-            List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
-            if (participants != null) {
-                for (Map<String, Object> p : participants) {
-                    // 컨트롤러에서 문자열로 넘어왔으므로 숫자로 변환
-                    totalAmount += Integer.parseInt(p.get("individualAmount").toString());
-                }
+        if (lunchVO.getParticipantList() != null) {
+            for (ParticipantVO p : lunchVO.getParticipantList()) {
+                totalAmount += p.getIndividualAmount();
             }
         }
-        params.put("totalAmount", totalAmount);
-        int result = lunchMapper.updateLunch(params);
-        int lunchId = Integer.parseInt(params.get("lunchId").toString());
-
-        lunchMapper.deleteParticipantsByLunchId(lunchId);
-        if (params.containsKey("participants")) {
-            // 리스트를 직접 가져와서 null이 아니고 비어있는지(!isEmpty) 확인
-            List<Map<String, Object>> participants = (List<Map<String, Object>>) params.get("participants");
-
-            if (participants != null && !participants.isEmpty()) {
-                // 리스트가 비어있지 않을 때만 배치 인서트를 실행
-                lunchMapper.insertParticipantsBatch(params);
-                log.debug("참여자 (수정) 등록 완료");
-            } else {
-                // 참여자가 0명이면 로그만 남기고 건너뜀
-                log.warn("참여자가 0명이므로 insertParticipantsBatch를 건너뜁니다.");
-            }
+        lunchVO.setTotalAmount(totalAmount);
+        
+        // 2. lunch_master 수정
+        int result = lunchMapper.updateLunch(lunchVO);
+        
+        // 3. 기존 참여자 삭제
+        lunchMapper.deleteParticipantsByLunchId(lunchVO.getLunchId());
+        
+        // 4. 새로운 참여자 등록
+        if (lunchVO.getParticipantList() != null && !lunchVO.getParticipantList().isEmpty()) {
+            lunchMapper.insertParticipantsBatch(lunchVO);
+            log.debug("참여자 (수정) 등록 완료");
+        } else {
+            log.warn("참여자가 0명이므로 건너뜁니다.");
         }
-
-        // 수정된 날짜 기준으로 summary 갱신
-        updateSummary((String) params.get("date"));
-
-        log.info("점심/커피 내역 수정 완료 (lunchId={})", lunchId);
+        
+        // 5. 요약 테이블 갱신
+        updateSummary(lunchVO.getDate());
+        
+        log.info("점심/커피 내역 수정 완료 (lunchId={})", lunchVO.getLunchId());
         return result;
     }
 
@@ -138,77 +124,72 @@ public class LunchServiceImpl implements LunchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteLunch(int lunchId) throws Exception {
-        log.info("점심/커피 내역 삭제 요청 - lunchId={}", lunchId);
-
+        
         if (lunchId <= 0) {
             throw new IllegalArgumentException("유효하지 않은 lunchId입니다.");
         }
-
-        // 삭제 전 날짜 조회 → 해당 월 기준으로 summary 갱신
+        
+        // 삭제 전 날짜 조회
         String dateStr = lunchMapper.getLunchDateById(lunchId);
-
+        
+        // 삭제 실행
         int delMaster = lunchMapper.deleteLunch(lunchId);
+        
         if (delMaster > 0) {
             updateSummary(dateStr);
             log.info("점심/커피 내역 삭제 완료 (lunchId={})", lunchId);
         } else {
             log.warn("삭제 대상이 존재하지 않음 (lunchId={})", lunchId);
         }
-
+        
         return delMaster;
     }
 
     /**
-     * 내역 목록 조회 (단순히 DB에서만 조회)
+     * 내역 목록 조회
      */
     @Override
-    public List<Map<String, Object>> getLunchList(Map<String, Object> params) throws Exception {
-        log.info("점심/커피 목록 조회 - params={}", params);
-
-        if (params.containsKey("searchMonth") && params.get("searchMonth") != null) {
-            String monthStr = params.get("searchMonth").toString();
-            if (monthStr.length() == 7) {
-                YearMonth yearMonth = YearMonth.parse(monthStr);
-
-                // 정산 기간: 전달 26일 ~ 당월 25일
-                LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26);  // 전달 26일
-                LocalDate endDate = yearMonth.atDay(25);                                       // 당월 25일
-
-                params.put("startDate", startDate.toString());
-                params.put("endDate", endDate.toString());
-
-                log.info("정산 기간: {} ~ {}", startDate, endDate);
-            }
+    public List<LunchVO> getLunchList(LunchVO searchVO) throws Exception {
+        
+        // searchMonth가 있으면 정산 기간 계산 (전달 26일 ~ 당월 25일)
+        if (searchVO != null && searchVO.getDate() != null && searchVO.getDate().length() == 7) {
+            String monthStr = searchVO.getDate();
+            YearMonth yearMonth = YearMonth.parse(monthStr);
+            
+            LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26);
+            LocalDate endDate = yearMonth.atDay(25);
+            
+            // startDate, endDate 필드에 직접 세팅
+            searchVO.setStartDate(startDate.toString());
+            searchVO.setEndDate(endDate.toString());
+            
+            log.info("정산 기간: {} ~ {}", startDate, endDate);
         }
-        return lunchMapper.getLunchList(params);
+        
+        return lunchMapper.getLunchList(searchVO);
     }
 
     /**
      * 통계 요약 조회
      */
     @Override
-    public List<Map<String, Object>> getStatistics(Map<String, Object> params) throws Exception {
-        log.info("점심/커피 통계 조회 - params={}", params);
-
-        // [수정됨] searchMonth를 startDate, endDate로 변환
-        if (params.containsKey("searchMonth") && params.get("searchMonth") != null) {
-            String monthStr = params.get("searchMonth").toString();
-
-            if (monthStr.length() == 7) {
-                YearMonth yearMonth = YearMonth.parse(monthStr);
-
-                // 정산 기간: 전달 26일 ~ 당월 25일 (getLunchList와 동일하게)
-                LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26); // "2025-10-26"
-                LocalDate endDate = yearMonth.atDay(25);                                      // "2025-11-25"
-
-                params.put("startDate", startDate.toString());
-                params.put("endDate", endDate.toString());
-
-                log.info("통계 조회 기간: {} ~ {}", startDate, endDate);
-            }
+    public List<SummaryVO> getStatistics(String searchMonth) throws Exception {
+        
+        String startDate = null;
+        String endDate = null;
+        
+        if (searchMonth != null && searchMonth.length() == 7) {
+            YearMonth yearMonth = YearMonth.parse(searchMonth);
+            LocalDate start = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(26);
+            LocalDate end = yearMonth.atDay(25);
+            
+            startDate = start.toString();
+            endDate = end.toString();
+            
+            log.info("통계 조회 기간: {} ~ {}", startDate, endDate);
         }
-
-        return lunchMapper.getStatistics(params);
+        
+        return lunchMapper.getStatistics(startDate, endDate, searchMonth);
     }
 
     /**
@@ -216,23 +197,22 @@ public class LunchServiceImpl implements LunchService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int completeSettlement(Map<String, Object> params) throws Exception {
-        if (!params.containsKey("month") || !params.containsKey("userId")) {
+    public int completeSettlement(String month, String userId, String action) throws Exception {
+        if (month == null || userId == null) {
             throw new IllegalArgumentException("month 또는 userId 누락");
         }
-        String action = (String) params.getOrDefault("action", "complete");
-        log.info("정산 처리 ({}): params={}", action, params);
-
-        // Mapper가 'action' 파라미터를 보고 동적으로 쿼리 실행
-        int result = lunchMapper.completeSettlement(params);
-
+        
+        String finalAction = (action != null) ? action : "complete";
+        log.info("정산 처리 ({}): month={}, userId={}", finalAction, month, userId);
+        
+        int result = lunchMapper.completeSettlement(month, userId, finalAction);
+        
         if (result == 0) {
-            log.warn("정산 처리 대상 없음 ({}): (month={}, userId={})",
-                    action, params.get("month"), params.get("userId"));
+            log.warn("정산 처리 대상 없음 ({}): (month={}, userId={})", finalAction, month, userId);
         } else {
-            log.info("정산 처리 성공 ({}): (month={}, userId={})",
-                    action, params.get("month"), params.get("userId"));
+            log.info("정산 처리 성공 ({}): (month={}, userId={})", finalAction, month, userId);
         }
+        
         return result;
     }
 }

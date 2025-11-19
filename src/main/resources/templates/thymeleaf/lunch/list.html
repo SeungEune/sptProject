@@ -11,8 +11,9 @@
 
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
     <link rel="stylesheet" th:href="@{/css/lunch/list.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="page-wrapper">
+<body>
 
 <!--모바일 버튼 -->
 <button id="menu-toggle" class="mobile-menu-toggle">
@@ -21,182 +22,178 @@
 
 <div id="overlay" class="mobile-overlay"></div>
 
-<!--공통 Header -->
-<header th:replace="cmm/header :: headerLayout"></header>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-<div class="main-container">
+    <div th:fragment="content">
+        <h1 class="content-title">점심/커피 내역 조회</h1>
 
-    <!--공통 Sidebar -->
-    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+        <div class="content-body lunch-layout" style="display: block;">
 
+            <!-- 검색 (월별 조회) -->
+            <form th:action="@{/lunch/list.do}" method="get" class="mb-4">
 
-    <!-- 본문-->
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">점심/커피 내역 조회</h1>
+                <div class="relative w-full max-w-md border border-gray-300 rounded bg-white px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
 
-            <div class="content-body" style="display: block;">
+                    <span id="date-range-text" class="font-bold text-gray-700 text-2xl">날짜 계산 중...</span>
 
-                <!-- 검색 (월별 조회) -->
-                <form th:action="@{/lunch/list.do}" method="get" class="flex items-center gap-2 mb-4">
-                    <input type="month" name="searchMonth" class="border border-gray-300 rounded p-2"
-                           th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}"
-                           onchange="this.form.submit()" />
-                </form>
+                    <i class="far fa-calendar-alt text-gray-500 text-2xl"></i>
 
-                <!-- 테이블 -->
-                <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
-                    <table class="lunch-table w-full min-w-[1000px] text-sm text-center">
-                        <thead class="bg-gray-100">
-                        <tr>
-                            <th class="p-3 font-semibold text-gray-700">날짜</th>
-                            <th class="p-3 font-semibold text-gray-700">가게</th>
-
-                            <th th:each="user : ${summaryList}"
-                                th:text="${user.user_nm}"
-                                th:data-user-id="${user.user_id}"
-                                class="p-3 font-semibold text-gray-700">
-                            </th>
-
-                            <th class="p-3 font-semibold text-gray-700">합계</th>
-                            <th class="p-3 font-semibold text-gray-700">관리</th>
-                        </tr>
-                        </thead>
-
-                        <tbody id="lunch-table-body">
-
-                        <!-- DETAIL / PAY 행 렌더링 -->
-                        <tr th:each="row : ${flatLunchList}"
-                            class="detail-row border-b hover:bg-gray-50"
-                            th:classappend="${row.rowType == 'PAY'} ? ' pay-row' : ''"
-                            th:attr="data-participants=${row.rowType == 'DETAIL' ? row.participants : null}">
-
-                            <!-- 날짜(rowspan) -->
-                            <td class="date-cell p-3 font-bold align-middle"
-                                th:if="${row.isFirstOfDate}"
-                                th:rowspan="${row.dateRowSpan}"
-                                th:text="${#strings.substring(row.date, 5)}">
-                            </td>
-
-                            <!-- 가게명 OR 결제금액 -->
-                            <td th:class="${row.rowType == 'DETAIL' ? 'store-name-cell p-3' : 'pay-label p-3'}"
-                                th:text="${row.rowType == 'DETAIL' ? row.store_name : '결제금액'}">
-                            </td>
-
-                            <!-- 사용자별 금액 -->
-                            <td th:each="user : ${summaryList}"
-                                th:class="${row.rowType == 'DETAIL' ? 'p-3 cell-user-' + user.user_id : 'p-3 text-red-600 font-bold'}">
-
-                                <!-- DETAIL 행 -->
-                                <span th:if="${row.rowType == 'DETAIL'}">-</span>
-
-                                <!-- PAY 행 -->
-                                <span th:if="${row.rowType == 'PAY'}">
-                                    <span th:if="${user.user_id == row.payer_id}"
-                                          th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}"></span>
-                                    <span th:unless="${user.user_id == row.payer_id}">-</span>
-                                </span>
-                            </td>
-
-                            <!-- 합계 -->
-                            <td th:class="${row.rowType == 'DETAIL' ? 'p-3' : 'pay-total p-3'}"
-                                th:text="${#numbers.formatInteger(row.total_amount, 0, 'COMMA')}">
-                            </td>
-
-                            <!-- 관리 -->
-                            <td class="action-cell p-3">
-                                <div th:if="${row.rowType == 'DETAIL'}" class="flex items-center justify-center gap-3">
-                                    <a th:href="@{/lunch/update.do(lunchId=${row.lunch_id})}"
-                                       class="text-blue-500 hover:text-blue-700 transition-colors">수정</a>
-                                    <p>/</p>
-                                    <a th:href="@{/lunch/delete.do(lunchId=${row.lunch_id})}"
-                                       class="text-blue-500 hover:text-blue-700 transition-colors">삭제</a>
-                                </div>
-                            </td>
-
-                        </tr>
-
-                        <!-- 합계 행 -->
-                        <tr class="bg-gray-100 font-bold border-b">
-                            <td class="p-3" colspan="2">총 합계</td>
-                            <td th:each="user : ${summaryList}" class="p-3"
-                                th:text="${#numbers.formatInteger(user.total_owed, 0, 'COMMA')}">
-                            </td>
-                            <td class="p-3"
-                                th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[user_id != null].![total_owed]), 0, 'COMMA')}">
-                            </td>
-                            <td class="p-3"></td>
-                        </tr>
-
-                        <!-- 송금 총액 -->
-                        <tr class="bg-gray-100 font-bold">
-                            <td class="p-3" colspan="2">송금 총액</td>
-                            <td th:each="user : ${summaryList}" class="p-3"
-                                th:classappend="${user.balance < 0 ? 'text-red-500' : 'text-blue-500'}"
-                                th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
-                            </td>
-                            <td class="p-3"></td>
-                            <td class="p-3"></td>
-                        </tr>
-
-                        <!-- 정산 처리 -->
-                        <tr class="bg-white">
-                            <td class="p-3" colspan="2">정산처리</td>
-
-                            <td th:each="user : ${summaryList}" class="p-3">
-                                <div th:if="${user.total_owed > 0}">
-                                    <!-- 미정산 → 정산완료 버튼 -->
-                                    <form th:if="${user.is_settled == 'N'}"
-                                          th:action="@{/lunch/completeSettlement.do}"
-                                          method="post"
-                                          class="inline-block">
-                                        <input type="hidden" name="month"
-                                               th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
-                                        <input type="hidden" name="userId" th:value="${user.user_id}" />
-                                        <input type="hidden" name="action" value="complete" />
-
-                                        <button type="submit"
-                                                class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
-                                            정산완료
-                                        </button>
-                                    </form>
-
-                                    <!-- 정산완료 → 정산취소 버튼 -->
-                                    <form th:if="${user.is_settled == 'Y'}"
-                                          th:action="@{/lunch/completeSettlement.do}"
-                                          method="post"
-                                          class="inline-block">
-                                        <input type="hidden" name="month"
-                                               th:value="${params.containsKey('searchMonth') ? params.searchMonth : #dates.format(#dates.createNow(), 'yyyy-MM')}" />
-                                        <input type="hidden" name="userId" th:value="${user.user_id}" />
-                                        <input type="hidden" name="action" value="cancel" />
-
-                                        <button type="submit"
-                                                class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
-                                            정산취소
-                                        </button>
-                                    </form>
-                                </div>
-
-                                <span th:if="${user.total_owed <= 0}" class="text-sm text-gray-400">해당 없음</span>
-                            </td>
-
-                            <td class="p-3"></td>
-                            <td class="p-3"></td>
-                        </tr>
-
-                        </tbody>
-                    </table>
+                    <input type="month" id="searchMonthInput" name="date"
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                           th:value="${lunchVO.date}"
+                           onclick="this.showPicker()"
+                           onchange="updateDateRange(this.value); this.form.submit();" />
                 </div>
+            </form>
 
+            <!-- 테이블 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
+                <table class="lunch-table w-full min-w-[1000px] text-sm text-center">
+                    <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-3 font-semibold text-gray-700">날짜</th>
+                        <th class="p-3 font-semibold text-gray-700">가게</th>
+
+                        <th th:each="user : ${summaryList}"
+                            th:text="${user.userName}"
+                            th:data-user-id="${user.userId}"
+                            class="p-3 font-semibold text-gray-700">
+                        </th>
+
+                        <th class="p-3 font-semibold text-gray-700">합계</th>
+                        <th class="p-3 font-semibold text-gray-700">관리</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="lunch-table-body">
+
+                    <!-- DETAIL / PAY 행 렌더링 -->
+                    <tr th:each="row : ${flatLunchList}"
+                        class="detail-row border-b hover:bg-gray-50"
+                        th:classappend="${row.rowType == 'PAY'} ? ' pay-row' : ''"
+                        th:attr="data-participants=${row.rowType == 'DETAIL' ? row.participants : null}">
+
+                        <!-- 날짜(rowspan) -->
+                        <td class="date-cell p-3 font-bold align-middle"
+                            th:if="${row.isFirstOfDate}"
+                            th:rowspan="${row.dateRowSpan}"
+                            th:text="${#strings.substring(row.date, 5)}">
+                        </td>
+
+                        <!-- 가게명 OR 결제금액 -->
+                        <td th:class="${row.rowType == 'DETAIL' ? 'store-name-cell p-3' : 'pay-label p-3'}"
+                            th:text="${row.rowType == 'DETAIL' ? row.storeName : '결제금액'}">
+                        </td>
+
+                        <!-- 사용자별 금액 -->
+                        <td th:each="user : ${summaryList}"
+                            th:class="${row.rowType == 'DETAIL' ? 'p-3 cell-user-' + user.userId : 'p-3 text-red-600 font-bold'}">
+
+                            <!-- DETAIL 행 -->
+                            <span th:if="${row.rowType == 'DETAIL'}">-</span>
+
+                            <!-- PAY 행 -->
+                            <span th:if="${row.rowType == 'PAY'}">
+                                    <span th:if="${user.userId == row.payerId}"
+                                          th:text="${#numbers.formatInteger(row.totalAmount, 0, 'COMMA')}"></span>
+                                    <span th:unless="${user.userId == row.payerId}">-</span>
+                                </span>
+                        </td>
+
+                        <!-- 합계 -->
+                        <td th:class="${row.rowType == 'DETAIL' ? 'p-3' : 'pay-total p-3'}"
+                            th:text="${#numbers.formatInteger(row.totalAmount, 0, 'COMMA')}">
+                        </td>
+
+                        <!-- 관리 -->
+                        <td class="action-cell p-3">
+                            <div th:if="${row.rowType == 'DETAIL'}" class="flex items-center justify-center gap-3">
+                                <a th:href="@{/lunch/update.do(lunchId=${row.lunchId})}"
+                                   class="text-blue-500 hover:text-blue-700 transition-colors">수정</a>
+                                <p>/</p>
+                                <a th:href="@{/lunch/delete.do(lunchId=${row.lunchId})}"
+                                   class="text-blue-500 hover:text-blue-700 transition-colors">삭제</a>
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    <!-- 합계 행 -->
+                    <tr class="bg-gray-100 font-bold border-b">
+                        <td class="p-3" colspan="2">총 합계</td>
+                        <td th:each="user : ${summaryList}" class="p-3"
+                            th:text="${#numbers.formatInteger(user.totalOwed, 0, 'COMMA')}">
+                        </td>
+                        <td class="p-3"
+                            th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[userId != null].![totalOwed]), 0, 'COMMA')}">
+                        </td>
+                        <td class="p-3"></td>
+                    </tr>
+
+                    <!-- 송금 총액 -->
+                    <tr class="bg-gray-100 font-bold">
+                        <td class="p-3" colspan="2">송금 총액</td>
+                        <td th:each="user : ${summaryList}" class="p-3"
+                            th:classappend="${user.balance < 0 ? 'text-red-500' : 'text-blue-500'}"
+                            th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
+                        </td>
+                        <td class="p-3"></td>
+                        <td class="p-3"></td>
+                    </tr>
+
+                    <!-- 정산 처리 -->
+                    <tr class="bg-white">
+                        <td class="p-3" colspan="2">정산처리</td>
+
+                        <td th:each="user : ${summaryList}" class="p-3">
+                            <div th:if="${user.totalOwed > 0}">
+                                <!-- 미정산 → 정산완료 버튼 -->
+                                <form th:if="${user.isSettled == 'N'}"
+                                      th:action="@{/lunch/completeSettlement.do}"
+                                      method="post"
+                                      class="inline-block">
+                                    <input type="hidden" name="month" th:value="${lunchVO.date}" />
+                                    <input type="hidden" name="userId" th:value="${user.userId}" />
+                                    <input type="hidden" name="action" value="complete" />
+
+                                    <button type="button"
+                                            class="bg-blue-500 text-white px-6 py-3 rounded text-xl hover:bg-blue-600" onclick="confirmAdd(this.form)">
+                                        정산완료
+                                    </button>
+
+                                </form>
+
+                                <!-- 정산완료 → 정산취소 버튼 -->
+                                <form th:if="${user.isSettled == 'Y'}"
+                                      th:action="@{/lunch/completeSettlement.do}"
+                                      method="post"
+                                      class="inline-block">
+                                    <input type="hidden" name="month" th:value="${lunchVO.date}" />
+                                    <input type="hidden" name="userId" th:value="${user.userId}" />
+                                    <input type="hidden" name="action" value="cancel" />
+
+                                    <button type="button"
+                                            class="bg-gray-500 text-white px-6 py-3 rounded text-xl hover:bg-gray-600" onclick="confirmDelete(this.form)">
+                                        정산취소
+                                    </button>
+                                </form>
+                            </div>
+
+                            <span th:if="${user.totalOwed <= 0}" class="text-sm text-gray-400">해당 없음</span>
+                        </td>
+
+                        <td class="p-3"></td>
+                        <td class="p-3"></td>
+                    </tr>
+
+                    </tbody>
+                </table>
             </div>
+
         </div>
-    </main>
+    </div>
+
 </div>
-
-<!--공통 Footer -->
-<footer th:replace="cmm/footer :: footerLayout"></footer>
-
 
 <!--JS 스크립트-->
 <script th:inline="javascript">
@@ -224,22 +221,97 @@
         if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
         if (overlay) overlay.addEventListener('click', closeSidebarFunc);
     }
+    function updateDateRange(dateStr) {
+        if (!dateStr) return;
 
+        // 1. 기준일 설정 (선택된 달의 25일)
+        // 예: 2025-11 -> 2025-11-25
+        const endDate = new Date(dateStr + "-25");
+
+        // 2. 시작일 계산 (한 달 전 26일)
+        const startDate = new Date(endDate);
+        startDate.setMonth(startDate.getMonth() - 1);
+        startDate.setDate(26);
+
+        // 3. 날짜 포맷팅 (YYYY년 M월 D일)
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth() + 1;
+        const startDay = startDate.getDate();
+
+        const endMonth = endDate.getMonth() + 1;
+        const endDay = endDate.getDate();
+
+        // 4. 텍스트 조합
+        // 결과 예시: "2025년 10월 26일 ~ 11월 25일"
+        const text = `${startYear}년 ${startMonth}월 ${startDay}일 ~ ${endMonth}월 ${endDay}일`;
+
+        // 5. 화면 업데이트
+        const textSpan = document.getElementById('date-range-text');
+        if (textSpan) {
+            textSpan.innerText = text;
+        }
+    }
+
+    function confirmAdd(form) {
+        return Swal.fire({
+            title: '정산 완료',
+            text: '정산을 완료하시겠습니까?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요',
+            allowOutsideClick: false,
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+    function confirmDelete(form) {
+        return Swal.fire({
+            title: '정산 취소',
+            text: '정산을 취소하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '예',
+            cancelButtonText: '아니요',
+            allowOutsideClick: false,
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn-red',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
     // --- DETAIL 칸 자동 채우기 ---
     document.addEventListener("DOMContentLoaded", function() {
         const headers = document.querySelectorAll('thead th[data-user-id]');
         const userIdsInOrder = Array.from(headers).map(th => th.getAttribute('data-user-id'));
         const rows = document.querySelectorAll('tbody tr[data-participants]');
+        const input = document.getElementById('searchMonthInput');
 
+        if(input && input.value) {
+            updateDateRange(input.value);
+        }
         rows.forEach(row => {
             const participantString = row.getAttribute('data-participants');
             if (!participantString) return;
 
             const participantMap = new Map();
-            participantString.split(', ').forEach(pair => {
+            participantString.split(',').forEach(pair => {
                 const parts = pair.split(':');
                 if (parts.length === 2) {
-                    participantMap.set(parts[0], parseInt(parts[1]).toLocaleString());
+                    const userId = parts[0].trim(); // 공백 제거
+                    const amount = parseInt(parts[1].trim());
+                    participantMap.set(userId, amount.toLocaleString());
                 }
             });
 

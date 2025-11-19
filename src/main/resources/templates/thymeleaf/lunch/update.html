@@ -7,8 +7,9 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="page-wrapper">
+<body>
 
 <!--모바일 메뉴 버튼 -->
 <button id="menu-toggle" class="mobile-menu-toggle">
@@ -16,78 +17,75 @@
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
-<!--공통 Header -->
-<header th:replace="cmm/header :: headerLayout"></header>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-<div class="main-container">
+    <div th:fragment="content">
+        <h1 class="content-title">점심/커피 내역 수정</h1>
+        <div class="content-body lunch-layout">
+            <form class="entry-form" th:action="@{/lunch/update.do}" method="post">
 
-    <!--공통 Sidebar -->
-    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+                <input type="hidden" name="lunchId" th:value="${lunch.lunchId}">
 
-    <!--본문-->
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">점심/커피 내역 수정</h1>
-            <div class="content-body">
-                <form class="entry-form" th:action="@{/lunch/update.do}" method="post">
+                <div class="form-group">
+                    <label for="date-input">날짜</label>
+                    <input type="date" id="date-input" name="date" th:value="${lunch.date}" required>
+                </div>
 
-                    <input type="hidden" name="lunchId" th:value="${lunch.lunch_id}">
+                <div class="form-group">
+                    <label for="store-name">가게명</label>
+                    <input type="text" id="store-name" name="storeName"
+                           th:value="${lunch.storeName}" placeholder="내용을 입력하세요" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="date-input">날짜</label>
-                        <input type="date" id="date-input" name="date" th:value="${lunch.date}" required>
-                    </div>
+                <div class="form-group">
+                    <label for="participant-search">
+                        참석자 선택
+                        <span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span>
+                    </label>
+                    <input type="text" id="participant-search"
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
+                           onkeyup="filterParticipants()"
+                           placeholder="내용을 입력하세요">
+                    <div id="search-results"
+                         class="search-results-dropdown" style="display: none;"></div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="store-name">가게명</label>
-                        <input type="text" id="store-name" name="storeName"
-                               th:value="${lunch.store_name}" placeholder="내용을 입력하세요" required>
-                    </div>
+                <div class="form-group">
+                    <label for="payer-search">
+                        계산자 선택
+                        <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
+                    </label>
+                    <input type="text" id="payer-search"
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
+                           onkeyup="filterPayers()"
+                           placeholder="내용을 입력하세요"
+                           th:value="${lunch.payerName}">
+                    <input type="hidden" id="payerId" name="payerId"
+                           th:value="${lunch.payerId}" required>
+                    <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="participant-search">
-                            참석자 선택
-                            <span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span>
-                        </label>
-                        <input type="text" id="participant-search"
-                               onkeyup="filterParticipants()" placeholder="내용을 입력하세요">
-                        <div id="search-results"
-                             class="search-results-dropdown" style="display: none;"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="payer-search">
-                            계산자 선택
-                            <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
-                        </label>
-                        <input type="text" id="payer-search" onkeyup="filterPayers()"
-                               placeholder="내용을 입력하세요" th:value="${lunch.payer_name}">
-                        <input type="hidden" id="payerId" name="payerId"
-                               th:value="${lunch.payer_id}" required>
-                        <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
-                    </div>
-
-                    <fieldset class="form-group">
-                        <legend class="legend-title">유형 선택</legend>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="type-lunch" name="type" value="점심"
-                                       th:checked="${lunch.type == '점심'}">
-                                <label for="type-lunch">점심</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="type-coffee" name="type" value="커피"
-                                       th:checked="${lunch.type == '커피'}">
-                                <label for="type-coffee">커피</label>
-                            </div>
+                <fieldset class="form-group">
+                    <legend class="legend-title">유형 선택</legend>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="type-lunch" name="type" value="점심"
+                                   th:checked="${lunch.type == '점심'}">
+                            <label for="type-lunch">점심</label>
                         </div>
-                    </fieldset>
+                        <div class="radio-option">
+                            <input type="radio" id="type-coffee" name="type" value="커피"
+                                   th:checked="${lunch.type == '커피'}">
+                            <label for="type-coffee">커피</label>
+                        </div>
+                    </div>
+                </fieldset>
 
-                    <div id="hidden-fields"></div>
+                <div id="hidden-fields"></div>
 
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                        <button type="submit" class="submit-btn">수정</button>
-                        <button type="button" class="submit-btn delete-btn" onclick="goToDelete()">삭제</button>
+                        <button type="button" class="submit-btn" onclick="confirmUpdate()">수정</button>
+                        <button type="button" class="submit-btn add-btn" onclick="confirmAdd()">추가</button>
                     </div>
                 </form>
 
@@ -99,28 +97,24 @@
                         </p>
                     </div>
                 </div>
-
             </div>
 
         </div>
 
-    </main>
+    </div>
 </div>
-
-<!--공통 Footer -->
-<footer th:replace="cmm/footer :: footerLayout"></footer>
 
 <script th:inline="javascript">
 
     // --- 유저 데이터 ---
     const userList = /*[[${userList}]]*/ [];
     const selectedParticipants = new Set();
-    let selectedPayerId = /*[[${lunch.payer_id}]]*/ null;
+    let selectedPayerId = /*[[${lunch.payerId}]]*/ null;
 
     const existingParticipants = /*[[${lunch.participants}]]*/ '';
 
     function goToDelete() {
-        const lunchId = /*[[${lunch.lunch_id}]]*/ '';
+        const lunchId = /*[[${lunch.lunchId}]]*/ '';
         if (confirm('삭제 페이지로 이동하시겠습니까?')) {
             window.location.href = '/lunch/delete.do?lunchId=' + lunchId;
         }
@@ -129,11 +123,20 @@
     // 기존 참여자 입력칸 자동 생성
     window.addEventListener('DOMContentLoaded', function() {
         if (existingParticipants) {
-            const participants = existingParticipants.split(', ');
+            // 콤마로 분리
+            const participants = existingParticipants.split(',');
             participants.forEach(function(item) {
-                const [userId, amount] = item.split(':');
-                const user = userList.find(u => u.userid === userId);
-                if (user) addParticipant(userId, user.usernm, parseInt(amount));
+                // 콜론으로 분리
+                const parts = item.split(':');
+                if (parts.length === 2) {
+                    // trim()으로 공백 제거
+                    const userId = parts[0].trim();
+                    const amount = parseInt(parts[1].trim());
+
+                    // 유저 찾아서 추가
+                    const user = userList.find(u => u.userId === userId);
+                    if (user) addParticipant(userId, user.userName, amount);
+                }
             });
         }
     });
@@ -150,7 +153,7 @@
         }
 
         const filtered = userList.filter(user =>
-            user.usernm.toLowerCase().includes(query) && !selectedParticipants.has(user.userid)
+            user.userName.toLowerCase().includes(query) && !selectedParticipants.has(user.userId)
         );
 
         if (filtered.length === 0) {
@@ -160,7 +163,7 @@
         }
 
         resultsDiv.innerHTML = filtered.map(user =>
-            `<div onclick="addParticipant('${user.userid}', '${user.usernm}')">${user.usernm}</div>`
+            `<div onclick="addParticipant('${user.userId}', '${user.userName}')">${user.userName}</div>`
         ).join('');
 
         resultsDiv.style.display = 'block';
@@ -176,6 +179,7 @@
         const placeholder = document.getElementById('amount-placeholder');
         placeholder.style.display = 'none';
 
+        // --- UI 요소 생성 (화면 표시용) ---
         const row = document.createElement('div');
         row.className = 'amount-row';
         row.id = 'participant-row-' + userId;
@@ -187,17 +191,12 @@
         const group = document.createElement('div');
         group.className = 'amount-input-group';
 
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'participantUserIds';
-        hiddenInput.value = userId;
-
-        const amountInput = document.createElement('input');
-        amountInput.type = 'number';
-        amountInput.name = 'participantAmounts';
-        amountInput.placeholder = '금액입력';
-        amountInput.value = initialAmount;
-        amountInput.required = true;
+        // 화면용 금액 입력창 (name 속성 제거 - 중복 전송 방지)
+        const uiAmountInput = document.createElement('input');
+        uiAmountInput.type = 'number';
+        uiAmountInput.placeholder = '금액입력';
+        uiAmountInput.value = initialAmount;
+        uiAmountInput.required = true;
 
         const unitSpan = document.createElement('span');
         unitSpan.innerText = '원';
@@ -208,18 +207,86 @@
         removeBtn.innerHTML = '<i class="fas fa-times"></i>';
         removeBtn.onclick = () => removeParticipant(userId);
 
-        group.appendChild(hiddenInput);
-        group.appendChild(amountInput);
+        group.appendChild(uiAmountInput);
         group.appendChild(unitSpan);
         group.appendChild(removeBtn);
 
         row.appendChild(nameSpan);
         row.appendChild(group);
-
         container.appendChild(row);
+
+        // --- Hidden Fields 생성 (Form 내부 전송용) [핵심 수정] ---
+        const hiddenFields = document.getElementById("hidden-fields");
+
+        const hiddenUserInput = document.createElement("input");
+        hiddenUserInput.type = "hidden";
+        hiddenUserInput.name = "participantUserIds";
+        hiddenUserInput.value = userId;
+        hiddenUserInput.id = "hidden-user-" + userId;
+
+        const hiddenAmountInput = document.createElement("input");
+        hiddenAmountInput.type = "hidden";
+        hiddenAmountInput.name = "participantAmounts";
+        // 값이 없으면 '0'으로 처리하여 에러 방지
+        hiddenAmountInput.value = (initialAmount === '' ? '0' : initialAmount);
+        hiddenAmountInput.id = "hidden-amount-" + userId;
+
+        // UI 입력값 변경 시 Hidden 값 동기화
+        uiAmountInput.addEventListener("input", () => {
+            hiddenAmountInput.value = uiAmountInput.value === '' ? '0' : uiAmountInput.value;
+        });
+
+        hiddenFields.appendChild(hiddenUserInput);
+        hiddenFields.appendChild(hiddenAmountInput);
 
         document.getElementById('participant-search').value = '';
         document.getElementById('search-results').style.display = 'none';
+    }
+
+    // 1. 수정 확인
+    function confirmUpdate() {
+        Swal.fire({
+            title: '내역 수정',
+            text: "내역을 수정하시겠습니까?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '수정',
+            cancelButtonText: '취소',
+
+            //스타일 지정
+            buttonsStyling: false, // 기본 스타일 끄기
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.querySelector('.entry-form').submit();
+            }
+        });
+    }
+
+    // 2. 추가 확인
+    function confirmAdd() {
+        Swal.fire({
+            title: '내역 등록',
+            text: "현재 내용으로 새로 등록하시겠습니까?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '등록',
+            cancelButtonText: '취소',
+
+            //스타일 지정
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn-blue',
+                cancelButton: 'btn-gray'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                    document.querySelector('.entry-form').submit();
+            }
+        });
     }
 
     function removeParticipant(userId) {
@@ -244,7 +311,7 @@
         }
 
         const filtered = userList.filter(user =>
-            user.usernm.toLowerCase().includes(query)
+            user.userName.toLowerCase().includes(query)
         );
 
         if (filtered.length === 0) {
@@ -254,7 +321,7 @@
         }
 
         resultsDiv.innerHTML = filtered.map(user =>
-            `<div onclick="selectPayer('${user.userid}', '${user.usernm}')">${user.usernm}</div>`
+            `<div onclick="selectPayer('${user.userId}', '${user.userName}')">${user.userName}</div>`
         ).join('');
 
         resultsDiv.style.display = 'block';

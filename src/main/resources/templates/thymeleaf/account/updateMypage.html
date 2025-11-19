@@ -6,145 +6,25 @@
     <title>점심/커피 내역 등록</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
+
+    <!-- ✅ 공통 기초 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <!-- 대시보드 / toc 는 안 써도 됨 -->
+
+    <!-- ✅ 레이아웃 & 헤더 -->
+    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
+    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
+
+    <link rel="stylesheet" th:href="@{/css/account/form.css}">
 
     <style>
-        .content-body{
-            display: flex;
-            justify-content: center;
-        }
-        #user-profile-form{
-            width: 30vw;
-        }
-        .form-container {
-            width: 100%;
-            max-width: 80vw;
-        }
-
-        .profile-form {
-            width: 100%;
-            background-color: #ffffff;
-            border: 1px solid #d9d9d9;
-            border-radius: 8px;
-            padding: 42px 24px 29px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            color: #1e1e1e;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 22.4px;
-        }
-
-        .form-group input {
-            background-color: #ffffff;
-            border: 1px solid #d9d9d9;
-            border-radius: 8px;
-            padding: 12px 16px;
-            height: 20px !important;
-            width: 100%;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            font-size: 16px;
-            color: #b3b3b3;
-            line-height: 1;
-        }
-        .update-mode{
-            color: black !important;
-        }
-        .form-group input:read-only {
-            background-color: #ffffff;
-            cursor: default;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            /*margin-top: 41px; !* Calculated from (70px gap - 29px bottom padding) or (last input bottom to button top) *!*/
-        }
-
-        .submit-btn {
-            margin: 0;
-            width: 60px;
-            background-color: #256ef4;
-            border-radius: 8px;
-            height: 32px;
-            border: none;
-            cursor: pointer;
-            color: #ffffff;
-            font-family: 'Abel', sans-serif;
-            font-weight: 400;
-            font-size: 19px;
-            line-height: 28.5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.2s;
-        }
-
-
-        .cancel-btn{
-            margin-left: 20px;
-            width: 60px;
-            background-color: #FFFFFF;
-            border-radius: 8px;
-            height: 32px;
-            border: 1px solid black;
-            cursor: pointer;
-            color: black;
-            font-family: 'Abel', sans-serif;
-            font-weight: 400;
-            font-size: 19px;
-            line-height: 28.5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.2s;
-        }
-
-        .btn-area{
-            display: flex !important;
-        }
-
-        .btn-area button{
-            height: 100% !important;
-        }
-
-        .submit-btn:hover {
-            opacity: 0.9;
-        }
-        .cancel-btn:hover{
-            opacity: 0.9;
-        }
-
-        @media (max-width: 768px) {
-            #user-profile-form {
-                padding: 10px;
-                align-items: flex-start;
-            }
-            .profile-form {
-                padding: 32px 20px;
-            }
-            .form-actions {
-                justify-content: center;
-            }
-            .submit-btn {
-                width: 100%;
-            }
-        }
+        .field-error{color: red;}
     </style>
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
@@ -153,64 +33,69 @@
 <div id="overlay" class="mobile-overlay"></div>
 
 
-<!-- header -->
-<div th:replace="~{cmm/header :: headerLayout}"></div>
 
-<div class="main-container">
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
 
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">마이페이지</h1>
+    <div th:fragment="content">
+        <h1 class="content-title">마이페이지</h1>
 
-            <div class="content-body">
+        <div class="content-body form">
 
-                <section id="user-profile-form">
-                    <div class="form-container">
-                        <form class="profile-form"
-                              th:action="@{/mypage/update/{id}(id=${user.userId})}"
-                              th:object="${user}"
-                              method="post">
-                            <div class="form-group">
-                                <label for="user-id">아이디</label>
-                                <input type="text" id="user-id" th:field="*{userId}">
-                            </div>
-                            <div class="form-group">
-                                <label for="password">비밀번호</label>
-                                <input type="password" id="password" th:field="*{password}" class="update-mode">
-                            </div>
-                            <div class="form-group">
-                                <label for="password-chk">비밀번호 확인</label>
-                                <input type="password" id="password-chk" th:field="*{passwordChk}" class="update-mode">
-                            </div>
-                            <div class="form-group">
-                                <label for="name">이름</label>
-                                <input type="text" id="name" th:field="*{name}" class="update-mode">
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">전화번호</label>
-                                <input type="tel" id="phone" th:field="*{phone}" class="update-mode">
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" th:field="*{email}" class="update-mode">
-                            </div>
-                            <div class="form-actions">
-                                <div class="btn-area">
-                                    <button type="submit" class="submit-btn">확인</button>
-                                    <button type="button" class="cancel-btn" onclick="location.href='/mypage'">취소</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </section>
+            <section id="user-profile-form">
+                <div class="form-container">
+                    <form class="profile-form"
+                          th:action="@{/mypage/update/{id}(id=${user.userId})}"
+                          th:object="${user}"
+                          method="post">
+                        <div class="form-group">
+                            <label for="user-id">아이디</label>
+                            <input type="text" id="user-id" th:field="*{userId}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">비밀번호</label>
+                            <input type="password" id="password"
+                                   th:field="*{password}" class="update-mode" required>
+                            <!-- ⬇ 서버검증 에러 표시 -->
+                            <div class="field-error"
+                                 th:if="${#fields.hasErrors('password')}"
+                                 th:errors="*{password}"></div>
+                        </div>
 
-            </div>
+                        <div class="form-group">
+                            <label for="password-chk">비밀번호 확인</label>
+                            <input type="password" id="password-chk"
+                                   th:field="*{passwordChk}" class="update-mode" required>
+                            <!-- ⬇ 여기서 '비밀번호가 일치하지 않습니다.' 메시지가 뜸 -->
+                            <div class="field-error"
+                                 th:if="${#fields.hasErrors('passwordChk')}"
+                                 th:errors="*{passwordChk}"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">이름</label>
+                            <input type="text" id="name" th:field="*{name}" class="update-mode">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">전화번호</label>
+                            <input type="tel" id="phone" th:field="*{phone}" class="update-mode">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" th:field="*{email}" class="update-mode">
+                        </div>
+                        <div class="form-actions">
+                            <div class="btn-area">
+                                <button type="submit" class="submit-btn">확인</button>
+                                <button type="button" class="cancel-btn btn btn-cancel" onclick="location.href='/mypage'">취소</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
         </div>
-    </main>
+    </div>
 </div>
-
-
-
 </body>
 </html>

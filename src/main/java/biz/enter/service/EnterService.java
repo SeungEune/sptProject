@@ -5,7 +5,9 @@ import biz.enter.vo.EnterVO;
 import java.util.List;
 
 public interface EnterService {
-    List<EnterVO> getEnterList();
+    // Service
+    public List<EnterVO> getEnterList(int page, int size) throws Exception;
+    public int getEnterCount() throws Exception;
     void createEnter(EnterVO enter);
     EnterVO getEnter(Long enterId) throws Exception;
     void updateEnter(EnterVO vo) throws Exception;

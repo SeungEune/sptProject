@@ -9,19 +9,19 @@
     </button>
 
     <nav class="sidebar-nav">
-        <div class="nav-group">
+        <div class="nav-group" th:if="${session.isAdmin}">
             <h3 class="nav-title">계정관리</h3>
             <ul class="nav-list">
                 <li><a th:href="@{/account/manage}">계정관리</a></li>
             </ul>
         </div>
-        <div class="nav-group">
+        <div class="nav-group" th:if="${session.isAdmin}">
             <h3 class="nav-title">출입관리</h3>
             <ul class="nav-list">
                 <li><a th:href="@{/enter/manage}">출입관리</a></li>
             </ul>
         </div>
-        <div class="nav-group">
+        <div class="nav-group" th:if="${session.isAdmin}">
             <h3 class="nav-title">장비관리</h3>
             <ul class="nav-list">
                 <li><a th:href="@{/equipment/list.do}">장비관리</a></li>
@@ -50,7 +50,6 @@
                 </li>
             </ul>
         </div>
-
     </nav>
 </aside>
 </div>

@@ -78,4 +78,14 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
         return userDAO.findUserByName(name);
     }
 
+    @Override
+    public List<UserVO> getUserTotalList() {
+        return userDAO.selectUserTotalList();
+    }
+
+    @Override
+    public List<String> getUserRoles(String userId) throws Exception {
+        return userDAO.selectUserRoles(userId);
+    }
+
 }

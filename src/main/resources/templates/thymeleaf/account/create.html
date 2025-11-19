@@ -2,42 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
-    <link rel="stylesheet" th:href="@{/css/account/mypage.css}">
+    <!-- ✅ 공통 기초 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/reset.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <!-- 대시보드 / toc 는 안 써도 됨 -->
+
+    <!-- ✅ 레이아웃 & 헤더 -->
+    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
+    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
+
+    <link rel="stylesheet" th:href="@{/css/account/form.css}">
+
     <style>
         #id-chk-area{
+            width: 100%;
             display: flex;
         }
-        .btn-area{
-            display: flex !important;
-        }
-
-        .cancel-btn{
-            margin-left: 20px;
-            width: 60px;
-            background-color: #FFFFFF;
-            border-radius: 8px;
-            height: 32px;
-            border: 1px solid black;
-            cursor: pointer;
-            color: black;
-            font-family: 'Abel', sans-serif;
-            font-weight: 400;
-            font-size: 19px;
-            line-height: 28.5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.2s;
-        }
-
-        .cancel-btn:hover{
-            opacity: 0.9;
-        }
+        .field-error{color: red;}
     </style>
+
 </head>
-<body class="page-wrapper">
+<body>
 
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
@@ -47,14 +35,10 @@
 
 
 <!-- header -->
-<div th:replace="~{cmm/header :: headerLayout}"></div>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
-<div class="main-container">
-
-
-    <main class="content-area">
-        <div class="content-inner">
-            <h1 class="content-title">계정관리</h1>
+        <div th:fragment="content">
+            <h1 class="content-title">계정등록</h1>
 
             <div class="content-body form">
 
@@ -64,8 +48,9 @@
                             <div class="form-group">
                                 <label for="user-id">아이디</label>
                                 <div id="id-chk-area">
-                                    <input id="user-id" th:field="*{userId}" type="text">  <!-- ✅ VO.userId -->
+                                    <input id="user-id" th:field="*{userId}" type="text" required>  <!-- ✅ VO.userId -->
                                     <button id="id-check-btn" type="button" class="submit-btn">체크</button> <!-- ✅ 버튼은 submit 아님 -->
+                                    <input type="hidden" id="id-checked" value="false">
                                 </div>
                                 <small id="id-check-result"></small>
                                 <div th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></div>
@@ -73,14 +58,14 @@
 
                             <div class="form-group">
                                 <label for="password">비밀번호</label>
-                                <input id="password" th:field="*{password}" type="password">
-                                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                <input id="password" th:field="*{password}" type="password" required>
+                                <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="password-chk">비밀번호 확인</label>
-                                <input id="password-chk" th:field="*{passwordChk}" type="password">
-                                <div th:if="${#fields.hasErrors('passwordChk')}" th:errors="*{passwordChk}"></div>
+                                <input id="password-chk" th:field="*{passwordChk}" type="password" required>
+                                <div class="field-error" th:if="${#fields.hasErrors('passwordChk')}" th:errors="*{passwordChk}"></div>
                             </div>
 
                             <div class="form-group">
@@ -88,6 +73,7 @@
                                 <select id="search-option-position" th:field="*{jssfcCd}">
                                     <option value="HEAD">사장</option>
                                     <option value="PM">부장</option>
+                                    <option value="SM">차장</option>
                                     <option value="PL">과장</option>
                                     <option value="AS">대리</option>
                                     <option value="NEW">담당</option>
@@ -112,7 +98,7 @@
                             <div class="form-actions">
                                 <div class="btn-area">
                                     <button type="submit" class="submit-btn">확인</button>
-                                    <button type="button" class="cancel-btn" onclick="location.href='/account/manage'">취소</button>
+                                    <button type="button" class="cancel-btn btn btn-cancel" onclick="location.href='/account/manage'">취소</button>
                                 </div>
                             </div>
                         </form>
@@ -122,27 +108,43 @@
 
             </div>
         </div>
-    </main>
 </div>
-
 
 <script>
     document.getElementById('id-check-btn').addEventListener('click', async () => {
         const input = document.getElementById('user-id');
         const result = document.getElementById('id-check-result');
         const userId = input.value.trim();
-        if (!userId) { result.textContent = '아이디를 입력하세요.'; return; }
+        if (!userId) {
+            result.textContent = '아이디를 입력하세요.';
+            result.style.color = 'red';
+            return;
+        }
 
         const res = await fetch(`/account/create/id-check?userId=${encodeURIComponent(userId)}`);
         const text = await res.text(); // "OK" | "DUPLICATED"
+
         if (text === 'OK') {
             result.textContent = '사용 가능한 아이디입니다.';
             result.style.color = 'green';
+            document.getElementById('id-checked').value = 'true';   // ✅ 여기!
         } else {
             result.textContent = '이미 사용 중인 아이디입니다.';
             result.style.color = 'red';
+            document.getElementById('id-checked').value = 'false';  // 혹시 몰라 초기화
         }
     });
+
+    document.querySelector('.profile-form').addEventListener('submit', function (e) {
+        const checked = document.getElementById('id-checked').value === 'true';
+
+        if (!checked) {
+            e.preventDefault(); // ✅ 서버로 안 보내고 막기
+            alert('아이디 중복체크를 먼저 해주세요.');
+        }
+    });
+
+
 </script>
 
 </body>
