@@ -7,17 +7,22 @@ import biz.equipment.dto.EquipmentUpdate;
 import biz.equipment.mapstruct.EquipmentMapStruct;
 import biz.equipment.vo.EquipmentVO;
 import biz.equipment.vo.Status;
+import biz.user.service.UserService;
+import biz.user.vo.UserVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EquipmentServiceImpl implements EquipmentService {
 
     final EquipmentDAO equipmentDAO;
     private final EquipmentMapStruct equipmentMapStruct;
+    private final UserService userService;
 
     @Override
     public List<EquipmentResponse> getEquipments() {
@@ -62,5 +67,10 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public void updateStatus(Long id, Status status) {
          equipmentDAO.updateStatus(id, status);
+    }
+
+    @Override
+    public List<String> getDirector(String name) throws Exception {
+     return userService.getUserByName(name);
     }
 }

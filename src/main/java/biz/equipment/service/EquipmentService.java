@@ -37,4 +37,6 @@ public interface EquipmentService {
     // 상태 변경
     void updateStatus(Long id, Status status);
 
+    // 관리자 검색
+    List<String> getDirector(String user) throws Exception;
 }

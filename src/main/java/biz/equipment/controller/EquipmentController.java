@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/equipment")
@@ -46,14 +48,14 @@ public class EquipmentController {
     // 장비 수정
     @GetMapping("/update.do")
     public String updateForm(@RequestParam("id") Long id, Model model) {
-        model.addAttribute(equipmentService.getEquipment(id));
+        model.addAttribute("equipment",equipmentService.getEquipment(id));
         return "equipment/update";
     }
 
     @PostMapping("/update.do")
     public String updateEquipment(@ModelAttribute EquipmentUpdate equipmentUpdate) {
          equipmentService.updateEquipment(equipmentUpdate);
-         return "redirect:equipment/update.do";
+         return "redirect:equipment/list.do";
     }
 
     // 장비 삭제
@@ -83,12 +85,12 @@ public class EquipmentController {
         return "equipment/director/update";
     }
 
-    // 관리자 찾기
-//    @GetMapping("/director/view.do")
-//    public String getDirector(@RequestParam("name") String name, Model model) {
-//        model.addAttribute(equipmentService.getDirector(id));
-//        return "equipment/director/update";
-//    }
+     //관리자 찾기
+    @GetMapping("/director/view")
+    @ResponseBody
+    public List<String> getDirector(@RequestParam("name") String name) throws Exception {
+        return equipmentService.getDirector(name);
+    }
 
     // 관리자 수정
     @PostMapping("/director/update.do")
@@ -103,8 +105,5 @@ public class EquipmentController {
         equipmentService.updateStatus(id, status);
         return "redirect:/equipment/status/list.do";
     }
-
-
-
 
 }

@@ -73,4 +73,9 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
         return userDAO.countUserList(cond);
     }
 
+    @Override
+    public List<String> getUserByName(String name) throws Exception {
+        return userDAO.findUserByName(name);
+    }
+
 }

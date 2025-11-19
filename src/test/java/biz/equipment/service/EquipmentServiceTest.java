@@ -59,9 +59,10 @@ public class EquipmentServiceTest {
     void 장비_수정을_성공한다() {
         //given
         equipmentService.updateEquipment(
-                createUpdate(testVO.getId(), "serialNumber5", "accessNumber5","홍길동", Status.USE));
+                createUpdate(testVO.getId(), "serialNumber5", "accessNumber5","고양이", Status.USE));
 
         assertThat(equipmentDAO.findById(testVO.getId()).getSerialNumber()).isEqualTo("serialNumber5");
+        assertThat(equipmentDAO.findById(testVO.getId()).getDirector()).isEqualTo("고양이");
     }
 
     @Test
@@ -78,16 +79,11 @@ public class EquipmentServiceTest {
 
     @Test
     void 일련_번호_중복_조회를_성공한다(){
-        log.info("조회 결과 중복O: "+equipmentService.checkSerialNumber("serialNumber1"));
-        log.info("조회 결과 중복X: "+equipmentService.checkSerialNumber("seriamber1"));
-
         assertThat(equipmentService.checkSerialNumber("serialNumber1")).isNotNull();
     }
 
     @Test
     void 자산_번호_중복_조회를_성공한다(){
-        log.info("조회 결과 중복O: "+equipmentService.checkAccessNumber("accessNumber1"));
-        log.info("조회 결과 중복X: "+equipmentService.checkAccessNumber("seriamber1"));
         assertThat(equipmentService.checkAccessNumber("accessNumber1")).isNotNull();
     }
 
@@ -95,6 +91,11 @@ public class EquipmentServiceTest {
     void 장비_상태_변경을_성공한다(){
         equipmentService.updateStatus(testVO.getId(), Status.DISPOSAL);
         assertThat(equipmentDAO.findById(testVO.getId()).getStatus()).isEqualTo(Status.DISPOSAL);
+    }
+
+    @Test
+    void 관리자_목록_조회를_성공한다() throws Exception {
+        assertThat(equipmentService.getDirector("테스트사용자")).size().isEqualTo(2) ;
     }
 
     private EquipmentVO createEquipmentVO(String serialNumber, String accessNumber, String director, Status status) {
