@@ -1,0 +1,76 @@
+:root {
+    --Color: #2563eb;
+    --Color-blue: #2563eb;
+    --Color-dark: #0056b3;
+    --Color-gray: #f8f9fc;
+    --Color-brigth-gray: #F8F9FCFF
+}
+
+.submit-box{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.blue-btn{
+    width: 90px;
+    height: 30px;
+    border: none;
+    text-align: center;
+    background-color: var(--Color);
+    color:white;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.blue-btn:hover {
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.equipment-table {
+    width: 100%;                  /* 테이블이 부모 영역을 가득 채우도록 설정 */
+    border-collapse: collapse;    /* 테이블 셀 사이의 이중 테두리를 단일 테두리로 병합 */
+    font-size: 0.9rem;            /* 기본 폰트 크기 설정 */
+    line-height: 1.5;             /* 줄 간격 설정 */
+    margin-top: 20px;             /* 위쪽 여백 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* 은은한 그림자 추가 */
+    border-radius: 6px;
+}
+
+/* 1. 테이블 헤더 (<thead>) 스타일 */
+.equipment-table thead th {
+    background-color: var(--Color-gray); ; /* 헤더 배경색 (옅은 Primary 색상 사용 가정) */
+    color: var(--Gray-800);              /* 헤더 글자색 */
+    padding: 12px 15px;                  /* 내부 여백 */
+    text-align: center;                  /* 텍스트 가운데 정렬 */
+}
+
+/* 2. 테이블 바디 (<tbody>) 및 셀 (<td>) 스타일 */
+.equipment-table tbody td {
+    padding: 10px 15px;
+    border-bottom: 1px solid var(--Color-gray); /* 옅은 회색으로 행 구분 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    color: var(--font-default);
+}
+
+.equipment-table tbody tr:hover {
+    background-color: var(--Color-brigth-gray); /* 마우스를 올렸을 때 강조 */
+    cursor: pointer;
+}
+
+/* 4. 마지막 셀 테두리 제거 (선택 사항) */
+.equipment-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 5. 링크 스타일 (수정/삭제) */
+.equipment-table td a {
+    color: var(--Color-blue); /* 링크에 Primary 색상 적용 */
+    text-decoration: none;
+    margin: 0 5px;
+    font-weight: 500;
+}
+
+.equipment-table td a:hover {
+    text-decoration: underline;
+}

@@ -19,4 +19,6 @@ public interface UserService {
     List<UserVO> getUserTotalList();
 
     List<String> getUserRoles(String userId) throws Exception;
+
+    List<String> getUserByName(String name)  throws Exception;
 }

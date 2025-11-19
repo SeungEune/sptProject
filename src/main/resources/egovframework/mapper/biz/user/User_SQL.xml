@@ -124,20 +124,6 @@
 
     </select>
 
-    <select id="selectUserTotalList" resultType="biz.user.vo.UserVO">
-        SELECT
-            user_id      AS userId,
-            user_nm      AS name,
-            user_password AS password,
-            email_adres  AS email,
-            moblphon_no  AS phone,
-            jssfc_cd     AS jssfcCd,
-            register_id  AS registerId,
-            regist_dt    AS registDt
-        FROM tb_user
-    </select>
-
-
 
     <!-- 한 명 조회 -->
     <select id="selectUser" parameterType="string"
@@ -183,4 +169,12 @@
 
 
 
+<!--    이름으로 단건 조회-->
+    <select id="findUserIdByName" parameterType="string"
+            resultType="string">
+        SELECT
+            user_nm      AS name
+        FROM tb_user
+        WHERE user_nm = #{userName}
+    </select>
 </mapper>

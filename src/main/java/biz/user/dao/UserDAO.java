@@ -41,6 +41,10 @@ public class UserDAO extends EgovAbstractMapper {
         return selectOne("UserDAO.countUserList", cond);
     }
 
+    public List<String> findUserByName(String userName) {
+        return selectList("UserDAO.findUserIdByName",userName);
+    }
+
     public List<UserVO> selectUserTotalList() {
         return selectList("UserDAO.selectUserTotalList");
     }

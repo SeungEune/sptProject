@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>템플릿</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+
+</head>
+<body class="page-wrapper">
+
+<!--모바일 메뉴 버튼 -->
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+<div id="overlay" class="mobile-overlay"></div>
+
+<!--공통 Header -->
+<header th:replace="cmm/header :: headerLayout"></header>
+
+<div class="main-container">
+
+    <!--공통 Sidebar -->
+    <div th:replace="cmm/layout/tocLayout :: tocLayout"></div>
+
+    <!--본문-->
+    <main class="content-area">
+        <div class="content-inner">
+            <h1 class="content-title">타이틀</h1>
+            <div class="content-body">
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!--공통 Footer -->
+<footer th:replace="cmm/footer :: footerLayout"></footer>
+
+<script th:inline="javascript">
+</script>
+
+</body>
+</html>

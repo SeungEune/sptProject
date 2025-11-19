@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>장비 등록</title>
+    <style>
+        .accordion-item {
+            margin-top: 20px;
+            width: 300px;
+        }
+
+        .accordion-content {
+            display: none;
+            border: 1px solid #ccc;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .accordion-content input {
+            width: calc(100% - 16px);
+            margin: 8px;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        .accordion-content ul {
+            list-style: none;
+            padding: 0 8px 8px 8px;
+            margin: 0;
+        }
+
+        .accordion-content li {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .accordion-content li:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>장비 등록</h1>
+
+<!-- 일련번호 중복 확인 -->
+<form id="form">
+    <div>
+        <label for="serialNumber">일련번호</label><br>
+        <input type="text" id="serialNumber" name="serialNumber" placeholder="일련번호를 입력해주세요">
+        <button type="button" id="serialBtn">중복 확인</button>
+        <br>
+        <p id="serialMessage" style="color: red; margin-top: 4px;"></p>
+
+    </div>
+
+    <!-- 자산번호 중복 확인 -->
+    <div>
+        <label for="accessNumber">자산번호</label><br>
+        <input type="text" id="accessNumber" name="accessNumber" placeholder="자산번호를 입력해주세요">
+        <button type="button" id="accessBtn">중복 확인</button>
+        <p id="accessMessage" style="color: red; margin-top: 4px;"></p>
+    </div>
+
+    <!-- 담당자 검색-->
+    <div class="accordion-item">
+        <label for="managerInput">담당자</label><br>
+        <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director">
+        <button type="button" id="managerBtn" class="accordion-header">
+            <span class="arrow">▼</span>
+        </button>
+        <div class="accordion-content">
+            <ul id="managerList">
+            </ul>
+        </div>
+    </div>
+
+    <!-- 상태 선택 -->
+    <div>
+        <label for="statusSelect">상태</label><br>
+        <select id="statusSelect" name="status">
+            <option value="USE" selected>사용중</option>
+            <option value="STORAGE" selected>보관중</option>
+            <option value="REPAIR">수리중</option>
+            <option value="DISPOSAL">폐기</option>
+        </select>
+    </div>
+    <div style="margin-top: 10px;">
+        <button type="button" id="cancelBtn">취소하기</button>
+        <button type="submit" id="inputBtn">등록하기</button>
+    </div>
+</form>
+
+
+<script>
+    // 중복 확인
+    const serialInput = document.getElementById('serialNumber');
+    const serialBtn = document.getElementById('serialBtn');
+    const serialMessage = document.getElementById('serialMessage');
+
+    const accessInput = document.getElementById('accessNumber');
+    const accessBtn = document.getElementById('accessBtn');
+    const accessMessage = document.getElementById('accessMessage');
+
+    let serialValue = false;
+    let accessValue = false;
+
+    let selectedManager = null;
+
+    accessBtn.addEventListener('click', () => {
+        const access = accessInput.value.trim();
+        if (access === '') {
+            accessMessage.textContent = "자산번호를 입력해주세요";
+            accessMessage.style.color = 'red';
+            accessValue = false;
+            return;
+        }
+
+        fetch(`/equipment/check-accessNumber?accessNumber=${encodeURIComponent(access)}`)
+            .then(res => res.text())
+            .then(result => {
+                console.log(result)
+                if (result) {
+                    accessMessage.textContent = "사용 불가";
+                    accessMessage.style.color = 'red';
+                    accessValue = false;
+                } else {
+                    accessMessage.textContent = "사용 가능";
+                    accessMessage.style.color = 'blue';
+                    accessValue = true;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                accessMessage.textContent = "서버 오류 발생";
+                accessMessage.style.color = 'red';
+                accessValue = false;
+            });
+    });
+
+    serialBtn.addEventListener('click', () => {
+        const serial = serialInput.value.trim();
+        if (serial === '') {
+            serialMessage.textContent = "일련번호를 입력해주세요";
+            accessMessage.style.color = 'red';
+            serialValue = false;
+            return;
+        }
+
+        fetch(`/equipment/check-serialNumber?serialNumber=${encodeURIComponent(serial)}`)
+            .then(res => res.text())
+            .then(result => {
+                console.log(result)
+                if (result) {
+                    serialMessage.textContent = "사용 불가";
+                    serialMessage.style.color = 'red';
+                    serialValue = false
+                } else {
+                    serialMessage.textContent = "사용 가능";
+                    serialMessage.style.color = 'blue';
+                    serialValue = true;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                serialMessage.textContent = "서버 오류 발생";
+                serialMessage.style.color = 'red';
+                serialValue = false;
+            });
+    });
+
+
+    // 담당자 아코디언
+    document.querySelectorAll('.accordion-header').forEach(header => {
+        const content = header.nextElementSibling;
+        const arrow = header.querySelector('.arrow');
+        header.addEventListener('click', () => {
+            const isOpen = content.style.display === 'block';
+            content.style.display = isOpen ? 'none' : 'block';
+            arrow.textContent = isOpen ? '▼' : '▲';
+        });
+    });
+
+    // 담당자 검색
+    const managerInput = document.getElementById('managerInput');
+    const managerList = document.getElementById('managerList');
+    const managerBtn = document.getElementById('managerBtn');
+
+    managerBtn.addEventListener('click', () => {
+        const name = managerInput.value.trim();
+
+        fetch(`/equipment/director/view?name=${encodeURIComponent(name)}`)
+            .then(res => res.json())
+            .then(result => {
+                managerList.innerHTML = '';
+
+                result.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+
+                    li.addEventListener('click', () => {
+                        managerInput.value = item;
+                        selectedManager = item;
+                        managerList.style.display = 'none';
+                    });
+                    managerList.appendChild(li);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    });
+
+    managerBtn.addEventListener('click', () => {
+        selectedManager = null;
+    });
+
+    // 등록하기
+    const inputBtn = document.getElementById('inputBtn');
+    const form = document.getElementById('form')
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault(); // 페이지 새로고침 막기
+
+        if (!serialValue) {
+            alert("일련번호 중복 확인 필요");
+            return;
+        }
+
+        if (!accessValue) {
+            alert("자산번호 중복 확인 필요");
+            return;
+        }
+
+        if (!selectedManager) {
+            alert("담당자를 지정해주세요");
+            return;
+        }
+        const formData = new FormData(form);
+
+        fetch('/equipment/insert.do', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.text())
+            .then(result => {
+                alert('장비 등록 성공!');
+                form.reset();
+                window.location.href = '/equipment/list.do';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('등록 중 오류 발생');
+            });
+    });
+    // 취소
+    document.getElementById("cancelBtn").addEventListener('click', () => {
+        window.location.href = '/equipment/list.do';
+    });
+
+    managerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            managerBtn.click();
+            e.preventDefault();
+        }
+    });
+</script>
+
+</body>
+</html>
