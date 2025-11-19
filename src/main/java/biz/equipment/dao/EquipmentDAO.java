@@ -1,5 +1,6 @@
 package biz.equipment.dao;
 
+import egovframework.com.cmm.exception.custom.NoContentException;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import biz.mapper.EquipmentMapper;
 import biz.equipment.vo.EquipmentVO;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository("equipmentDAO")
 @RequiredArgsConstructor
@@ -53,5 +55,10 @@ public class EquipmentDAO extends EgovComAbstractDAO {
 
     public void updateStatus(Long id, Status status) {
         equipmentMapper.updateStatus(id, status);
+    }
+
+
+    public void findByIdOrElseThrow(Long id) {
+        Optional.ofNullable(findById(id)).orElseThrow(NoContentException::new);
     }
 }
