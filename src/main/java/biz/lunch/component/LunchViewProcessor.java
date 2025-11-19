@@ -1,6 +1,7 @@
 package biz.lunch.component;
 
 import biz.lunch.vo.LunchVO;
+import egovframework.com.cmm.service.EgovProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,8 @@ public class LunchViewProcessor {
 
     public List<Map<String, Object>> convertToFlatList(List<LunchVO> lunchList) {
         List<Map<String, Object>> flatLunchList = new ArrayList<>();
+
+        EgovProperties.getProperty("lunch.representative.name");
 
         Map<String, List<LunchVO>> byDate = new LinkedHashMap<>();
         for (LunchVO item : lunchList) {
