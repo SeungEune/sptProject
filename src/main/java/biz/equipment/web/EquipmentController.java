@@ -1,9 +1,8 @@
-package biz.equipment.controller;
+package biz.equipment.web;
 
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentUpdate;
 import biz.equipment.service.EquipmentService;
-import biz.equipment.service.EquipmentServiceImpl;
 import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
