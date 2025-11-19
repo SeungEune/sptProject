@@ -45,6 +45,16 @@ public class AccountAdminController {
             binding.rejectValue("userId", "duplicated", "이미 사용 중인 아이디입니다.");
         }
 
+        // 전화번호
+        if (userService.isDuplicatedPhone(user.getPhone())) {
+            binding.rejectValue("phone", "duplicated", "이미 사용 중인 전화번호입니다.");
+        }
+        // 이메일
+        if (userService.isDuplicatedEmail(user.getEmail())) {
+            binding.rejectValue("email", "duplicated", "이미 사용 중인 이메일입니다.");
+        }
+
+
         if (binding.hasErrors()) {
             return "account/create";
         }
@@ -59,7 +69,9 @@ public class AccountAdminController {
             @RequestParam(value = "option",      required = false, defaultValue = "all") String option,
             @RequestParam(value = "keyword",     required = false) String keyword,
             @RequestParam(value = "jssfcCd",     required = false) String jssfcCd,
-            @RequestParam(value = "registMonth", required = false) String registMonth,
+            //  새로 추가
+            @RequestParam(value = "startDate",   required = false) String startDate,
+            @RequestParam(value = "endDate",     required = false) String endDate,
             @RequestParam(value = "page",        required = false, defaultValue = "1") int page,
             @RequestParam(value = "size",        required = false, defaultValue = "10") int size,
             Model model) throws Exception {
@@ -71,12 +83,15 @@ public class AccountAdminController {
         cond.setOption(option);
         cond.setKeyword(keyword);
         cond.setJssfcCd(jssfcCd);
-        cond.setRegistMonth(registMonth);
+
+        //  기간값 세팅
+        cond.setStartDate(startDate);
+        cond.setEndDate(endDate);
+
         cond.setPage(page);
         cond.setSize(size);
         cond.setOffset((page - 1) * size);
 
-        // 전체 개수
         int totalCount = userService.getUserCount(cond);
         int totalPages = (int) Math.ceil((double) totalCount / size);
 
@@ -91,6 +106,7 @@ public class AccountAdminController {
 
         return "account/manage";
     }
+
 
 
 
@@ -119,25 +135,45 @@ public class AccountAdminController {
 
     @PostMapping("/account/edit/{id}")
     public String edit(@PathVariable("id") String userId,
-                       @Valid @ModelAttribute("user") UserVO user,
+                       @ModelAttribute("user") UserVO user,
                        BindingResult binding,
                        Model model) throws Exception {
+
 
         // 비밀번호 확인
         if (!user.getPassword().equals(user.getPasswordChk())) {
             binding.rejectValue("passwordChk", "mismatch", "비밀번호가 일치하지 않습니다.");
         }
 
+        // 전화번호 중복 (현재 userId 제외)
+        if (userService.isDuplicatedPhoneExceptUser(user.getPhone(), userId)) {
+            binding.rejectValue("phone", "duplicated", "이미 사용 중인 전화번호입니다.");
+        }
+
+        // 이메일 중복 (현재 userId 제외)
+        if (userService.isDuplicatedEmailExceptUser(user.getEmail(), userId)) {
+            binding.rejectValue("email", "duplicated", "이미 사용 중인 이메일입니다.");
+        }
+
+        // 4) 에러 있으면 다시 수정 화면
         if (binding.hasErrors()) {
-            // ★ 다시 수정 모드로 돌려줘야 버튼이 뜸
             model.addAttribute("mode", "edit");
             return "account/edit";
         }
 
+
+        // 5) userId는 path variable 기준으로 고정
         user.setUserId(userId);
+
+        if(user.getPassword().isEmpty()&&user.getPasswordChk().isEmpty()){
+            userService.updateUserExceptPw(user);
+            return "redirect:/account/manage";
+        }
         userService.updateUser(user);
         return "redirect:/account/manage";
     }
+
+
 
     // 삭제 확인 팝업
     @GetMapping("/account/delete/{id}/confirm")

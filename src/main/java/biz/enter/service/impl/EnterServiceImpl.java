@@ -31,7 +31,7 @@ public class EnterServiceImpl implements EnterService {
     }
 
     @Override
-    public EnterVO getEnter(Long enterId) throws Exception {
+    public EnterVO getEnter(String enterId) throws Exception {
         return enterDAO.selectEnter(enterId);
     }
 
@@ -41,7 +41,7 @@ public class EnterServiceImpl implements EnterService {
     }
 
     @Override
-    public void deleteEnter(Long enterId) throws Exception {
+    public void deleteEnter(String enterId) throws Exception {
         enterDAO.deleteEnter(enterId);
     }
 }

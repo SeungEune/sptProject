@@ -9,7 +9,7 @@ public interface EnterService {
     public List<EnterVO> getEnterList(int page, int size) throws Exception;
     public int getEnterCount() throws Exception;
     void createEnter(EnterVO enter);
-    EnterVO getEnter(Long enterId) throws Exception;
+    EnterVO getEnter(String enterId) throws Exception;
     void updateEnter(EnterVO vo) throws Exception;
-    void deleteEnter(Long enterId) throws Exception;
+    void deleteEnter(String enterId) throws Exception;
 }

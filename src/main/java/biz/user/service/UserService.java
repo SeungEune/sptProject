@@ -19,4 +19,12 @@ public interface UserService {
     List<UserVO> getUserTotalList();
 
     List<String> getUserRoles(String userId) throws Exception;
+
+    boolean isDuplicatedPhone(String phone);
+    boolean isDuplicatedPhoneExceptUser(String phone, String userId);
+
+    boolean isDuplicatedEmail(String email);
+    boolean isDuplicatedEmailExceptUser(String email, String userId);
+
+    void updateUserExceptPw(UserVO vo);
 }

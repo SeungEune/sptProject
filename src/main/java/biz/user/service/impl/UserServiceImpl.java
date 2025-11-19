@@ -83,4 +83,29 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
         return userDAO.selectUserRoles(userId);
     }
 
+    @Override
+    public boolean isDuplicatedPhone(String phone) {
+        return userDAO.countByPhone(phone) > 0;
+    }
+
+    @Override
+    public boolean isDuplicatedPhoneExceptUser(String phone, String userId) {
+        return userDAO.countByPhoneExceptUser(phone, userId) > 0;
+    }
+
+    @Override
+    public boolean isDuplicatedEmail(String email) {
+        return userDAO.countByEmail(email) > 0;
+    }
+
+    @Override
+    public boolean isDuplicatedEmailExceptUser(String email, String userId) {
+        return userDAO.countByEmailExceptUser(email, userId) > 0;
+    }
+
+    @Override
+    public void updateUserExceptPw(UserVO vo) {
+        userDAO.updateUserExceptPw(vo);
+    }
+
 }

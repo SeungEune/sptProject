@@ -7,18 +7,12 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
-    <!-- ✅ 공통 기초 스타일 -->
-    <link rel="stylesheet" th:href="@{/css/reset.css}">
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/components.css}">
-    <!-- 대시보드 / toc 는 안 써도 됨 -->
-
-    <!-- ✅ 레이아웃 & 헤더 -->
-    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
-    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
 
     <link rel="stylesheet" th:href="@{/css/account/form.css}">
 
+    <style>
+        .field-error{color: red;}
+    </style>
 </head>
 <body>
 
@@ -40,6 +34,11 @@
                           th:action="@{/enter/edit/{id}(id=${enter.enterId})}"
                           th:object="${enter}"
                           method="post">
+
+                        <div class="form-group">
+                            <label for="enter-id">출입번호</label>
+                            <input id="enter-id" th:field="*{enterId}" type="text" readonly class="emp-fixed">
+                        </div>
 
                         <!-- 1) 유형 -->
                         <div class="form-group">
@@ -76,6 +75,7 @@
                             <select th:field="*{method}">
                                 <option value="CARD">카드</option>
                                 <option value="FINGER">지문</option>
+                                <option value="PW">비밀번호</option>
                             </select>
                         </div>
 
@@ -94,8 +94,15 @@
                                 <input id="guest-email" th:field="*{guestEmail}" type="email">
                             </div>
                             <div class="form-group">
+                                <label for="guest-start">게스트 시작일</label>
+                                <input id="guest-start" th:field="*{startGuestDt}" type="date" class="emp-fixed">
+                            </div>
+                            <div class="form-group">
                                 <label for="guest-end">게스트 마감일</label>
                                 <input id="guest-end" th:field="*{endGuestDt}" type="date">
+                                <div class="field-error"
+                                     th:if="${#fields.hasErrors('endGuestDt')}"
+                                     th:errors="*{endGuestDt}"></div>
                             </div>
                         </div>
 
@@ -150,7 +157,13 @@
                                 <button type="button" id="editBtn"  class="submit-btn">수정</button>
 
                                 <button type="submit" id="saveBtn" class="submit-btn hidden">확인</button>
-                                <button type="button" id="cancelBtn" class="cancel-btn btn btn-cancel hidden">취소</button>
+                                <button type="button"
+                                        id="cancelBtn"
+                                        class="cancel-btn btn btn-cancel hidden"
+                                        th:onclick="|location.href='@{/enter/edit/{id}(id=${enter.enterId})}'|">
+                                    취소
+                                </button>
+
 
                                 <button type="button" class="submit-btn" id="deleteBtn">
                                     삭제
@@ -177,108 +190,7 @@
     </div>
 </div>
 
-<script>
-    // 게스트/직원 섹션 토글 (create 화면이랑 동일)
-    function toggleTypeSection() {
-        const type = document.querySelector('input[name="type"]:checked')?.value;
-        const guest = document.getElementById('guest-section');
-        const emp = document.getElementById('emp-section');
-
-        if (type === 'GUEST') {
-            guest.classList.remove('hidden');
-            emp.classList.add('hidden');
-        } else {
-            guest.classList.add('hidden');
-            emp.classList.remove('hidden');
-        }
-    }
-
-    function setMode(mode) {
-        const form   = document.querySelector('.profile-form');
-        const inputs = form.querySelectorAll('input, select');
-
-        const isView = (mode === 'view');
-
-        inputs.forEach(el => {
-            if (el.type === 'hidden') return;
-
-            // 🔒 항상 잠겨 있어야 하는 필드
-            if (el.classList.contains('emp-fixed')) {
-                if (el.tagName === 'INPUT') {
-                    el.readOnly = true;
-                } else if (el.tagName === 'SELECT') {
-                    el.disabled = true;
-                }
-                return;
-            }
-
-            // 🔁 나머지는 모드에 따라 토글
-            if (el.tagName === 'INPUT') {
-                if (el.type === 'radio') {
-                    el.disabled = true;      // 항상 막기
-                } else if (el.type !== 'hidden') {
-                    el.readOnly = isView;    // hidden 은 위에서 이미 return 처리
-                }
-            }
-            else if (el.tagName === 'SELECT') {
-                el.disabled = isView;
-            }
-        });
-
-        document.getElementById('editBtn').classList.toggle('hidden', !isView);
-        document.getElementById('saveBtn').classList.toggle('hidden', isView);
-        document.getElementById('cancelBtn').classList.toggle('hidden', isView);
-        document.getElementById('deleteBtn').classList.toggle('hidden', !isView);
-        document.getElementById('listBtn').classList.toggle('hidden', !isView);
-    }
-
-
-
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // 타입 섹션 세팅
-        document.querySelectorAll('input[name="type"]').forEach(radio => {
-            radio.addEventListener('change', toggleTypeSection);
-        });
-        toggleTypeSection();
-
-        // 처음에는 조회 모드
-        setMode('view');
-
-        document.getElementById('editBtn').addEventListener('click', () => {
-            setMode('edit');
-        });
-
-        document.getElementById('cancelBtn').addEventListener('click', () => {
-            // 값 되돌리기 위해 새로고침
-            location.reload();
-        });
-    });
-</script>
-
-<script th:inline="javascript">
-    const enterId = /*[[${enter.enterId}]]*/ '';
-
-    document.getElementById('deleteBtn').addEventListener('click', function () {
-        openDeleteModal(enterId);
-    });
-
-    function openDeleteModal(enterId) {
-        Swal.fire({
-            title: '출입 삭제',
-            text: enterId + ' 출입을 삭제하시겠습니까?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: '삭제',
-            cancelButtonText: '취소',
-            allowOutsideClick: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteForm').submit();
-            }
-        });
-    }
-</script>
+<script th:src="@{/js/enter/new/edit.js}"></script>
 
 </body>
 </html>

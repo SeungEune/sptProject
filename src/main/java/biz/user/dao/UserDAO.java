@@ -5,7 +5,9 @@ import biz.user.vo.UserVO;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository("userDAO")
 public class UserDAO extends EgovAbstractMapper {
@@ -47,6 +49,37 @@ public class UserDAO extends EgovAbstractMapper {
 
     public List<String> selectUserRoles(String userId) {
         return selectList("UserDAO.selectUserRoles", userId);
+    }
+
+    /** 전화번호 중복 (등록용) */
+    public int countByPhone(String phone) {
+        return selectOne("UserDAO.countByPhone", phone);
+        // namespace.id
+    }
+
+    /** 전화번호 중복 (수정용 : 자기 자신 제외) */
+    public int countByPhoneExceptUser(String phone, String userId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("phone", phone);
+        param.put("userId", userId);
+        return selectOne("UserDAO.countByPhoneExceptUser", param);
+    }
+
+    /** 이메일 중복 (등록용) */
+    public int countByEmail(String email) {
+        return selectOne("UserDAO.countByEmail", email);
+    }
+
+    /** 이메일 중복 (수정용 : 자기 자신 제외) */
+    public int countByEmailExceptUser(String email, String userId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("email", email);
+        param.put("userId", userId);
+        return selectOne("UserDAO.countByEmailExceptUser", param);
+    }
+
+    public void updateUserExceptPw(UserVO vo) {
+        update("UserDAO.updateUserExceptPw", vo);
     }
 
 }

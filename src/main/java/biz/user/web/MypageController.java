@@ -45,6 +45,21 @@ public class MypageController {
             binding.rejectValue("passwordChk", "mismatch", "비밀번호가 일치하지 않습니다.");
         }
 
+        // 전화번호 중복 (현재 userId 제외)
+        if (userService.isDuplicatedPhoneExceptUser(user.getPhone(), userId)) {
+            binding.rejectValue("phone", "duplicated", "이미 사용 중인 전화번호입니다.");
+        }
+
+        // 이메일 중복 (현재 userId 제외)
+        if (userService.isDuplicatedEmailExceptUser(user.getEmail(), userId)) {
+            binding.rejectValue("email", "duplicated", "이미 사용 중인 이메일입니다.");
+        }
+
+        if (binding.hasErrors()) {
+            model.addAttribute("mode", "edit");
+            return "account/edit";
+        }
+
         if (binding.hasErrors()) {
             // 에러 나면 다시 "수정 화면" 으로
             return "account/updateMypage";
