@@ -5,6 +5,9 @@ import biz.enter.vo.EnterVO;
 import biz.user.service.UserService;
 import biz.user.vo.UserSearchCond;
 import biz.user.vo.UserVO;
+import biz.util.EgovDateUtil;
+import biz.util.EgovStringUtil;
+import egovframework.com.cmm.exception.custom.NoContentException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,9 +30,14 @@ public class EnterController {
     @GetMapping("/enter/manage")
     public String manage(@RequestParam(defaultValue = "1") int page,
                          @RequestParam(defaultValue = "10") int size,
-                         Model model) throws Exception {
+                         Model model){
 
         List<EnterVO> enterList = enterService.getEnterList(page, size);
+
+        if(enterList==null||enterList.isEmpty()){
+            throw new NoContentException("출입 목록이 존재하지 않습니다.");
+        }
+
         int totalCount = enterService.getEnterCount();
         int totalPages = (int) Math.ceil((double) totalCount / size);
 
@@ -43,13 +51,17 @@ public class EnterController {
 
     /** 등록 폼 */
     @GetMapping("/enter/create")
-    public String createForm(@ModelAttribute("enter") EnterVO enter,Model model) throws Exception {
+    public String createForm(@ModelAttribute("enter") EnterVO enter,Model model){
 
-        if(enter.getType()==null){
+        if(EgovStringUtil.isEmpty(enter.getType())){
             enter.setType("EMP");
         }
 
         List<UserVO>users = userService.getUserTotalList();
+
+        if(users==null||users.isEmpty()){
+            throw new NoContentException("직원이 존재하지 않습니다.");
+        }
 
         model.addAttribute("userList", users);
 
@@ -58,10 +70,11 @@ public class EnterController {
 
     @PostMapping("/enter/create")
     public String create(@Valid @ModelAttribute("enter") EnterVO enter,
-                         BindingResult binding) throws Exception {
+                         BindingResult binding)  {
         if(enterService.getEnter(enter.getEnterId()) != null){
             binding.rejectValue("enterId","required","출입번호가 중복입니다.");
         }
+
         // 게스트인데 시작일이 없으면 오늘로
         if ("GUEST".equals(enter.getType()) && enter.getStartGuestDt() == null){
             enter.setStartGuestDt(LocalDate.now());
@@ -90,10 +103,12 @@ public class EnterController {
 
     @GetMapping("/enter/edit/{id}")
     public String editForm(@PathVariable("id") String enterId,
-                           Model model) throws Exception {
+                           Model model) {
 
         // 1건 조회
         EnterVO enter = enterService.getEnter(enterId);
+
+        if(EgovStringUtil.isEmpty(enterId)||enter == null)throw new NoContentException("출입번호가 없습니다.");
         model.addAttribute("enter", enter);
         model.addAttribute("mode", "view");   //  처음엔 view
 
@@ -104,7 +119,9 @@ public class EnterController {
     public String update(@PathVariable("id") String enterId,
                          @ModelAttribute("enter") EnterVO enter,
                          BindingResult binding,
-                         Model model) throws Exception {
+                         Model model){
+
+        if(EgovStringUtil.isEmpty(enterId))throw new NoContentException("출입번호가 없습니다.");
         enter.setEnterId(enterId);   // 혹시 폼에 없으면 보정
 
         // 게스트일 때만 기간 검증
@@ -112,7 +129,6 @@ public class EnterController {
                 && enter.getStartGuestDt() != null
                 && enter.getEndGuestDt()   != null
                 && enter.getEndGuestDt().isBefore(enter.getStartGuestDt())) {
-
             binding.rejectValue("endGuestDt","range","마감일은 시작일 이후여야 합니다.");
         }
 
@@ -130,13 +146,15 @@ public class EnterController {
     // 삭제 확인 팝업
     @GetMapping("/enter/delete/{id}/confirm")
     public String deleteConfirm(@PathVariable("id") String enterId, Model model) {
+        if(EgovStringUtil.isEmpty(enterId))throw new NoContentException("출입번호 없습니다.");
         model.addAttribute("enterId", enterId);
         return "enter/popup";   // 방금 HTML 파일 이름
     }
 
     // 실제 삭제 처리 (POST 권장)
     @PostMapping("/enter/delete/{id}")
-    public String delete(@PathVariable("id") String enterId) throws Exception {
+    public String delete(@PathVariable("id") String enterId) {
+        if(EgovStringUtil.isEmpty(enterId))throw new NoContentException("출입번호 없습니다.");
         enterService.deleteEnter(enterId);
         return "redirect:/enter/manage";
     }

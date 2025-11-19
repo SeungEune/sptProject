@@ -3,6 +3,8 @@ package biz.user.web;
 import biz.user.service.UserService;
 import biz.user.vo.UserSearchCond;
 import biz.user.vo.UserVO;
+import biz.util.EgovStringUtil;
+import egovframework.com.cmm.exception.custom.NoContentException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +28,8 @@ public class AccountAdminController {
     /** 아이디 중복 체크 (폼의 formaction에서 호출) */
     @GetMapping("/account/create/id-check")
     @ResponseBody
-    public String idCheck(@RequestParam("userId") String userId) {
-        boolean dup = userService.isDuplicatedId(userId);
-        return dup ? "DUPLICATED" : "OK";
+    public boolean idCheck(@RequestParam("userId") String userId) {
+        return userService.isDuplicatedId(userId);
     }
 
     /** 등록 처리 */
@@ -74,7 +75,7 @@ public class AccountAdminController {
             @RequestParam(value = "endDate",     required = false) String endDate,
             @RequestParam(value = "page",        required = false, defaultValue = "1") int page,
             @RequestParam(value = "size",        required = false, defaultValue = "10") int size,
-            Model model) throws Exception {
+            Model model) {
 
         if (page < 1) page = 1;
         if (size < 1) size = 10;
@@ -97,6 +98,10 @@ public class AccountAdminController {
 
         List<UserVO> userList = userService.getUserList(cond);
 
+        if(userList.isEmpty()){
+            throw new NoContentException("직원 목록이 없습니다.");
+        }
+
         model.addAttribute("userList", userList);
         model.addAttribute("search", cond);
         model.addAttribute("page", page);
@@ -115,21 +120,21 @@ public class AccountAdminController {
     /** 수정 폼 */
 // 조회(읽기 전용 화면)
     @GetMapping("/account/edit/{id}")
-    public String editView(@PathVariable("id") String userId, Model model) throws Exception {
+    public String editView(@PathVariable("id") String userId, Model model)  {
         UserVO user = userService.getUser(userId);
+        if(EgovStringUtil.isEmpty(userId)||user==null)throw new NoContentException("존재하지 않는 사용자입니다.");
         model.addAttribute("user", user);
-        model.addAttribute("mode", "view");   // ★ 조회 모드
+        model.addAttribute("mode", "view");   // 조회 모드
 
-        System.out.println("~~~~~~~~~~~~~~~~~~");
-        System.out.println(user);
         return "account/edit";
     }
     // 수정 화면(입력 가능)
     @GetMapping("/account/edit/{id}/update")
-    public String editForm(@PathVariable("id") String userId, Model model) throws Exception {
+    public String editForm(@PathVariable("id") String userId, Model model){
         UserVO user = userService.getUser(userId);
+        if(EgovStringUtil.isEmpty(userId)||user==null)throw new NoContentException("존재하지 않는 사용자입니다.");
         model.addAttribute("user", user);
-        model.addAttribute("mode", "edit");   // ★ 수정 모드
+        model.addAttribute("mode", "edit");   // 수정 모드
         return "account/edit";
     }
 
@@ -138,8 +143,6 @@ public class AccountAdminController {
                        @ModelAttribute("user") UserVO user,
                        BindingResult binding,
                        Model model) throws Exception {
-
-
         // 비밀번호 확인
         if (!user.getPassword().equals(user.getPasswordChk())) {
             binding.rejectValue("passwordChk", "mismatch", "비밀번호가 일치하지 않습니다.");
@@ -165,10 +168,11 @@ public class AccountAdminController {
         // 5) userId는 path variable 기준으로 고정
         user.setUserId(userId);
 
-        if(user.getPassword().isEmpty()&&user.getPasswordChk().isEmpty()){
+        if(EgovStringUtil.isEmpty(user.getPassword()) && EgovStringUtil.isEmpty(user.getPasswordChk())){
             userService.updateUserExceptPw(user);
             return "redirect:/account/manage";
         }
+
         userService.updateUser(user);
         return "redirect:/account/manage";
     }
@@ -178,13 +182,15 @@ public class AccountAdminController {
     // 삭제 확인 팝업
     @GetMapping("/account/delete/{id}/confirm")
     public String deleteConfirm(@PathVariable("id") String userId, Model model) {
+        if(EgovStringUtil.isEmpty(userId))throw new NoContentException("존재하지 않는 사용자입니다.");
         model.addAttribute("userId", userId);
         return "account/popup";   // 방금 HTML 파일 이름
     }
 
     // 실제 삭제 처리 (POST 권장)
     @PostMapping("/account/delete/{id}")
-    public String delete(@PathVariable("id") String userId) throws Exception {
+    public String delete(@PathVariable("id") String userId){
+        if(EgovStringUtil.isEmpty(userId))throw new NoContentException("존재하지 않는 사용자입니다.");
         userService.deleteUser(userId);
         return "redirect:/account/manage";
     }

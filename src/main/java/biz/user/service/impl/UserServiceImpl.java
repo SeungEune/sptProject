@@ -24,7 +24,6 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
         return userDAO.selectCountByUserId(userId) > 0;
     }
 
-    @Transactional
     @Override
     public void createUser(UserVO vo) throws Exception {
         // 등록자(관리자) 세팅(선택)
@@ -42,17 +41,17 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
     }
 
     @Override
-    public List<UserVO> getUserList(UserSearchCond cond) throws Exception {
+    public List<UserVO> getUserList(UserSearchCond cond) {
         return userDAO.selectUserList(cond);
     }
 
 
     @Override
-    public UserVO getUser(String userId) throws Exception {
+    public UserVO getUser(String userId) {
         return userDAO.selectUser(userId);
     }
 
-    @Transactional
+
     @Override
     public void updateUser(UserVO vo) throws Exception {
         // 비밀번호를 수정 폼에서 다시 받는다면 암호화
@@ -64,12 +63,12 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
     }
 
     @Override
-    public void deleteUser(String userId) throws Exception {
+    public void deleteUser(String userId) {
         userDAO.deleteUser(userId);
     }
 
     @Override
-    public int getUserCount(UserSearchCond cond) throws Exception {
+    public int getUserCount(UserSearchCond cond) {
         return userDAO.countUserList(cond);
     }
 
