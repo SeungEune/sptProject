@@ -5,14 +5,14 @@ import biz.lunch.service.LunchService;
 import biz.lunch.vo.LunchVO;
 import biz.lunch.vo.SummaryVO;
 import biz.lunch.vo.UserVO;
+import biz.util.EgovDateUtil;
+import biz.util.EgovStringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -34,10 +34,15 @@ public class LunchController {
     @Resource(name = "lunchViewProcessor")
     private LunchViewProcessor viewProcessor;
 
-    // [공통 메서드] 날짜 기본값 설정 (중복 제거)
+    // 날짜 기본값 설정
     private void setDefaultDate(LunchVO searchVO) {
-        if (searchVO.getDate() == null || searchVO.getDate().trim().isEmpty()) {
-            searchVO.setDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM")));
+        // EgovStringUtil로 Null/Empty 체크
+        if (EgovStringUtil.isEmpty(searchVO.getDate())) {
+            // EgovDateUtil로 오늘 날짜 가져오기 -> yyyy-MM 형태로 자르기
+            String today = EgovDateUtil.getToday();
+            if (today != null && today.length() >= 7) {
+                searchVO.setDate(today.substring(0, 7));
+            }
         }
     }
 
@@ -54,9 +59,9 @@ public class LunchController {
             return "lunch/register";
         } catch (Exception e) {
             log.error("점심/커피 등록 화면 조회 실패", e);
-            // 에러 발생 시 처리 (보통 공통 에러 페이지로 이동하거나 메시지 전달)
+            // 에러 발생 시 처리 (공통 에러 페이지로 이동하거나 메시지 전달)
             model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -85,7 +90,7 @@ public class LunchController {
         } catch (Exception e) {
             log.error("점심/커피 등록 처리 실패", e);
             model.addAttribute("message", "등록 중 오류가 발생했습니다.");
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -117,7 +122,7 @@ public class LunchController {
         } catch (Exception e) {
             log.error("점심/커피 목록 조회 실패", e);
             model.addAttribute("message", "목록 조회 중 오류가 발생했습니다.");
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -140,7 +145,7 @@ public class LunchController {
             return "lunch/update";
         } catch (Exception e) {
             log.error("수정 화면 조회 실패", e);
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -158,7 +163,7 @@ public class LunchController {
             return "redirect:/lunch/list.do";
         } catch (Exception e) {
             log.error("점심/커피 수정 처리 실패", e);
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -181,7 +186,7 @@ public class LunchController {
             return "lunch/delete";
         } catch (Exception e) {
             log.error("삭제 화면 조회 실패", e);
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -198,7 +203,7 @@ public class LunchController {
             return "redirect:/lunch/list.do";
         } catch (Exception e) {
             log.error("점심/커피 삭제 처리 실패", e);
-            return "common/error";
+            return "error/404";
         }
     }
 
@@ -223,7 +228,7 @@ public class LunchController {
             return "lunch/statistics";
         } catch (Exception e) {
             log.error("통계 조회 실패", e);
-            return "common/error";
+            return "error/404";
         }
     }
 
