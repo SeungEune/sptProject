@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}"
-      xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +17,7 @@
 <button id="menu-toggle" class="mobile-menu-toggle">
     <i class="fas fa-bars"></i>
 </button>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 <div id="overlay" class="mobile-overlay"></div>
     <div th:fragment="content">
         <h1 class="content-title">점심/커피 내역 등록</h1>
@@ -99,6 +99,7 @@
                 </div>
         </div>
     </div>
+</div>
 
 <script th:inline="javascript">
     // --- 유저 데이터 로드 ---
