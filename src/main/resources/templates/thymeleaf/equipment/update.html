@@ -66,14 +66,11 @@
     <div class="accordion-item">
         <label for="managerInput">담당자</label><br>
         <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director" th:value="${param.director}">
-        <button type="button" class="accordion-header">
+        <button type="button" id="managerBtn" class="accordion-header">
             <span class="arrow">▼</span>
         </button>
         <div class="accordion-content">
             <ul id="managerList">
-                <li>홍길동 (사용중)</li>
-                <li>김영희 (미사용)</li>
-                <li>박철수 (사용중)</li>
             </ul>
         </div>
     </div>
@@ -95,7 +92,6 @@
 </form>
 
 <script>
-    // ========================= 전역 변수 =========================
     let serialValue = false;
     let accessValue = false;
 
@@ -106,7 +102,8 @@
 
     const serialInit = serialInput.value;
     const accessInit = accessInput.value;
-    const managerInput = document.getElementById('managerInput');
+
+    let selectedManager = null;
 
     // ========================= 일련번호 중복 체크 =========================
     document.getElementById('serialBtn').addEventListener('click', () => {
@@ -231,22 +228,45 @@
     });
 
     // ========================= 담당자 검색 =========================
+    const managerInput = document.getElementById('managerInput');
     const managerList = document.getElementById('managerList');
-    const allManagers = ['홍길동 (사용중)', '김영희 (미사용)', '박철수 (사용중)'];
+    const managerBtn = document.getElementById('managerBtn');
 
-    managerInput.addEventListener('input', () => {
+
+    managerBtn.addEventListener('click', () => {
         const name = managerInput.value.trim();
-        managerList.innerHTML = '';
-        allManagers
-            .filter(item => item.includes(name))
-            .forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                li.addEventListener('click', () => {
-                    managerInput.value = item.replace(/\s?\(.*?\)/, ""); // 이름만 입력
+
+        fetch(`/equipment/director/view?name=${encodeURIComponent(name)}`)
+            .then(res => res.json())
+            .then(result => {
+                managerList.innerHTML = '';
+
+                result.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+
+                    li.addEventListener('click', () => {
+                        managerInput.value = item;
+                        selectedManager = item;
+                        managerList.style.display = 'none';
+                    });
+                    managerList.appendChild(li);
                 });
-                managerList.appendChild(li);
+            })
+            .catch(err => {
+                console.error(err);
             });
+    });
+
+    managerBtn.addEventListener('click', () => {
+        selectedManager = null;
+    });
+
+    managerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            managerBtn.click();
+            e.preventDefault();
+        }
     });
 </script>
 

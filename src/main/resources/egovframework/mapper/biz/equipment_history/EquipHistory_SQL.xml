@@ -1,0 +1,14 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<!DOCTYPE mapper-->
+<!--        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"-->
+<!--        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
+
+<!--<mapper namespace="biz.mapper.EquipmentCodeMapper">-->
+
+<!--    &lt;!&ndash;조회&ndash;&gt;-->
+<!--&lt;!&ndash;    <select id="findAll" resultType="biz.equipment_code.vo.EquipmentCodeVO">&ndash;&gt;-->
+<!--&lt;!&ndash;        SELECT ID, CODE, NAME&ndash;&gt;-->
+<!--&lt;!&ndash;        FROM EQUIPMENT_CODE&ndash;&gt;-->
+<!--&lt;!&ndash;    </select>&ndash;&gt;-->
+<!--    -->
+<!--</mapper>-->

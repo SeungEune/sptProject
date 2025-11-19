@@ -47,46 +47,46 @@
 
 <!-- 일련번호 중복 확인 -->
 <form id="form">
-<div>
-    <label for="serialNumber">일련번호</label><br>
-    <input type="text" id="serialNumber" name="serialNumber" placeholder="일련번호를 입력해주세요">
-    <button type="button" id="serialBtn">중복 확인</button>
-    <br>
-    <p id="serialMessage" style="color: red; margin-top: 4px;"></p>
+    <div>
+        <label for="serialNumber">일련번호</label><br>
+        <input type="text" id="serialNumber" name="serialNumber" placeholder="일련번호를 입력해주세요">
+        <button type="button" id="serialBtn">중복 확인</button>
+        <br>
+        <p id="serialMessage" style="color: red; margin-top: 4px;"></p>
 
-</div>
-
-<!-- 자산번호 예시 (중복 확인 동일 구조 가능) -->
-<div>
-    <label for="accessNumber">자산번호</label><br>
-    <input type="text" id="accessNumber" name="accessNumber" placeholder="자산번호를 입력해주세요">
-    <button type="button" id="accessBtn">중복 확인</button>
-    <p id="accessMessage" style="color: red; margin-top: 4px;"></p>
-</div>
-
-<!-- 담당자 검색 아코디언 -->
-<div class="accordion-item">
-    <label for="managerInput">담당자</label><br>
-    <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director">
-    <button type="button" id="managerBtn" class="accordion-header">
-        <span class="arrow">▼</span>
-    </button>
-    <div class="accordion-content">
-        <ul id="managerList">
-        </ul>
     </div>
-</div>
 
-<!-- 상태 선택 -->
-<div>
-    <label for="statusSelect">상태</label><br>
-    <select id="statusSelect" name="status">
-        <option value="USE" selected>사용중</option>
-        <option value="STORAGE" selected>보관중</option>
-        <option value="REPAIR">수리중</option>
-        <option value="DISPOSAL">폐기</option>
-    </select>
-</div>
+    <!-- 자산번호 중복 확인 -->
+    <div>
+        <label for="accessNumber">자산번호</label><br>
+        <input type="text" id="accessNumber" name="accessNumber" placeholder="자산번호를 입력해주세요">
+        <button type="button" id="accessBtn">중복 확인</button>
+        <p id="accessMessage" style="color: red; margin-top: 4px;"></p>
+    </div>
+
+    <!-- 담당자 검색-->
+    <div class="accordion-item">
+        <label for="managerInput">담당자</label><br>
+        <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director">
+        <button type="button" id="managerBtn" class="accordion-header">
+            <span class="arrow">▼</span>
+        </button>
+        <div class="accordion-content">
+            <ul id="managerList">
+            </ul>
+        </div>
+    </div>
+
+    <!-- 상태 선택 -->
+    <div>
+        <label for="statusSelect">상태</label><br>
+        <select id="statusSelect" name="status">
+            <option value="USE" selected>사용중</option>
+            <option value="STORAGE" selected>보관중</option>
+            <option value="REPAIR">수리중</option>
+            <option value="DISPOSAL">폐기</option>
+        </select>
+    </div>
     <div style="margin-top: 10px;">
         <button type="button" id="cancelBtn">취소하기</button>
         <button type="submit" id="inputBtn">등록하기</button>
@@ -95,48 +95,7 @@
 
 
 <script>
-    // 등록하기
-    const inputBtn = document.getElementById('inputBtn');
-    const form = document.getElementById('form')
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault(); // 페이지 새로고침 막기
-
-        if(!serialValue){
-            alert("일련번호 중복 확인 필요");
-            return;
-        }
-
-        if(!accessValue){
-            alert("자산번호 중복 확인 필요");
-            return;
-        }
-
-        if(!selectedManager){
-            alert("담당자를 지정해주세요");
-            return;
-        }
-        const formData = new FormData(form);
-
-        fetch('/equipment/insert.do', {
-            method: 'POST',
-            body: formData
-        })
-            .then(res => res.text()) // 혹은 res.json() (서버 응답에 따라)
-            .then(result => {
-                alert('장비 등록 성공!');
-                // 필요하면 form 초기화
-
-                form.reset();
-                window.location.href = '/equipment/list.do';
-            })
-            .catch(err => {
-                console.error(err);
-                alert('등록 중 오류 발생');
-            });
-    });
-
-    // 일련번호 중복 확인
+    // 중복 확인
     const serialInput = document.getElementById('serialNumber');
     const serialBtn = document.getElementById('serialBtn');
     const serialMessage = document.getElementById('serialMessage');
@@ -152,19 +111,18 @@
 
     accessBtn.addEventListener('click', () => {
         const access = accessInput.value.trim();
-        if(access === '') {
+        if (access === '') {
             accessMessage.textContent = "자산번호를 입력해주세요";
             accessMessage.style.color = 'red';
             accessValue = false;
             return;
         }
 
-        // 서버 API 호출 (Spring Controller에서 @ResponseBody 반환)
         fetch(`/equipment/check-accessNumber?accessNumber=${encodeURIComponent(access)}`)
             .then(res => res.text())
             .then(result => {
                 console.log(result)
-                if(result) {
+                if (result) {
                     accessMessage.textContent = "사용 불가";
                     accessMessage.style.color = 'red';
                     accessValue = false;
@@ -178,18 +136,13 @@
                 console.error(err);
                 accessMessage.textContent = "서버 오류 발생";
                 accessMessage.style.color = 'red';
-                accessValue=false;
+                accessValue = false;
             });
-    });
-
-    // 취소하기 버튼
-    document.getElementById("cancelBtn").addEventListener('click', ()=>{
-        window.location.href= '/equipment/list.do';
     });
 
     serialBtn.addEventListener('click', () => {
         const serial = serialInput.value.trim();
-        if(serial === '') {
+        if (serial === '') {
             serialMessage.textContent = "일련번호를 입력해주세요";
             accessMessage.style.color = 'red';
             serialValue = false;
@@ -200,7 +153,7 @@
             .then(res => res.text())
             .then(result => {
                 console.log(result)
-                if(result) {
+                if (result) {
                     serialMessage.textContent = "사용 불가";
                     serialMessage.style.color = 'red';
                     serialValue = false
@@ -214,9 +167,10 @@
                 console.error(err);
                 serialMessage.textContent = "서버 오류 발생";
                 serialMessage.style.color = 'red';
-                serialValue=false;
+                serialValue = false;
             });
     });
+
 
     // 담당자 아코디언
     document.querySelectorAll('.accordion-header').forEach(header => {
@@ -229,11 +183,10 @@
         });
     });
 
-    // 담당자 검색 필터링
+    // 담당자 검색
     const managerInput = document.getElementById('managerInput');
     const managerList = document.getElementById('managerList');
     const managerBtn = document.getElementById('managerBtn');
-
 
     managerBtn.addEventListener('click', () => {
         const name = managerInput.value.trim();
@@ -248,9 +201,9 @@
                     li.textContent = item;
 
                     li.addEventListener('click', () => {
-                        managerInput.value = item;  // input에 값 세팅
-                        selectedManager = item;      // 선택된 담당자 저장
-                        managerList.style.display = 'none'; // 아코디언 닫기 (선택 후 자동 닫힘)
+                        managerInput.value = item;
+                        selectedManager = item;
+                        managerList.style.display = 'none';
                     });
                     managerList.appendChild(li);
                 });
@@ -261,18 +214,58 @@
     });
 
     managerBtn.addEventListener('click', () => {
-        selectedManager = null;  // 🔥 검색 버튼 눌렀으면 선택 초기화 (입력만으로 선택 인정 X)
+        selectedManager = null;
     });
 
+    // 등록하기
+    const inputBtn = document.getElementById('inputBtn');
+    const form = document.getElementById('form')
 
-        managerInput.addEventListener('keypress', (e) => {
+    form.addEventListener('submit', function (e) {
+        e.preventDefault(); // 페이지 새로고침 막기
+
+        if (!serialValue) {
+            alert("일련번호 중복 확인 필요");
+            return;
+        }
+
+        if (!accessValue) {
+            alert("자산번호 중복 확인 필요");
+            return;
+        }
+
+        if (!selectedManager) {
+            alert("담당자를 지정해주세요");
+            return;
+        }
+        const formData = new FormData(form);
+
+        fetch('/equipment/insert.do', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.text())
+            .then(result => {
+                alert('장비 등록 성공!');
+                form.reset();
+                window.location.href = '/equipment/list.do';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('등록 중 오류 발생');
+            });
+    });
+    // 취소
+    document.getElementById("cancelBtn").addEventListener('click', () => {
+        window.location.href = '/equipment/list.do';
+    });
+
+    managerInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             managerBtn.click();
             e.preventDefault();
         }
     });
-
-
 </script>
 
 </body>
