@@ -46,6 +46,8 @@
 <h1>장비 수정</h1>
 
 <form id="form">
+    <input type="hidden" name="id" th:value="${param.id}" />
+
     <div>
         <label for="serialNumber">일련번호</label><br>
         <input type="text" id="serialNumber" name="serialNumber" placeholder="일련번호를 입력해주세요" th:value="${param.serialNumber}">
@@ -109,6 +111,7 @@
     // ========================= 일련번호 중복 체크 =========================
     document.getElementById('serialBtn').addEventListener('click', () => {
         const serial = serialInput.value.trim();
+        console.log(serial);
 
         if(serial === '') {
             serialMessage.textContent = "일련번호를 입력해주세요";
@@ -124,6 +127,7 @@
                     serialMessage.textContent = "사용 가능";
                     serialMessage.style.color = 'blue';
                     serialValue = true;
+
                     return;
                 }
 
@@ -131,15 +135,19 @@
                     serialMessage.textContent = "사용 불가";
                     serialMessage.style.color = 'red';
                     serialValue = false;
+                    return;
                 } else {
                     serialMessage.textContent = "사용 가능";
                     serialMessage.style.color = 'blue';
                     serialValue = true;
+                    return;
                 }
+
             });
     });
 
     // ========================= 자산번호 중복 체크 =========================
+
     document.getElementById('accessBtn').addEventListener('click', () => {
         const access = accessInput.value.trim();
 
@@ -157,6 +165,7 @@
                     accessMessage.textContent = "사용 가능";
                     accessMessage.style.color = 'blue';
                     accessValue = true;
+
                     return;
                 }
 
@@ -168,6 +177,7 @@
                     accessMessage.textContent = "사용 가능";
                     accessMessage.style.color = 'blue';
                     accessValue = true;
+
                 }
             });
     });
@@ -194,7 +204,7 @@
         const formData = new FormData(e.target);
 
         fetch('/equipment/update.do', {
-            method: 'PUT',
+            method: 'POST',
             body: formData
         })
             .then(() => {

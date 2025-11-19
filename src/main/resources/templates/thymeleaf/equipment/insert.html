@@ -68,14 +68,11 @@
 <div class="accordion-item">
     <label for="managerInput">담당자</label><br>
     <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director">
-    <button type="button" class="accordion-header">
+    <button type="button" id="managerBtn" class="accordion-header">
         <span class="arrow">▼</span>
     </button>
     <div class="accordion-content">
         <ul id="managerList">
-            <li>홍길동 (사용중)</li>
-            <li>김영희 (미사용)</li>
-            <li>박철수 (사용중)</li>
         </ul>
     </div>
 </div>
@@ -115,7 +112,7 @@
             return;
         }
 
-        if(managerInput.value ===''){
+        if(!selectedManager){
             alert("담당자를 지정해주세요");
             return;
         }
@@ -150,6 +147,8 @@
 
     let serialValue = false;
     let accessValue = false;
+
+    let selectedManager = null;
 
     accessBtn.addEventListener('click', () => {
         const access = accessInput.value.trim();
@@ -197,7 +196,6 @@
             return;
         }
 
-        // 서버 API 호출 (Spring Controller에서 @ResponseBody 반환)
         fetch(`/equipment/check-serialNumber?serialNumber=${encodeURIComponent(serial)}`)
             .then(res => res.text())
             .then(result => {
@@ -234,19 +232,47 @@
     // 담당자 검색 필터링
     const managerInput = document.getElementById('managerInput');
     const managerList = document.getElementById('managerList');
-    const allManagers = ['홍길동 (사용중)', '김영희 (미사용)', '박철수 (사용중)'];
+    const managerBtn = document.getElementById('managerBtn');
 
-    managerInput.addEventListener('input', () => {
+
+    managerBtn.addEventListener('click', () => {
         const name = managerInput.value.trim();
-        managerList.innerHTML = '';
-        allManagers
-            .filter(item => item.includes(name))
-            .forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                managerList.appendChild(li);
+
+        fetch(`/equipment/director/view?name=${encodeURIComponent(name)}`)
+            .then(res => res.json())
+            .then(result => {
+                managerList.innerHTML = '';
+
+                result.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+
+                    li.addEventListener('click', () => {
+                        managerInput.value = item;  // input에 값 세팅
+                        selectedManager = item;      // 선택된 담당자 저장
+                        managerList.style.display = 'none'; // 아코디언 닫기 (선택 후 자동 닫힘)
+                    });
+                    managerList.appendChild(li);
+                });
+            })
+            .catch(err => {
+                console.error(err);
             });
     });
+
+    managerBtn.addEventListener('click', () => {
+        selectedManager = null;  // 🔥 검색 버튼 눌렀으면 선택 초기화 (입력만으로 선택 인정 X)
+    });
+
+
+        managerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            managerBtn.click();
+            e.preventDefault();
+        }
+    });
+
+
 </script>
 
 </body>
