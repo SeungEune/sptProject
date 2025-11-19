@@ -1,5 +1,6 @@
 package biz.user.vo;
 
+import lombok.Builder;
 import lombok.Data;
 import javax.validation.constraints.*;
 import java.sql.Timestamp;

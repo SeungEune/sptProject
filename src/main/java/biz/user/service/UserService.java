@@ -15,4 +15,6 @@ public interface UserService {
     void deleteUser(String userId) throws Exception;
 
     int getUserCount(UserSearchCond cond) throws Exception;
+
+    List<String> getUserByName(String name)  throws Exception;
 }
