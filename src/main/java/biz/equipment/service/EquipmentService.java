@@ -1,14 +1,11 @@
 package biz.equipment.service;
 
-
-
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentResponse;
 import biz.equipment.dto.EquipmentUpdate;
 import biz.equipment.vo.Status;
 
 import java.util.List;
-
 
 public interface EquipmentService {
     // 장비 조회
