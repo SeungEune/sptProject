@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface EnterService {
     // Service
-    public List<EnterVO> getEnterList(int page, int size) throws Exception;
-    public int getEnterCount() throws Exception;
+    public List<EnterVO> getEnterList(int page, int size);
+    public int getEnterCount();
     void createEnter(EnterVO enter);
-    EnterVO getEnter(Long enterId) throws Exception;
-    void updateEnter(EnterVO vo) throws Exception;
-    void deleteEnter(Long enterId) throws Exception;
+    EnterVO getEnter(String enterId);
+    void updateEnter(EnterVO vo);
+    void deleteEnter(String enterId);
 }

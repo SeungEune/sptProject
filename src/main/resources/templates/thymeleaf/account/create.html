@@ -4,16 +4,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
-    <!-- ✅ 공통 기초 스타일 -->
-    <link rel="stylesheet" th:href="@{/css/reset.css}">
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/components.css}">
-    <!-- 대시보드 / toc 는 안 써도 됨 -->
-
-    <!-- ✅ 레이아웃 & 헤더 -->
-    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
-    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
-
     <link rel="stylesheet" th:href="@{/css/account/form.css}">
 
     <style>
@@ -88,11 +78,13 @@
                             <div class="form-group">
                                 <label for="phone">전화번호</label>
                                 <input id="phone" th:field="*{phone}" type="tel">
+                                <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="email">Email</label>
                                 <input id="email" th:field="*{email}" type="email">
+                                <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                             </div>
 
                             <div class="form-actions">
@@ -109,43 +101,7 @@
             </div>
         </div>
 </div>
-
-<script>
-    document.getElementById('id-check-btn').addEventListener('click', async () => {
-        const input = document.getElementById('user-id');
-        const result = document.getElementById('id-check-result');
-        const userId = input.value.trim();
-        if (!userId) {
-            result.textContent = '아이디를 입력하세요.';
-            result.style.color = 'red';
-            return;
-        }
-
-        const res = await fetch(`/account/create/id-check?userId=${encodeURIComponent(userId)}`);
-        const text = await res.text(); // "OK" | "DUPLICATED"
-
-        if (text === 'OK') {
-            result.textContent = '사용 가능한 아이디입니다.';
-            result.style.color = 'green';
-            document.getElementById('id-checked').value = 'true';   // ✅ 여기!
-        } else {
-            result.textContent = '이미 사용 중인 아이디입니다.';
-            result.style.color = 'red';
-            document.getElementById('id-checked').value = 'false';  // 혹시 몰라 초기화
-        }
-    });
-
-    document.querySelector('.profile-form').addEventListener('submit', function (e) {
-        const checked = document.getElementById('id-checked').value === 'true';
-
-        if (!checked) {
-            e.preventDefault(); // ✅ 서버로 안 보내고 막기
-            alert('아이디 중복체크를 먼저 해주세요.');
-        }
-    });
-
-
-</script>
+<script th:src="@{/js/account/new/create.js}"></script>
 
 </body>
 </html>

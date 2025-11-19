@@ -4,6 +4,7 @@ import biz.login.vo.LoginVO;
 import biz.user.service.UserService;
 import biz.user.vo.UserVO;
 import biz.util.SessionUtil;
+import egovframework.com.cmm.exception.custom.NoContentException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,16 +22,18 @@ public class MypageController {
     private UserService userService;
 
     @GetMapping("mypage")
-    public String mypage(Model model) throws Exception {
+    public String mypage(Model model){
         // SessionUtil을 사용한 로그인 정보 확인
         LoginVO loginVO = SessionUtil.getLoginUser();
         UserVO userVO = userService.getUser(loginVO.getUserId());
+        if(userVO == null) throw new NoContentException("직원이 없습니다.");
         model.addAttribute("user", userVO);
         return "account/mypage";
     }
     @GetMapping("mypage/{id}/update")
-    public String mypageUpdate(@PathVariable("id") String userId, Model model) throws Exception {
+    public String mypageUpdate(@PathVariable("id") String userId, Model model) {
         UserVO userVO = userService.getUser(userId);
+        if(userVO==null)throw new NoContentException("직원이 없습니다.");
         model.addAttribute("user", userVO);
         return "account/updateMypage";
     }
@@ -43,6 +46,21 @@ public class MypageController {
         // 비밀번호 확인
         if (!user.getPassword().equals(user.getPasswordChk())) {
             binding.rejectValue("passwordChk", "mismatch", "비밀번호가 일치하지 않습니다.");
+        }
+
+        // 전화번호 중복 (현재 userId 제외)
+        if (userService.isDuplicatedPhoneExceptUser(user.getPhone(), userId)) {
+            binding.rejectValue("phone", "duplicated", "이미 사용 중인 전화번호입니다.");
+        }
+
+        // 이메일 중복 (현재 userId 제외)
+        if (userService.isDuplicatedEmailExceptUser(user.getEmail(), userId)) {
+            binding.rejectValue("email", "duplicated", "이미 사용 중인 이메일입니다.");
+        }
+
+        if (binding.hasErrors()) {
+            model.addAttribute("mode", "edit");
+            return "account/edit";
         }
 
         if (binding.hasErrors()) {

@@ -9,16 +9,24 @@ public interface UserService {
     boolean isDuplicatedId(String userId);
     void createUser(UserVO vo) throws Exception;
     // UserService
-    List<UserVO> getUserList(UserSearchCond cond) throws Exception;
-    UserVO getUser(String userId) throws Exception;   // ✅ 추가
+    List<UserVO> getUserList(UserSearchCond cond);
+    UserVO getUser(String userId);   // ✅ 추가
     void updateUser(UserVO vo) throws Exception;      // ✅ 추가
-    void deleteUser(String userId) throws Exception;
+    void deleteUser(String userId);
 
-    int getUserCount(UserSearchCond cond) throws Exception;
+    int getUserCount(UserSearchCond cond);
 
     List<UserVO> getUserTotalList();
 
     List<String> getUserRoles(String userId) throws Exception;
 
-    List<String> getUserByName(String name)  throws Exception;
+    boolean isDuplicatedPhone(String phone);
+    boolean isDuplicatedPhoneExceptUser(String phone, String userId);
+
+    boolean isDuplicatedEmail(String email);
+    boolean isDuplicatedEmailExceptUser(String email, String userId);
+
+    void updateUserExceptPw(UserVO vo);
+
+    List<String> getUserByName(String userName);
 }

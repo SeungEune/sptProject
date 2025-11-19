@@ -26,7 +26,7 @@ public class EnterDAO extends EgovAbstractMapper {
         insert("EnterDAO.insertEnter",enter);
     }
 
-    public EnterVO selectEnter(Long enterId) {
+    public EnterVO selectEnter(String enterId) {
         return selectOne("EnterDAO.selectEnter", enterId);
     }
 
@@ -34,7 +34,7 @@ public class EnterDAO extends EgovAbstractMapper {
         update("EnterDAO.updateEnter", vo);
     }
 
-    public void deleteEnter(Long enterId) {
+    public void deleteEnter(String enterId) {
         delete("EnterDAO.deleteEnter", enterId);
     }
 }

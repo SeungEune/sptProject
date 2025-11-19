@@ -14,12 +14,12 @@ public class EnterServiceImpl implements EnterService {
     private EnterDAO enterDAO;
 
     // Service
-    public List<EnterVO> getEnterList(int page, int size) throws Exception {
+    public List<EnterVO> getEnterList(int page, int size) {
         int offset = (page - 1) * size;
         return enterDAO.selectEnterList(offset, size);
     }
 
-    public int getEnterCount() throws Exception {
+    public int getEnterCount(){
         return enterDAO.selectEnterCount();
     }
 
@@ -31,17 +31,17 @@ public class EnterServiceImpl implements EnterService {
     }
 
     @Override
-    public EnterVO getEnter(Long enterId) throws Exception {
+    public EnterVO getEnter(String enterId) {
         return enterDAO.selectEnter(enterId);
     }
 
     @Override
-    public void updateEnter(EnterVO vo) throws Exception {
+    public void updateEnter(EnterVO vo) {
         enterDAO.updateEnter(vo);
     }
 
     @Override
-    public void deleteEnter(Long enterId) throws Exception {
+    public void deleteEnter(String enterId) {
         enterDAO.deleteEnter(enterId);
     }
 }

@@ -3,6 +3,8 @@
     display: flex !important;
     justify-content: center;
 }
+
+/* 기본(데스크탑) */
 #user-profile-form{
     width: 30vw;
 }
@@ -58,7 +60,6 @@
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    /*margin-top: 41px; !* Calculated from (70px gap - 29px bottom padding) or (last input bottom to button top) *!*/
 }
 
 .submit-btn {
@@ -79,6 +80,7 @@
     align-items: center;
     transition: opacity 0.2s;
 }
+
 .btn{
     width: 60px;
     border-radius: 8px;
@@ -96,29 +98,8 @@
     transition: opacity 0.2s;
 }
 
-
-
-
-
 .submit-btn:hover {
     opacity: 0.9;
-}
-
-
-@media (max-width: 768px) {
-    #user-profile-form {
-        padding: 10px;
-        align-items: flex-start;
-    }
-    .profile-form {
-        padding: 32px 20px;
-    }
-    .form-actions {
-        justify-content: center;
-    }
-    .submit-btn {
-        width: 100%;
-    }
 }
 
 .btn-area{
@@ -167,4 +148,112 @@
 
 .radio-option input[type="radio"]:checked::before {
     transform: scale(1);   /* 체크되면 점이 보임 */
+}
+
+/*폼 글자색*/
+/* 기본값: 입력 가능한 필드는 검정색 */
+.profile-form input,
+.profile-form select {
+    color: #111827;
+}
+
+/* ===== 조회 모드 : 전부 회색으로 ===== */
+.profile-form.view-mode input,
+.profile-form.view-mode select {
+    color: #9ca3af !important;      /* 연한 회색 텍스트 */
+}
+
+/* ===== 수정 모드 :
+   - 수정 가능한 필드 = 검정
+   - readonly / disabled = 회색 유지
+===== */
+
+/* 수정 모드에서도 읽기 전용/비활성은 회색 */
+.profile-form.edit-mode input[readonly],
+.profile-form.edit-mode select:disabled {
+    color: #9ca3af !important;
+}
+
+/* emp-fixed 는 항상 회색(직원 정보처럼 항상 잠가두는 필드) */
+.profile-form .emp-fixed{
+    color: #9ca3af;
+}
+
+
+/* ========== 반응형 ========== */
+
+/* 태블릿 (가로 1024px 이하) */
+@media (max-width: 1024px) {
+    #user-profile-form {
+        width: 60vw;
+    }
+    .btn-area {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+}
+
+/* 모바일 (가로 768px 이하) */
+@media (max-width: 768px) {
+    .form {
+        padding: 16px;
+        align-items: flex-start;
+    }
+
+    #user-profile-form {
+        width: 100%;
+    }
+
+    .form-container {
+        max-width: 100%;
+    }
+
+    .profile-form {
+        padding: 24px 16px;
+        border-radius: 0;          /* 화면 꽉 차게 */
+        border-left: none;
+        border-right: none;
+    }
+
+    .form-group input {
+        height: auto !important;   /* 터치하기 편하게 */
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+
+    .btn-area {
+        width: 100%;
+        gap: 8px;
+    }
+
+    .submit-btn,
+    .btn {
+        width: 50%;
+        flex: 1;                   /* 버튼 2개가 한 줄로 꽉 차게 */
+    }
+}
+
+/* 아주 작은 모바일 (가로 480px 이하) */
+@media (max-width: 480px) {
+    .profile-form {
+        padding: 20px 12px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input {
+        font-size: 14px;
+    }
+
+    .btn-area {
+        flex-direction: column;
+    }
+
+    .submit-btn,
+    .btn {
+        width: 100%;
+    }
 }

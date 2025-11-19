@@ -64,14 +64,23 @@
                         </select>
                     </div>
 
-                    <!-- 등록월 필터 -->
+                    <!-- 등록일 기간 필터 -->
                     <div class="search-option-field">
-                        <label for="search-option-registDate">등록월 필터</label>
-                        <input id="search-option-registDate"
-                               type="month"
-                               name="registMonth"
-                               th:value="${search != null ? search.registMonth : ''}">
+                        <label for="search-startDate">등록일 시작</label>
+                        <input id="search-startDate"
+                               type="date"
+                               name="startDate"
+                               th:value="${search != null ? search.startDate : ''}">
                     </div>
+
+                    <div class="search-option-field">
+                        <label for="search-endDate">등록일 종료</label>
+                        <input id="search-endDate"
+                               type="date"
+                               name="endDate"
+                               th:value="${search != null ? search.endDate : ''}">
+                    </div>
+
                 </div>
 
                 <!-- 오른쪽 : 검색어 + 테이블 -->
@@ -87,10 +96,10 @@
                     <!-- ↓↓↓ 여기부터는 기존 테이블 그대로 ↓↓↓ -->
                     <table class="auto-index">
                         <colgroup>
-                            <col style="width:6%;">
-                            <col style="width:12%;">
-                            <col style="width:14%;">
-                            <col style="width:30%;">
+                            <col style="width:8%;">
+                            <col style="width:16%;">
+                            <col style="width:16%;">
+                            <col style="width:22%;">
                             <col style="width:10%;">
                             <col style="width:10%;">
                             <col style="width:18%;">
@@ -106,7 +115,8 @@
                             style="cursor: pointer;">
                             <td th:text="${stat.count}"></td>
                             <td th:text="${user.userId}"></td>
-                            <td th:text="${user.phone}"></td>
+                            <td class="ellipsis-cell" th:text="${user.phone}"
+                                th:attr="title=${user.phone}"></td>
                             <td th:text="${user.email}"></td>
                             <td th:text="${user.name}"></td>
                             <td th:switch="${user.jssfcCd}">
