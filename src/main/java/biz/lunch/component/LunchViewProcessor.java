@@ -1,6 +1,7 @@
 package biz.lunch.component;
 
 import biz.lunch.vo.LunchVO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -10,36 +11,30 @@ import java.util.*;
  */
 @Component
 public class LunchViewProcessor {
+    @Value("${lunch.representative.name:이승은}")
+    private String representativeName;
 
-    private static final String REPRESENTATIVE_NAME = "이승은"; // 대표 정산자 이름
-
-    /**
-     * DB 데이터(List<LunchVO>) -> 화면용 Flat List(List<Map>) 변환
-     */
     public List<Map<String, Object>> convertToFlatList(List<LunchVO> lunchList) {
         List<Map<String, Object>> flatLunchList = new ArrayList<>();
 
-        // 1. 날짜 기준으로 그룹핑
         Map<String, List<LunchVO>> byDate = new LinkedHashMap<>();
         for (LunchVO item : lunchList) {
             if (item.getDate() == null) continue;
             byDate.computeIfAbsent(item.getDate(), k -> new ArrayList<>()).add(item);
         }
 
-        // 2. 그룹핑된 데이터를 화면용 Flat List로 변환 (RowSpan 계산 등)
         for (Map.Entry<String, List<LunchVO>> entry : byDate.entrySet()) {
             List<LunchVO> itemsForDate = entry.getValue();
             List<Map<String, Object>> dailyRows = new ArrayList<>();
 
             for (LunchVO item : itemsForDate) {
-                boolean isRepresentative = REPRESENTATIVE_NAME.equals(item.getPayerName());
+                // 변경된 변수 사용
+                boolean isRepresentative = representativeName.equals(item.getPayerName());
 
-                // DETAIL 행 (참여자 내역)
                 Map<String, Object> detailRow = toMap(item);
                 detailRow.put("rowType", "DETAIL");
                 dailyRows.add(detailRow);
 
-                // PAY 행 (결제 내역 - 대표자가 아닐 때만)
                 if (!isRepresentative) {
                     Map<String, Object> payRow = toMap(item);
                     payRow.put("rowType", "PAY");

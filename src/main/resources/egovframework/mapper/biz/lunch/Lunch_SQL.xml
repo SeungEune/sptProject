@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="biz.lunch.dao.LunchMapper">
+<mapper namespace="biz.lunch.dao.LunchDAO">
 
     <!-- 점심/커피 내역 등록 (ServiceImpl에서 참여자 별도 등록) -->
     <insert id="registerLunch" parameterType="biz.lunch.vo.LunchVO"
