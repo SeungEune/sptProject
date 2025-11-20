@@ -4,9 +4,7 @@
 
 <mapper namespace="biz.lunch.dao.LunchDAO">
 
-    <!-- 점심/커피 내역 등록 (ServiceImpl에서 참여자 별도 등록) -->
-    <insert id="registerLunch" parameterType="biz.lunch.vo.LunchVO"
-            useGeneratedKeys="true" keyProperty="lunchId" keyColumn="lunch_id">
+    <insert id="registerLunch" parameterType="biz.lunch.vo.LunchVO" useGeneratedKeys="true" keyProperty="lunchId" keyColumn="lunch_id">
         INSERT INTO lunch_master (
             date, store_name, payer_id, total_amount, type, created_at
         ) VALUES (
@@ -19,7 +17,6 @@
                  )
     </insert>
 
-    <!-- 점심/커피 내역 수정 -->
     <update id="updateLunch" parameterType="biz.lunch.vo.LunchVO">
         UPDATE lunch_master
         SET store_name = #{storeName},
@@ -27,16 +24,14 @@
             date = TO_DATE(#{date}, 'YYYY-MM-DD'),
             total_amount = #{totalAmount},
             type = #{type}
-        WHERE lunch_id = #{lunchId};
+        WHERE lunch_id = #{lunchId}
     </update>
 
-    <!-- 기존 참여자 전체 삭제 -->
     <delete id="deleteParticipantsByLunchId" parameterType="int">
         DELETE FROM lunch_participant
-        WHERE lunch_id = #{lunchId};
+        WHERE lunch_id = #{lunchId}
     </delete>
 
-    <!-- 새로운 참여자 등록 (일괄 등록 처리) -->
     <insert id="insertParticipantsBatch" parameterType="biz.lunch.vo.LunchVO">
         INSERT INTO lunch_participant (
         lunch_id, user_id, individual_amount, is_paid
@@ -45,22 +40,20 @@
             (
             #{lunchId},
             #{item.userId},
-            #{item.individualAmount}::integer, 'N'
+            #{item.individualAmount}::integer,
+            'N'
             )
         </foreach>
     </insert>
 
-    <!-- 점심/커피 내역 삭제 (CASCADE에 의해 참여자 자동 삭제됨) -->
     <delete id="deleteLunch" parameterType="int">
         DELETE FROM lunch_master
-        WHERE lunch_id = #{lunchId};
+        WHERE lunch_id = #{lunchId}
     </delete>
 
-    <!-- 점심/커피 내역 조회 -->
     <select id="getLunchList" parameterType="biz.lunch.vo.LunchVO" resultType="biz.lunch.vo.LunchVO">
-        SELECT
-        m.lunch_id AS lunchId,
-        m.date,
+        SELECT m.lunch_id AS lunchId,
+        TO_CHAR(m.date, 'YYYY-MM-DD') AS date,
         m.store_name AS storeName,
         m.total_amount AS totalAmount,
         m.type,
@@ -85,131 +78,104 @@
             AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
         </if>
         GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
-        ORDER BY m.date DESC;
+        ORDER BY m.date DESC
     </select>
 
-    <!-- 사용자별/월별 통계 조회 -->
-    <select id="getStatistics" resultType="biz.lunch.vo.SummaryVO">
-        WITH T_SUMMARY AS (
-        SELECT
-        s.user_id,
-        u.user_nm,
-        s.month,
-        s.total_paid,
-        s.total_owed,
-        s.balance,
-        u2.user_nm AS representative_payer,
-        s.representative_payer_id
-        FROM lunch_summary s
-        JOIN tb_user u ON s.user_id = u.user_id
-        LEFT JOIN tb_user u2 ON s.representative_payer_id = u2.user_id
-        <where>
-            <if test="month != null">
-                s.month = #{month}
-            </if>
-        </where>
+    <select id="getStatistics" parameterType="map" resultType="biz.lunch.vo.SummaryVO">
+        WITH T_DATA AS (
+            SELECT p.user_id
+                 , m.payer_id
+                 , p.individual_amount
+                 , m.total_amount
+                 , p.is_paid
+            FROM lunch_master m
+                     LEFT JOIN lunch_participant p ON m.lunch_id = p.lunch_id
+            WHERE m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+              AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
         ),
-        T_UNPAID_USERS AS (
-        SELECT DISTINCT p.user_id
-        FROM lunch_participant p
-        JOIN lunch_master m ON p.lunch_id = m.lunch_id
-        WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
-        AND p.is_paid = 'N'
-        AND p.individual_amount > 0
-        )
-        SELECT
-        s.user_id AS userId,
-        s.user_nm AS userName,
-        s.month,
-        s.total_paid AS totalPaid,
-        s.total_owed AS totalOwed,
-        s.balance,
-        s.representative_payer_id AS representativePayerId,
-        s.representative_payer AS representativePayerName,
-        CASE
-        WHEN s.total_owed &lt;= 0 THEN 'Y'
-        WHEN s.user_id NOT IN (SELECT user_id FROM T_UNPAID_USERS) THEN 'Y'
-        ELSE 'N'
+             T_OWED AS (
+                 SELECT user_id, SUM(individual_amount) as total_owed
+                 FROM T_DATA
+                 WHERE user_id IS NOT NULL
+                 GROUP BY user_id
+             ),
+             T_PAID AS (
+                 SELECT payer_id AS user_id, SUM(total_amount) as total_paid
+                 FROM lunch_master
+                 WHERE date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            AND date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        GROUP BY payer_id
+            ),
+            T_UNPAID AS (
+        SELECT DISTINCT user_id
+        FROM T_DATA
+        WHERE is_paid = 'N'
+          AND individual_amount > 0
+            )
+        SELECT u.user_id AS userId
+             , u.user_nm AS userName
+             , #{month} AS month
+             , COALESCE(tp.total_paid, 0) AS totalPaid
+             , COALESCE(to_d.total_owed, 0) AS totalOwed
+             , (COALESCE(tp.total_paid, 0) - COALESCE(to_d.total_owed, 0)) AS balance
+             , 'SYSTEM' AS representativePayerId
+             , '이승은' AS representativePayerName
+             , CASE
+                 WHEN COALESCE(to_d.total_owed, 0) = 0 THEN 'Y'
+                 WHEN tu.user_id IS NULL THEN 'Y'
+                 ELSE 'N'
         END AS isSettled
-        FROM T_SUMMARY s
-        ORDER BY s.balance DESC;
+          FROM tb_user u
+          LEFT JOIN T_PAID tp ON u.user_id = tp.user_id
+          LEFT JOIN T_OWED to_d ON u.user_id = to_d.user_id
+          LEFT JOIN T_UNPAID tu ON u.user_id = tu.user_id
+         WHERE u.user_sttus_cd = 'NORMAL'
+           AND u.use_yn = 'Y'
+         ORDER BY balance DESC
     </select>
 
-    <!-- 월별 정산 완료 처리 -->
-    <update id="completeSettlement">
-        UPDATE lunch_participant
-
-        <choose>
-            <when test="action != null and action == 'cancel'">
-                SET is_paid = 'N',
-                paid_at = NULL
-                WHERE user_id = #{userId}
-                AND lunch_id IN (
-                SELECT lm.lunch_id
-                FROM lunch_master lm
-                WHERE TO_CHAR(lm.date, 'YYYY-MM') = #{month}
-                )
-                AND is_paid = 'Y'
-            </when>
-
-            <otherwise>
-                SET is_paid = 'Y',
-                paid_at = NOW()
-                WHERE user_id = #{userId}
-                AND lunch_id IN (
-                SELECT lm.lunch_id
-                FROM lunch_master lm
-                WHERE TO_CHAR(lm.date, 'YYYY-MM') = #{month}
-                )
-                AND is_paid = 'N'
-            </otherwise>
-        </choose>
+    <update id="completeSettlement" parameterType="map">
+        UPDATE lunch_participant p
+        SET is_paid = CASE WHEN #{action} = 'cancel' THEN 'N' ELSE 'Y' END
+          , paid_at = CASE WHEN #{action} = 'cancel' THEN NULL ELSE NOW() END
+            FROM lunch_master m
+        WHERE p.lunch_id = m.lunch_id
+          AND p.user_id = #{userId}
+          AND m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+          AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+          AND p.is_paid = CASE WHEN #{action} = 'cancel' THEN 'Y' ELSE 'N' END
     </update>
 
-
-    <!-- 요약 테이블 자동 갱신 -->
     <insert id="updateSummaryAfterChange">
-        WITH
-        -- (A) 기존 월 데이터 삭제
-            deleted AS (
+        WITH deleted AS (
         DELETE FROM lunch_summary WHERE month = #{month} RETURNING 1
             ),
-            -- (B) 사용자별 총 부담금
             T_OWED AS (
-        SELECT
-            p.user_id,
-            SUM(p.individual_amount) AS total_owed
+        SELECT p.user_id, SUM(p.individual_amount) AS total_owed
         FROM lunch_participant p
             JOIN lunch_master m ON p.lunch_id = m.lunch_id
         WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
         GROUP BY p.user_id
             ),
-            -- (C) 사용자별 총 결제금
             T_PAID AS (
-        SELECT
-            m.payer_id AS user_id,
-            SUM(m.total_amount) AS total_paid
+        SELECT m.payer_id AS user_id, SUM(m.total_amount) AS total_paid
         FROM lunch_master m
         WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
         GROUP BY m.payer_id
-            ),
-            -- (D) 이 달의 대표 정산자
-            T_REP AS (
-        SELECT user_id AS payer_id FROM tb_user WHERE user_nm = '이승은'
             )
-        INSERT INTO lunch_summary (user_id, month, total_paid, total_owed, representative_payer_id)
-        SELECT
-            COALESCE(p.user_id, o.user_id) AS user_id,
-            #{month} AS month,
-        COALESCE(p.total_paid, 0) AS total_paid,
-        COALESCE(o.total_owed, 0) AS total_owed,
-        (SELECT payer_id FROM T_REP) AS representative_payer_id
-        FROM T_PAID p
-            FULL OUTER JOIN T_OWED o ON p.user_id = o.user_id;
+        INSERT INTO lunch_summary (
+            user_id, month, total_paid, total_owed, representative_payer_id
+        )
+        SELECT COALESCE(p.user_id, o.user_id) AS user_id
+             , #{month}
+             , COALESCE(p.total_paid, 0)
+             , COALESCE(o.total_owed, 0)
+             , (SELECT user_id FROM tb_user WHERE user_nm = '이승은' LIMIT 1) FROM T_PAID p
+            FULL OUTER JOIN T_OWED o ON p.user_id = o.user_id
     </insert>
 
     <select id="getLunchDateById" parameterType="int" resultType="String">
-        SELECT date
+        SELECT TO_CHAR(date, 'YYYY-MM-DD')
         FROM lunch_master
         WHERE lunch_id = #{lunchId}
     </select>
@@ -217,8 +183,8 @@
     <select id="getUserList" resultType="biz.lunch.vo.UserVO">
         SELECT user_id AS userId, user_nm AS userName
         FROM tb_user
+        WHERE use_yn = 'Y'
         ORDER BY user_nm
     </select>
-
 
 </mapper>
