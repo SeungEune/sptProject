@@ -75,24 +75,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// --- 삭제 확인 ---
+// [수정] 삭제 확인
 function confirmDelete() {
-    Swal.fire({
-        title: '내역 삭제',
-        text: '정말로 이 내역을 삭제하시겠습니까?', // 문구 조금 더 명확하게
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '삭제',
-        cancelButtonText: '취소',
-        allowOutsideClick: false,
-        buttonsStyling: true,
-        customClass: {
-            confirmButton: 'btn-red',
-            cancelButton: 'btn-gray'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.querySelector('.entry-form').submit();
-        }
-    });
+    MessageUtil.confirmed(
+        '내역 삭제',
+        function() { document.querySelector('.entry-form').submit(); },
+        '삭제',
+        '취소',
+        '정말로 이 내역을 삭제하시겠습니까?'
+    );
 }
