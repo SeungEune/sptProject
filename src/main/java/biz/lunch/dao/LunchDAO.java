@@ -12,10 +12,6 @@ import java.util.Map;
 
 /**
  * 점심식대 관련 처리를 하는 비즈니스 구현 클래스
- * @author GUNWOO
- * @since 2024.07.26
- * @version 1.0
- *
  */
 @Repository("lunchDAO")
 public class LunchDAO extends EgovComAbstractDAO { //
@@ -92,17 +88,18 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 정산을 완료 처리한다.
-     * @param month - 정산 월
      * @param userId - 사용자 ID
      * @param action - 처리 액션
      * @return int
      * @exception Exception
      */
-    public int completeSettlement(String month, String userId, String action) throws Exception {
+    public int completeSettlement(String startDate, String endDate, String userId, String action) throws Exception {
         Map<String, Object> params = new HashMap<>();
-        params.put("month", month);
+        params.put("startDate", startDate); // 추가됨
+        params.put("endDate", endDate);     // 추가됨
         params.put("userId", userId);
         params.put("action", action);
+
         return update(NAMESPACE + "completeSettlement", params);
     }
 

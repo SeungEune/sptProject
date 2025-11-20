@@ -18,8 +18,7 @@ public class LunchViewProcessor {
     public List<Map<String, Object>> convertToFlatList(List<LunchVO> lunchList) {
         List<Map<String, Object>> flatLunchList = new ArrayList<>();
 
-        EgovProperties.getProperty("lunch.representative.name");
-
+        // 1. 날짜별 그룹화
         Map<String, List<LunchVO>> byDate = new LinkedHashMap<>();
         for (LunchVO item : lunchList) {
             if (item.getDate() == null) continue;

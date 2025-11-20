@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,19 +31,16 @@ public class LunchController {
 
     @Resource(name = "lunchService")
     private LunchService lunchService;
-
     @Resource(name = "lunchViewProcessor")
     private LunchViewProcessor viewProcessor;
 
     // 날짜 기본값 설정
     private void setDefaultDate(LunchVO searchVO) {
-        // EgovStringUtil로 Null/Empty 체크
         if (EgovStringUtil.isEmpty(searchVO.getDate())) {
-            // EgovDateUtil로 오늘 날짜 가져오기 -> yyyy-MM 형태로 자르기
             String today = EgovDateUtil.getToday();
-            if (today != null && today.length() >= 7) {
-                searchVO.setDate(today.substring(0, 7));
-            }
+            // 파라미터: (날짜문자열, 시간(안쓰니까 "0000"), 변환할포맷
+            String yyyyMM = EgovDateUtil.convertDate(today, "0000", "yyyy-MM");
+            searchVO.setDate(yyyyMM);
         }
     }
 
@@ -110,15 +108,19 @@ public class LunchController {
             List<SummaryVO> summaryList = lunchService.getStatistics(searchVO.getDate());
 
             // ViewProcessor 사용 (데이터 가공)
-            List<Map<String, Object>> flatLunchList = viewProcessor.convertToFlatList(lunchList);
-
+            List<Map<String, Object>> flatLunchList;
+            if (lunchList != null) {
+                flatLunchList = viewProcessor.convertToFlatList(lunchList);
+            } else {
+                flatLunchList = Collections.emptyList();
+            }
             // View 전달
             model.addAttribute("lunchList", lunchList);
             model.addAttribute("flatLunchList", flatLunchList);
             model.addAttribute("summaryList", summaryList);
             model.addAttribute("lunchVO", searchVO);
-
             return "lunch/list";
+
         } catch (Exception e) {
             log.error("점심/커피 목록 조회 실패", e);
             model.addAttribute("message", "목록 조회 중 오류가 발생했습니다.");
