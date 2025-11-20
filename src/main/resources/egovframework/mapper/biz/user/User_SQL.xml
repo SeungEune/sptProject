@@ -167,14 +167,13 @@
         WHERE user_id = #{userId}
     </select>
 
-
-
 <!--    이름으로 단건 조회-->
-    <select id="findUserIdByName" parameterType="string"
-            resultType="string">
+    <select id="findUserIdByName" parameterType="string" resultType="string">
         SELECT
-            user_nm      AS name
+            user_nm AS name
         FROM tb_user
-        WHERE user_nm = #{userName}
+        WHERE to_tsvector(user_nm) @@ plainto_tsquery(#{userName});
     </select>
+
+
 </mapper>
