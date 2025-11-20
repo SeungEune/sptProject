@@ -190,47 +190,30 @@ function selectPayer(userId, userName) {
     document.getElementById('payer-results').style.display = 'none';
 }
 
-// --- 수정 확인 ---
+// [수정] 수정 확인
 function confirmUpdate() {
-    Swal.fire({
-        title: '내역 수정',
-        text: "내역을 수정하시겠습니까?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '수정',
-        cancelButtonText: '취소',
-        customClass: {
-            confirmButton: 'btn-blue',
-            cancelButton: 'btn-gray'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            document.querySelector('.entry-form').submit();
-        }
-    });
+    MessageUtil.confirmed(
+        '내역 수정',
+        function() { document.querySelector('.entry-form').submit(); },
+        '수정',
+        '취소',
+        '내역을 수정하시겠습니까?'
+    );
 }
 
-// --- 추가 확인 (신규 등록으로 전환) ---
+// [수정] 추가(신규등록) 확인
 function confirmAdd() {
-    Swal.fire({
-        title: '내역 등록',
-        text: "현재 내용으로 새로 등록하시겠습니까? (수정 아님)",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '등록',
-        cancelButtonText: '취소',
-        customClass: {
-            confirmButton: 'btn-blue',
-            cancelButton: 'btn-gray'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // action 변경 후 submit
+    MessageUtil.confirmed(
+        '내역 등록',
+        function() {
             const form = document.querySelector('.entry-form');
-            form.action = '/lunch/register.do'; // 등록 URL로 변경
+            form.action = '/lunch/register.do'; // action 변경
             form.submit();
-        }
-    });
+        },
+        '등록',
+        '취소',
+        '현재 내용으로 새로 등록하시겠습니까? (수정 아님)'
+    );
 }
 
 // --- 1/N 계산 (금액 복사) ---

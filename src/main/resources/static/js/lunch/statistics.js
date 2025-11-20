@@ -1,7 +1,4 @@
-/*
- * 파일 경로: src/main/resources/static/js/lunch/statistics.js
- * 설명: 점심/커피 통계 페이지 전용 스크립트 (Chart.js 및 UI 로직)
- */
+
 
 // --- 전역 변수 및 포맷터 선언 ---
 const formatCurrency = (value) => new Intl.NumberFormat('ko-KR').format(value) + '원';

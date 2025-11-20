@@ -180,31 +180,18 @@ function selectPayer(userId, userName) {
 
 // 확인 모달
 function confirmAdd() {
-    // 1. 유효성 검사 (빈칸 체크)
     const form = document.querySelector('.entry-form');
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
     }
-
-    // mainLayout 등에 이미 SweetAlert2가 로드되어 있어야 함
-    Swal.fire({
-        title: '내역 등록',
-        text: "현재 내용으로 새로 등록하시겠습니까?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '등록',
-        cancelButtonText: '취소',
-        buttonsStyling: false,
-        customClass: {
-            confirmButton: 'btn-blue',
-            cancelButton: 'btn-gray'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            form.submit();
-        }
-    });
+    MessageUtil.confirmed(
+        '내역 등록',                              // 메인 메시지 (Title)
+        function() { form.submit(); },           // 확인 시 실행할 콜백
+        '등록',                                  // 확인 버튼 텍스트
+        '취소',                                  // 취소 버튼 텍스트
+        '현재 내용으로 새로 등록하시겠습니까?'        // 서브 메시지 (HTML)
+    );
 }
 // [수정] 1/N 계산 함수 (한 명 금액 -> 전체 복사)
 function calculateDutchPay() {

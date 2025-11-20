@@ -28,44 +28,26 @@ function updateDateRange(dateStr) {
  * 정산 완료 확인
  */
 function confirmAdd(form) {
-    Swal.fire({
-        title: '정산 완료',
-        text: '정산을 완료하시겠습니까?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '예',
-        cancelButtonText: '아니요',
-        customClass: {
-            confirmButton: 'btn-blue',
-            cancelButton: 'btn-gray'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            form.submit();
-        }
-    });
+    MessageUtil.confirmed(
+        '정산 완료',
+        function() { form.submit(); },
+        '완료',
+        '취소',
+        '정산을 완료하시겠습니까?'
+    );
 }
 
 /**
  * 정산 취소 확인
  */
 function confirmDelete(form) {
-    Swal.fire({
-        title: '정산 취소',
-        text: '정산을 취소하시겠습니까?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: '예',
-        cancelButtonText: '아니요',
-        customClass: {
-            confirmButton: 'btn-red',
-            cancelButton: 'btn-gray'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            form.submit();
-        }
-    });
+    MessageUtil.confirmed(
+        '정산 취소',
+        function() { form.submit(); },
+        '취소 실행',
+        '닫기',
+        '정산을 취소하시겠습니까?'
+    );
 }
 
 // --- DOM 로드 후 실행 ---
