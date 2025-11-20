@@ -1,7 +1,7 @@
 package biz.equipment_code.dao;
 
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
-import biz.mapper.EquipmentCodeMapper;
+import biz.mapper.biz.equipment_code.EquipmentCodeMapper;
 import biz.equipment_code.vo.EquipmentCodeVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

@@ -2,7 +2,7 @@ package biz.equipment.dao;
 
 import egovframework.com.cmm.exception.custom.NoContentException;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
-import biz.mapper.EquipmentMapper;
+import biz.mapper.biz.equipment.EquipmentMapper;
 import biz.equipment.vo.EquipmentVO;
 import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;

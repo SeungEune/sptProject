@@ -1,4 +1,4 @@
-package biz.mapper;
+package biz.mapper.biz.equipment;
 
 
 import biz.equipment.vo.EquipmentVO;
