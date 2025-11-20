@@ -5,13 +5,7 @@
 </head>
 <body>
 
-<button id="menu-toggle" class="mobile-menu-toggle">
-    <i class="fas fa-bars"></i>
-</button>
-
 <div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
-
-    <div id="overlay" class="mobile-overlay"></div>
 
     <div th:fragment="content">
         <h1 class="content-title">점심/커피 내역 등록</h1>
@@ -76,7 +70,14 @@
             </form>
 
             <div class="amount-panel">
-                <h2 class="amount-panel-title">개인별 금액 입력</h2>
+                <div class="amount-header">
+
+                    <h2 class="amount-panel-title">개인별 금액 입력</h2>
+
+                    <button type="button" id="btnDutchPay" class="btn-s-blue btn-calc">
+                        1/N 적용
+                    </button>
+                </div>
 
                 <div class="amount-list" id="amount-list-container">
                     <p id="amount-placeholder" class="amount-placeholder" style="display: block;">

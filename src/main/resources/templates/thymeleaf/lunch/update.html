@@ -1,29 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>점심/커피 내역 수정</title>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/lunch/update.css}">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
 <body>
-
-<!--모바일 메뉴 버튼 -->
-<button id="menu-toggle" class="mobile-menu-toggle">
-    <i class="fas fa-bars"></i>
-</button>
-<div id="overlay" class="mobile-overlay"></div>
 
 <div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
     <div th:fragment="content">
         <h1 class="content-title">점심/커피 내역 수정</h1>
+
         <div class="content-body lunch-layout">
             <form class="entry-form" th:action="@{/lunch/update.do}" method="post">
-
                 <input type="hidden" name="lunchId" th:value="${lunch.lunchId}">
 
                 <div class="form-group">
@@ -46,8 +34,7 @@
                            onkeydown="if(event.key === 'Enter') event.preventDefault();"
                            onkeyup="filterParticipants()"
                            placeholder="내용을 입력하세요">
-                    <div id="search-results"
-                         class="search-results-dropdown" style="display: none;"></div>
+                    <div id="search-results" class="search-results-dropdown" style="display: none;"></div>
                 </div>
 
                 <div class="form-group">
@@ -56,12 +43,11 @@
                         <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
                     </label>
                     <input type="text" id="payer-search"
-                           onkeydown="if(event.key === 'Engter') event.preventDefault();"
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
                            onkeyup="filterPayers()"
                            placeholder="내용을 입력하세요"
                            th:value="${lunch.payerName}">
-                    <input type="hidden" id="payerId" name="payerId"
-                           th:value="${lunch.payerId}" required>
+                    <input type="hidden" id="payerId" name="payerId" th:value="${lunch.payerId}" required>
                     <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
                 </div>
 
@@ -69,13 +55,11 @@
                     <legend class="legend-title">유형 선택</legend>
                     <div class="radio-group">
                         <div class="radio-option">
-                            <input type="radio" id="type-lunch" name="type" value="점심"
-                                   th:checked="${lunch.type == '점심'}">
+                            <input type="radio" id="type-lunch" name="type" value="점심" th:checked="${lunch.type == '점심'}">
                             <label for="type-lunch">점심</label>
                         </div>
                         <div class="radio-option">
-                            <input type="radio" id="type-coffee" name="type" value="커피"
-                                   th:checked="${lunch.type == '커피'}">
+                            <input type="radio" id="type-coffee" name="type" value="커피" th:checked="${lunch.type == '커피'}">
                             <label for="type-coffee">커피</label>
                         </div>
                     </div>
@@ -83,257 +67,35 @@
 
                 <div id="hidden-fields"></div>
 
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                        <button type="button" class="submit-btn" onclick="confirmUpdate()">수정</button>
-                        <button type="button" class="submit-btn add-btn" onclick="confirmAdd()">추가</button>
-                    </div>
-                </form>
+                <div class="btn-group-center">
+                    <button type="button" class="submit-btn" onclick="confirmUpdate()">수정</button>
+                    <button type="button" class="submit-btn add-btn" onclick="confirmAdd()">추가</button>
+                </div>
+            </form>
 
-                <div class="amount-panel">
+            <div class="amount-panel">
+                <div class="amount-header">
                     <h2 class="amount-panel-title">개인별 금액 입력</h2>
-                    <div class="amount-list" id="amount-list-container">
-                        <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
-                            참석자를 선택하면 여기에 입력칸이 생성됩니다.
-                        </p>
-                    </div>
+                    <button type="button" id="btnDutchPay" class="btn-s-blue btn-calc">1/N 적용</button>
+                </div>
+
+                <div class="amount-list" id="amount-list-container">
+                    <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                        참석자를 선택하면 여기에 입력칸이 생성됩니다.
+                    </p>
                 </div>
             </div>
-
         </div>
 
+        <script th:inline="javascript">
+            const userList = /*[[${userList}]]*/ [];
+            const existingParticipants = /*[[${lunch.participants}]]*/ '';
+            const existingPayerId = /*[[${lunch.payerId}]]*/ null;
+        </script>
+
+        <script type="text/javascript" th:src="@{/js/lunch/update.js}"></script>
     </div>
 </div>
-
-<script th:inline="javascript">
-
-    // --- 유저 데이터 ---
-    const userList = /*[[${userList}]]*/ [];
-    const selectedParticipants = new Set();
-    let selectedPayerId = /*[[${lunch.payerId}]]*/ null;
-
-    const existingParticipants = /*[[${lunch.participants}]]*/ '';
-
-    function goToDelete() {
-        const lunchId = /*[[${lunch.lunchId}]]*/ '';
-        if (confirm('삭제 페이지로 이동하시겠습니까?')) {
-            window.location.href = '/lunch/delete.do?lunchId=' + lunchId;
-        }
-    }
-
-    // 기존 참여자 입력칸 자동 생성
-    window.addEventListener('DOMContentLoaded', function() {
-        if (existingParticipants) {
-            // 콤마로 분리
-            const participants = existingParticipants.split(',');
-            participants.forEach(function(item) {
-                // 콜론으로 분리
-                const parts = item.split(':');
-                if (parts.length === 2) {
-                    // trim()으로 공백 제거
-                    const userId = parts[0].trim();
-                    const amount = parseInt(parts[1].trim());
-
-                    // 유저 찾아서 추가
-                    const user = userList.find(u => u.userId === userId);
-                    if (user) addParticipant(userId, user.userName, amount);
-                }
-            });
-        }
-    });
-
-    // 참석자 검색
-    function filterParticipants() {
-        const query = document.getElementById('participant-search').value.toLowerCase().trim();
-        const resultsDiv = document.getElementById('search-results');
-
-        if (query === '') {
-            resultsDiv.style.display = 'none';
-            resultsDiv.innerHTML = '';
-            return;
-        }
-
-        const filtered = userList.filter(user =>
-            user.userName.toLowerCase().includes(query) && !selectedParticipants.has(user.userId)
-        );
-
-        if (filtered.length === 0) {
-            resultsDiv.innerHTML = '<div class="p-2 text-sm text-gray-500 text-center">검색 결과가 없습니다.</div>';
-            resultsDiv.style.display = 'block';
-            return;
-        }
-
-        resultsDiv.innerHTML = filtered.map(user =>
-            `<div onclick="addParticipant('${user.userId}', '${user.userName}')">${user.userName}</div>`
-        ).join('');
-
-        resultsDiv.style.display = 'block';
-    }
-
-    // 참석자 추가
-    function addParticipant(userId, userName, initialAmount = '') {
-        if (selectedParticipants.has(userId)) return;
-
-        selectedParticipants.add(userId);
-
-        const container = document.getElementById('amount-list-container');
-        const placeholder = document.getElementById('amount-placeholder');
-        placeholder.style.display = 'none';
-
-        // --- UI 요소 생성 (화면 표시용) ---
-        const row = document.createElement('div');
-        row.className = 'amount-row';
-        row.id = 'participant-row-' + userId;
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'name';
-        nameSpan.innerText = userName;
-
-        const group = document.createElement('div');
-        group.className = 'amount-input-group';
-
-        // 화면용 금액 입력창 (name 속성 제거 - 중복 전송 방지)
-        const uiAmountInput = document.createElement('input');
-        uiAmountInput.type = 'number';
-        uiAmountInput.placeholder = '금액입력';
-        uiAmountInput.value = initialAmount;
-        uiAmountInput.required = true;
-
-        const unitSpan = document.createElement('span');
-        unitSpan.innerText = '원';
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'remove-btn';
-        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        removeBtn.onclick = () => removeParticipant(userId);
-
-        group.appendChild(uiAmountInput);
-        group.appendChild(unitSpan);
-        group.appendChild(removeBtn);
-
-        row.appendChild(nameSpan);
-        row.appendChild(group);
-        container.appendChild(row);
-
-        // --- Hidden Fields 생성 (Form 내부 전송용) [핵심 수정] ---
-        const hiddenFields = document.getElementById("hidden-fields");
-
-        const hiddenUserInput = document.createElement("input");
-        hiddenUserInput.type = "hidden";
-        hiddenUserInput.name = "participantUserIds";
-        hiddenUserInput.value = userId;
-        hiddenUserInput.id = "hidden-user-" + userId;
-
-        const hiddenAmountInput = document.createElement("input");
-        hiddenAmountInput.type = "hidden";
-        hiddenAmountInput.name = "participantAmounts";
-        // 값이 없으면 '0'으로 처리하여 에러 방지
-        hiddenAmountInput.value = (initialAmount === '' ? '0' : initialAmount);
-        hiddenAmountInput.id = "hidden-amount-" + userId;
-
-        // UI 입력값 변경 시 Hidden 값 동기화
-        uiAmountInput.addEventListener("input", () => {
-            hiddenAmountInput.value = uiAmountInput.value === '' ? '0' : uiAmountInput.value;
-        });
-
-        hiddenFields.appendChild(hiddenUserInput);
-        hiddenFields.appendChild(hiddenAmountInput);
-
-        document.getElementById('participant-search').value = '';
-        document.getElementById('search-results').style.display = 'none';
-    }
-
-    // 1. 수정 확인
-    function confirmUpdate() {
-        Swal.fire({
-            title: '내역 수정',
-            text: "내역을 수정하시겠습니까?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: '수정',
-            cancelButtonText: '취소',
-
-            //스타일 지정
-            buttonsStyling: false, // 기본 스타일 끄기
-            customClass: {
-                confirmButton: 'btn-blue',
-                cancelButton: 'btn-gray'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.querySelector('.entry-form').submit();
-            }
-        });
-    }
-
-    // 2. 추가 확인
-    function confirmAdd() {
-        Swal.fire({
-            title: '내역 등록',
-            text: "현재 내용으로 새로 등록하시겠습니까?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: '등록',
-            cancelButtonText: '취소',
-
-            //스타일 지정
-            buttonsStyling: false,
-            customClass: {
-                confirmButton: 'btn-blue',
-                cancelButton: 'btn-gray'
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                    document.querySelector('.entry-form').submit();
-            }
-        });
-    }
-
-    function removeParticipant(userId) {
-        selectedParticipants.delete(userId);
-        const row = document.getElementById('participant-row-' + userId);
-        if (row) row.remove();
-
-        if (selectedParticipants.size === 0) {
-            document.getElementById('amount-placeholder').style.display = 'block';
-        }
-    }
-
-    // === 계산자 검색 ===
-    function filterPayers() {
-        const query = document.getElementById('payer-search').value.toLowerCase().trim();
-        const resultsDiv = document.getElementById('payer-results');
-
-        if (query === '') {
-            resultsDiv.style.display = 'none';
-            resultsDiv.innerHTML = '';
-            return;
-        }
-
-        const filtered = userList.filter(user =>
-            user.userName.toLowerCase().includes(query)
-        );
-
-        if (filtered.length === 0) {
-            resultsDiv.innerHTML = '<div class="p-2 text-sm text-gray-500 text-center">검색 결과가 없습니다.</div>';
-            resultsDiv.style.display = 'block';
-            return;
-        }
-
-        resultsDiv.innerHTML = filtered.map(user =>
-            `<div onclick="selectPayer('${user.userId}', '${user.userName}')">${user.userName}</div>`
-        ).join('');
-
-        resultsDiv.style.display = 'block';
-    }
-
-    function selectPayer(userId, userName) {
-        selectedPayerId = userId;
-        document.getElementById('payer-search').value = userName;
-        document.getElementById('payerId').value = userId;
-        document.getElementById('payer-results').style.display = 'none';
-    }
-</script>
 
 </body>
 </html>
