@@ -172,8 +172,7 @@
         SELECT
             user_nm AS name
         FROM tb_user
-        WHERE to_tsvector(user_nm) @@ plainto_tsquery(#{userName});
+        WHERE to_tsvector(user_nm) @@ to_tsquery(replace(#{userName}, ' ', ' &amp; ') || ':*');
     </select>
-
 
 </mapper>
