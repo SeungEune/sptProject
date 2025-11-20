@@ -97,9 +97,23 @@
     justify-content: flex-end;
     align-items: center;
 }
-.submit-btn{
+.submit-btn {
+    margin-top: 0 !important;
     width: 60px !important;
+    background-color: #256ef4;
+    border-radius: 8px;
     height: 32px !important;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: 'Abel', sans-serif;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 28.5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s;
 }
 
 /*검색어*/

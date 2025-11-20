@@ -80,12 +80,12 @@
     align-items: center;
     transition: opacity 0.2s;
 }
-
-.btn{
-    width: 60px;
+.cancel-btn{
+    margin-top: 0 !important;
+    width: 60px !important;
     border-radius: 8px;
-    height: 32px;
-    border: 1px solid black;
+    height: 32px !important;
+    border: 1px solid;
     cursor: pointer;
     color: black;
     font-family: 'Abel', sans-serif;
