@@ -90,42 +90,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // --- Chart 2: 일별 지출 추이 ---
-    if (lunchList.length > 0) {
-        const ctxDaily = document.getElementById('dailyExpenseChart');
-        if (ctxDaily) {
-            // 시간순 정렬 (오래된 순)
-            const list = [...lunchList].reverse();
-            const labels = list.map(i => i.date.substring(5));
-            const amounts = list.map(i => i.totalAmount);
-
-            new Chart(ctxDaily.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '지출 내역',
-                        data: amounts,
-                        fill: true,
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: CHART_COLORS.blueBorderDark,
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointBackgroundColor: CHART_COLORS.blueBorderDark,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
-                    plugins: { tooltip: { callbacks: { label: ctx => `금액: ${formatCurrency(ctx.raw)}` } } }
-                }
-            });
-        }
-    }
-
     // --- Chart 3: 일자별 점심/커피 구분 ---
     if (lunchList.length > 0) {
         const ctxType = document.getElementById('dailyTypeChart');

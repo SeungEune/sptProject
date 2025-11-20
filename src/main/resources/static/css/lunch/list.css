@@ -7,42 +7,40 @@
     grid-template-columns: none;
 }
 .search-area {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem; /* mb-6 */
 }
 
-.search-box {
+.date-picker-box {
     position: relative;
     width: 100%;
-    max-width: 420px;
-    height: 60px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fff;
+    max-width: 28rem; /* max-w-md */
+    background-color: #ffffff;
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 1rem 1.5rem; /* px-6 py-4 */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: background-color 0.2s;
 }
 
-.search-box:hover {
-    border-color: #bdbdbd;
-    background-color: #fafafa;
+.date-picker-box:hover {
+    background-color: #f9fafb; /* hover:bg-gray-50 */
 }
 
-.date-range-display {
-    font-size: 18px;
-    font-weight: 700;
-    color: #333;
+.date-text {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700; /* font-bold */
+    color: #374151; /* text-gray-700 */
 }
 
 .calendar-icon {
-    font-size: 24px;
-    color: #757575;
+    font-size: 1.5rem; /* text-2xl */
+    color: #6b7280; /* text-gray-500 */
 }
 
-.hidden-date-input {
+.date-input-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -131,9 +129,7 @@ table.lunch-table tbody td {
     font-weight: 700;
 }
 
-/* =========================================
-   4. 합계 및 정산 영역 (기존 스타일 유지)
-   ========================================= */
+/*합계 및 정산 영역 (기존 스타일 유지)*/
 
 /* 총합/송금 행 (summary-row) */
 .summary-row td {
