@@ -9,24 +9,24 @@ public interface UserService {
     boolean isDuplicatedId(String userId);
     void createUser(UserVO vo) throws Exception;
     // UserService
-    List<UserVO> getUserList(UserSearchCond cond);
-    UserVO getUser(String userId);   // ✅ 추가
+    List<UserVO> getUserList(UserSearchCond cond) throws Exception;
+    UserVO getUser(String userId) throws Exception;   // ✅ 추가
     void updateUser(UserVO vo) throws Exception;      // ✅ 추가
-    void deleteUser(String userId);
+    void deleteUser(String userId)  throws Exception;
 
-    int getUserCount(UserSearchCond cond);
+    int getUserCount(UserSearchCond cond) throws Exception;
 
-    List<UserVO> getUserTotalList();
+    List<UserVO> getUserTotalList() throws Exception;
 
     List<String> getUserRoles(String userId) throws Exception;
 
-    boolean isDuplicatedPhone(String phone);
-    boolean isDuplicatedPhoneExceptUser(String phone, String userId);
+    boolean isDuplicatedPhone(String phone) throws Exception;
+    boolean isDuplicatedPhoneExceptUser(String phone, String userId) throws Exception;
 
-    boolean isDuplicatedEmail(String email);
-    boolean isDuplicatedEmailExceptUser(String email, String userId);
+    boolean isDuplicatedEmail(String email) throws Exception;
+    boolean isDuplicatedEmailExceptUser(String email, String userId) throws Exception;
 
-    void updateUserExceptPw(UserVO vo);
+    void updateUserExceptPw(UserVO vo) throws Exception;
 
-    List<String> getUserByName(String userName);
+    List<String> getUserByName(String userName) throws Exception;
 }

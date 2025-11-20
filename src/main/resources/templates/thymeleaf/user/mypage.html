@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
-    <link rel="stylesheet" th:href="@{/css/account/form.css}">
+    <link rel="stylesheet" th:href="@{/css/user/form.css}">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
                       th:object="${user}">
                         <div class="form-group">
                             <label for="user-id">아이디</label>
-                            <input type="text" id="user-id" th:field="*{userId}" readonly>
+                            <input type="text" id="user-id" th:field="*{userId}" readonly class="emp-fixed">
                         </div>
                         <div class="form-group">
                             <label for="password">비밀번호</label>
@@ -38,7 +38,7 @@
                         </div>
                         <div class="form-group">
                             <label for="name">이름</label>
-                            <input type="text" id="name" th:field="*{name}" readonly>
+                            <input type="text" id="name" th:field="*{name}" readonly class="emp-fixed">
                         </div>
                         <div class="form-group">
                             <label for="phone">전화번호</label>
@@ -51,7 +51,7 @@
                         <div class="form-actions">
                             <button type="button"
                                     class="submit-btn"
-                                    th:onclick="|location.href='@{/mypage/{id}/update(id=${user.userId})}'|">
+                                    th:onclick="|location.href='@{/mypage/{id}/update.do(id=${user.userId})}'|">
                                 수정
                             </button>
                         </div>
@@ -64,6 +64,12 @@
 </div>
 
 
+<script th:inline="javascript">
+    const ALERT_MESSAGE = /*[[${alertMessage} ?: '']]*/ '';
+    if (ALERT_MESSAGE) {
+        MessageUtil.alert(ALERT_MESSAGE);
+    }
+</script>
 
 </body>
 </html>

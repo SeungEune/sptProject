@@ -176,7 +176,7 @@
 
 /* emp-fixed 는 항상 회색(직원 정보처럼 항상 잠가두는 필드) */
 .profile-form .emp-fixed{
-    color: #9ca3af;
+    color: #9ca3af !important;
 }
 
 
@@ -254,6 +254,6 @@
 
     .submit-btn,
     .btn {
-        width: 100%;
+        width: 100% !important;
     }
 }

@@ -14,34 +14,34 @@ public class EnterServiceImpl implements EnterService {
     private EnterDAO enterDAO;
 
     // Service
-    public List<EnterVO> getEnterList(int page, int size) {
+    public List<EnterVO> getEnterList(int page, int size) throws Exception {
         int offset = (page - 1) * size;
         return enterDAO.selectEnterList(offset, size);
     }
 
-    public int getEnterCount(){
+    public int getEnterCount() throws Exception {
         return enterDAO.selectEnterCount();
     }
 
 
     @Override
-    public void createEnter(EnterVO enter) {
+    public void createEnter(EnterVO enter) throws Exception {
         enter.setStatus("NORMAL");
         enterDAO.insertEnter(enter);
     }
 
     @Override
-    public EnterVO getEnter(String enterId) {
+    public EnterVO getEnter(String enterId) throws Exception {
         return enterDAO.selectEnter(enterId);
     }
 
     @Override
-    public void updateEnter(EnterVO vo) {
+    public void updateEnter(EnterVO vo) throws Exception {
         enterDAO.updateEnter(vo);
     }
 
     @Override
-    public void deleteEnter(String enterId) {
+    public void deleteEnter(String enterId) throws Exception {
         enterDAO.deleteEnter(enterId);
     }
 }
