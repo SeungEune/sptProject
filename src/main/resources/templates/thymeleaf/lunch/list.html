@@ -1,26 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>점심/커피 내역 조회</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
     <link rel="stylesheet" th:href="@{/css/lunch/list.css}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-
-<!--모바일 버튼 -->
-<button id="menu-toggle" class="mobile-menu-toggle">
-    <i class="fas fa-bars"></i>
-</button>
-
-<div id="overlay" class="mobile-overlay"></div>
 
 <div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
@@ -197,30 +182,6 @@
 
 <!--JS 스크립트-->
 <script th:inline="javascript">
-
-    // --- 사이드바 토글 ---
-    const menuToggle = document.getElementById('menu-toggle');
-    const closeMenu = document.getElementById('close-menu');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-
-    if (menuToggle) {
-        function openSidebar() {
-            if (sidebar) sidebar.classList.add('active');
-            if (overlay) overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeSidebarFunc() {
-            if (sidebar) sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        menuToggle.addEventListener('click', openSidebar);
-        if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
-        if (overlay) overlay.addEventListener('click', closeSidebarFunc);
-    }
     function updateDateRange(dateStr) {
         if (!dateStr) return;
 

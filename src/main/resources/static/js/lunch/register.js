@@ -206,31 +206,39 @@ function confirmAdd() {
         }
     });
 }
+// [수정] 1/N 계산 함수 (한 명 금액 -> 전체 복사)
+function calculateDutchPay() {
+    // 1. 현재 화면에 있는 모든 금액 입력칸(UI Input) 가져오기
+    const uiInputs = Array.from(document.querySelectorAll('.amount-input-group input[type="number"]'));
 
+    // 2. 기준이 될 금액 찾기 (가장 먼저 입력된 금액을 찾음)
+    let baseAmount = 0;
+    let found = false;
+
+    for (let input of uiInputs) {
+        let val = parseInt(input.value);
+        if (!isNaN(val) && val > 0) {
+            baseAmount = val;
+            found = true;
+            break; // 첫 번째로 발견된 유효한 금액을 기준 금액으로 사용
+        }
+    }
+
+    // 4. 모든 칸에 같은 금액 채우기
+    uiInputs.forEach((uiInput) => {
+        uiInput.value = baseAmount;
+        uiInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+}
 // --- DOMContentLoaded 이벤트: 문서 로드 후 실행 ---
 document.addEventListener('DOMContentLoaded', function() {
     // 사이드바 토글 로직
-    const menuToggle = document.getElementById('menu-toggle');
     const closeMenu = document.getElementById('close-menu');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-
-    if (menuToggle) {
-        function openSidebar() {
-            if (sidebar) sidebar.classList.add('active');
-            if (overlay) overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeSidebarFunc() {
-            if (sidebar) sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        menuToggle.addEventListener('click', openSidebar);
-        if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
-        if (overlay) overlay.addEventListener('click', closeSidebarFunc);
+    const btnDutchPay = document.getElementById('btnDutchPay');
+    if (btnDutchPay) {
+        btnDutchPay.addEventListener('click', calculateDutchPay);
     }
 
     // 드롭다운 자동 숨김 처리

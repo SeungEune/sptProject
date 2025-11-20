@@ -40,43 +40,19 @@ function updateDateRange(dateStr) {
 // --- DOMContentLoaded 이벤트: 문서 로드 후 실행 ---
 document.addEventListener("DOMContentLoaded", function() {
 
-    // 1. 사이드바 토글 로직 (register.js와 동일)
-    const menuToggle = document.getElementById('menu-toggle');
-    const closeMenu = document.getElementById('close-menu');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-
-    if (menuToggle) {
-        function openSidebar() {
-            if (sidebar) sidebar.classList.add('active');
-            if (overlay) overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeSidebarFunc() {
-            if (sidebar) sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        menuToggle.addEventListener('click', openSidebar);
-        if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
-        if (overlay) overlay.addEventListener('click', closeSidebarFunc);
-    }
-
-    // 2. 초기 날짜 텍스트 세팅
+    // 초기 날짜 텍스트 세팅
     const input = document.getElementById('searchMonthInput');
     if(input && input.value) {
         updateDateRange(input.value);
     }
 
-    // 3. 데이터 유효성 검사 (HTML에서 넘어온 데이터 확인)
+    // 데이터 유효성 검사 (HTML에서 넘어온 데이터 확인)
     if (typeof summaryList === 'undefined' || typeof lunchList === 'undefined') {
         console.error("데이터가 로드되지 않았습니다.");
         return;
     }
 
-    // --- Chart 1: 사용자별 부담금/결제금 ---
+    // Chart 1: 사용자별 부담금/결제금 ---
     if (summaryList.length > 0) {
         const ctxUser = document.getElementById('userSummaryChart');
         if (ctxUser) {
