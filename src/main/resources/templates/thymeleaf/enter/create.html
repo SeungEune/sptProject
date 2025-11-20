@@ -9,7 +9,7 @@
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 <!--    <link rel="stylesheet" th:href="@{/css/enter/create.css}">-->
 
-        <link rel="stylesheet" th:href="@{/css/account/form.css}">
+        <link rel="stylesheet" th:href="@{/css/user/form.css}">
 
     <style>
         .field-error{color: red;}
@@ -32,7 +32,7 @@
                 <div class="form-container">
 
                     <form class="profile-form"
-                          th:action="@{/enter/create}"
+                          th:action="@{/enter/create.do}"
                           th:object="${enter}"
                           method="post">
 
@@ -148,7 +148,7 @@
                             <div class="btn-area">
                                 <button type="submit" class="submit-btn">등록</button>
                                 <button type="button" class="cancel-btn btn btn-cancel"
-                                        onclick="location.href='/enter/manage'">취소</button>
+                                        onclick="location.href='/enter/manage.do'">취소</button>
                             </div>
                         </div>
 

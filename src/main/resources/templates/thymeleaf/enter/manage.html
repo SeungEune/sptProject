@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
-   <link rel="stylesheet" th:href="@{/css/account/manage.css}">
+   <link rel="stylesheet" th:href="@{/css/user/manage.css}">
 
 </head>
 <body>
@@ -31,7 +31,7 @@
 
             <div class="table-area">
                 <div class="regist-area">
-                    <button type="button" class="submit-btn" onclick="location.href='/enter/create'">등록</button>
+                    <button type="button" class="submit-btn" onclick="location.href='/enter/create.do'">등록</button>
                 </div>
                 <table class="auto-index">
                     <colgroup>
@@ -54,7 +54,7 @@
                     </thead>
                     <tbody>
                     <tr th:each="enter, stat : ${enterList}"
-                        th:onclick="|location.href='@{/enter/edit/{id}(id=${enter.enterId})}'|"
+                        th:onclick="|location.href='@{/enter/edit/{id}.do(id=${enter.enterId})}'|"
                         style="cursor: pointer;">
                         <!-- 번호 -->
                         <td th:text="${stat.count}"></td>
@@ -109,26 +109,53 @@
                 </table>
 
                 <!-- 페이지네이션 -->
-                <div class="pagination">
-                    <!-- 이전 페이지 -->
-                    <a th:if="${page > 1}"
-                       th:href="@{'/enter/manage'(page=${page - 1})}">
-                        &laquo;
-                    </a>
+<!--                <div class="pagination">-->
+<!--                    &lt;!&ndash; 이전 페이지 &ndash;&gt;-->
+<!--                    <a th:if="${page > 1}"-->
+<!--                       th:href="@{'/enter/manage'(page=${page - 1})}">-->
+<!--                        &laquo;-->
+<!--                    </a>-->
 
-                    <!-- 페이지 번호들 -->
-                    <a th:each="p : ${#numbers.sequence(1, totalPages)}"
-                       th:href="@{'/enter/manage'(page=${p})}"
-                       th:text="${p}"
-                       th:classappend="${p == page} ? ' active' : ''">
-                    </a>
+<!--                    &lt;!&ndash; 페이지 번호들 &ndash;&gt;-->
+<!--                    <a th:each="p : ${#numbers.sequence(1, totalPages)}"-->
+<!--                       th:href="@{'/enter/manage'(page=${p})}"-->
+<!--                       th:text="${p}"-->
+<!--                       th:classappend="${p == page} ? ' active' : ''">-->
+<!--                    </a>-->
 
-                    <!-- 다음 페이지 -->
-                    <a th:if="${page < totalPages}"
-                       th:href="@{'/enter/manage'(page=${page + 1})}">
-                        &raquo;
-                    </a>
-                </div>
+<!--                    &lt;!&ndash; 다음 페이지 &ndash;&gt;-->
+<!--                    <a th:if="${page < totalPages}"-->
+<!--                       th:href="@{'/enter/manage'(page=${page + 1})}">-->
+<!--                        &raquo;-->
+<!--                    </a>-->
+<!--                </div>-->
+
+                <!-- 페이지네이션 (JS로 채움) -->
+                <div id="paging-area" class="pagination"></div>
+
+                <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                <script src="/js/module/paginationModule.js"></script>
+
+                <script th:inline="javascript">
+                    const ALERT_MESSAGE = /*[[${alertMessage} ?: '']]*/ '';
+                    if (ALERT_MESSAGE) {
+                        MessageUtil.alert(ALERT_MESSAGE);
+                    }
+                </script>
+
+
+                <!-- ★ 여기서만 Thymeleaf 값을 JS 전역에 싣고 -->
+                <script th:inline="javascript">
+                    window.ENTER_PAGING = {
+                        totalCount : /*[[${totalCount}]]*/ 0,
+                        page       : /*[[${page}]]*/ 1,
+                        totalPages : /*[[${totalPages}]]*/ 1
+                    };
+                </script>
+
+                <!-- ★ 나머지 로직은 전부 외부 파일 -->
+                <script src="/js/enter/new/manage.js"></script>
+
 
 
             </div>

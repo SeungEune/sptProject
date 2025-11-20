@@ -110,6 +110,7 @@
     align-items: center;
 }
 /*페이지네이션*/
+
 .pagination {
     margin-top: 16px;
     display: flex;
@@ -125,12 +126,15 @@
     text-align: center;
     font-size: 14px;
     text-decoration: none;
-    color: #333;
+    /*color: #333;*/
+
+    text-indent: 0;         /* 혹시 -9999px 되어 있으면 덮어쓰기 */
+    color: #111827;         /* 글자색 */
 }
 
 .pagination a.active {
     background-color: #256ef4;
-    color: #fff;
+    color: black !important;
     border-color: #256ef4;
 }
 

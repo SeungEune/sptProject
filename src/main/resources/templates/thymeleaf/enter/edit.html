@@ -8,7 +8,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
-    <link rel="stylesheet" th:href="@{/css/account/form.css}">
+    <link rel="stylesheet" th:href="@{/css/user/form.css}">
 
     <style>
         .field-error{color: red;}
@@ -31,7 +31,7 @@
                 <div class="form-container">
 
                     <form class="profile-form"
-                          th:action="@{/enter/edit/{id}(id=${enter.enterId})}"
+                          th:action="@{/enter/edit/{id}.do(id=${enter.enterId})}"
                           th:object="${enter}"
                           method="post">
 
@@ -151,21 +151,21 @@
                             <!-- 처음엔 조회 모드: 수정 버튼만 보이게 -->
                             <div class="btn-area">
                                 <button type="button" id="listBtn" class="cancel-btn btn btn-cancel"
-                                        onclick="location.href='/enter/manage'">목록
+                                        onclick="location.href='/enter/manage.do'">목록
                                 </button>
 
-                                <button type="button" id="editBtn"  class="submit-btn">수정</button>
+                                <button type="button" id="editBtn"  class="submit-btn btb">수정</button>
 
-                                <button type="submit" id="saveBtn" class="submit-btn hidden">확인</button>
+                                <button type="submit" id="saveBtn" class="submit-btn btn hidden">확인</button>
                                 <button type="button"
                                         id="cancelBtn"
                                         class="cancel-btn btn btn-cancel hidden"
-                                        th:onclick="|location.href='@{/enter/edit/{id}(id=${enter.enterId})}'|">
+                                        th:onclick="|location.href='@{/enter/edit/{id}.do(id=${enter.enterId})}'|">
                                     취소
                                 </button>
 
 
-                                <button type="button" class="submit-btn" id="deleteBtn">
+                                <button type="button" class="submit-btn btn" id="deleteBtn" >
                                     삭제
                                 </button>
 
@@ -176,9 +176,9 @@
 
                     </form>
 
-                    <!-- 상세 페이지 제일 아래쪽 정도에 추가 -->
+
                     <form id="deleteForm"
-                          th:action="@{/enter/delete/{id}(id=${enter.enterId})}"
+                          th:action="@{/enter/delete/{id}.do(id=${enter.enterId})}"
                           method="post">
                         <!-- CSRF 쓰면 토큰 hidden -->
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}" th:if="${_csrf != null}">
@@ -189,6 +189,13 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    window.ENTER_PAGE = {
+        mode   : /*[[${mode}]]*/ 'view',
+        enter_Id: /*[[${enter.enterId}]]*/ ''
+    };
+</script>
 
 <script th:src="@{/js/enter/new/edit.js}"></script>
 

@@ -62,8 +62,8 @@ public class GlobalControllerAdvice {
         MenuVO dashboard = vo("대시보드", "/main/mainForm.do", "dashboard");
 
         // 사용자관리 하위: 계정관리 / 비밀번호초기화
-        MenuVO account   = vo("계정관리",       "/account/manage.do", "user");
-        MenuVO accountCreate   = vo("계정등록",       "/account/create.do", "user");
+        MenuVO account   = vo("계정관리",       "/user/manage.do", "user");
+        MenuVO accountCreate   = vo("계정등록",       "/user/create.do", "user");
         //MenuVO pwReset   = vo("비밀번호초기화", "/system/user/password/reset.do", "key");
         MenuVO userMgmt  = voWithSubs("사용자관리", "/system/user", "users",
                 List.of(account,accountCreate));

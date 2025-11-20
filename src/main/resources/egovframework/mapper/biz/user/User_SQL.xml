@@ -242,4 +242,18 @@
         FROM tb_user
         WHERE user_nm = #{userName}
     </select>
+
+<!--직원목록-->
+    <select id="selectUserTotalList" resultType="biz.user.vo.UserVO">
+        SELECT
+            user_id      AS userId,
+            user_nm      AS name,
+            user_password AS password,
+            email_adres  AS email,
+            moblphon_no  AS phone,
+            jssfc_cd     AS jssfcCd,
+            register_id  AS registerId,
+            regist_dt    AS registDt
+        FROM tb_user
+    </select>
 </mapper>
