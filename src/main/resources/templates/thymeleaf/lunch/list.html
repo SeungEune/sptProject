@@ -12,13 +12,13 @@
         <div class="content-body lunch-layout">
 
             <form th:action="@{/lunch/list.do}" method="get" class="search-area">
-                <div class="search-box">
-                    <span id="date-range-text" class="date-range-display">날짜 계산 중...</span>
+                <div class="date-picker-box">
+                    <span id="date-range-text" class="date-text">날짜 계산 중...</span>
 
                     <i class="far fa-calendar-alt calendar-icon"></i>
 
                     <input type="month" id="searchMonthInput" name="date"
-                           class="hidden-date-input"
+                           class="date-input-overlay"
                            th:value="${lunchVO.date}"
                            onclick="this.showPicker()"
                            onchange="updateDateRange(this.value); this.form.submit();" />
