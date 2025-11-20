@@ -7,7 +7,6 @@
     justify-content: center;
     margin-top: 20px;
 }
-
 /* 추가 버튼 (회색 등 다른 색상 적용 시) */
 .add-btn {
     background-color: #6b7280; /* gray-500 */
@@ -15,6 +14,3 @@
 .add-btn:hover {
     background-color: #4b5563; /* gray-600 */
 }
-
-/* 나머지 스타일은 register.css를 함께 로드하여 재사용 */
-/* (register.css에 있는 .amount-header, .btn-calc 등이 적용됨) */
