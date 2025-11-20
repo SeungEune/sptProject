@@ -40,7 +40,8 @@ function filterParticipants() {
     const query = document.getElementById('participant-search').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('search-results');
 
-    if (query === '') {
+    // [수정] Util.isEmpty 사용
+    if (Util.isEmpty(query)) {
         resultsDiv.style.display = 'none';
         resultsDiv.innerHTML = '';
         return;
@@ -160,7 +161,7 @@ function filterPayers() {
     const query = document.getElementById('payer-search').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('payer-results');
 
-    if (query === '') {
+    if (Util.isEmpty(query)) {
         resultsDiv.style.display = 'none';
         resultsDiv.innerHTML = '';
         return;
@@ -221,7 +222,7 @@ function calculateDutchPay() {
     const uiInputs = Array.from(document.querySelectorAll('.amount-input-group input[type="number"]'));
 
     if (uiInputs.length === 0) {
-        alert("참여자를 먼저 추가해주세요.");
+        MessageUtil.alert("참여자를 먼저 추가해주세요.");
         return;
     }
 
@@ -238,8 +239,9 @@ function calculateDutchPay() {
     }
 
     if (!found) {
-        alert("기준이 될 금액을 한 명의 입력칸에 적어주세요.");
-        if(uiInputs[0]) uiInputs[0].focus();
+        MessageUtil.alert("기준이 될 금액을 한 명의 입력칸에 적어주세요.", function() {
+            if(uiInputs[0]) uiInputs[0].focus();
+        });
         return;
     }
 

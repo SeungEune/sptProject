@@ -1,7 +1,3 @@
-/* * 파일 경로: src/main/resources/static/js/lunch/register.js
- * 설명: 점심/커피 등록 페이지 전용 스크립트
- */
-
 // 전역 변수 선언 (HTML에서 넘어온 userList가 없을 경우를 대비)
 const selectedParticipants = new Set();
 let selectedPayerId = null;
@@ -17,7 +13,7 @@ function filterParticipants() {
     const query = document.getElementById('participant-search').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('search-results');
 
-    if (query === '') {
+    if (Util.isEmpty(query)) {
         resultsDiv.style.display = 'none';
         resultsDiv.innerHTML = '';
         return;
@@ -145,7 +141,7 @@ function filterPayers() {
     const query = document.getElementById('payer-search').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('payer-results');
 
-    if (query === '') {
+    if (Util.isEmpty(query)) {
         resultsDiv.style.display = 'none';
         resultsDiv.innerHTML = '';
         return;
@@ -197,20 +193,30 @@ function confirmAdd() {
 function calculateDutchPay() {
     // 1. 현재 화면에 있는 모든 금액 입력칸(UI Input) 가져오기
     const uiInputs = Array.from(document.querySelectorAll('.amount-input-group input[type="number"]'));
-
+    // 1. 참여자가 없는 경우 체크
+    if (uiInputs.length === 0) {
+        MessageUtil.alert("참여자를 먼저 추가해주세요.");
+        return;
+    }
     // 2. 기준이 될 금액 찾기 (가장 먼저 입력된 금액을 찾음)
     let baseAmount = 0;
     let found = false;
 
     for (let input of uiInputs) {
-        let val = parseInt(input.value);
+        let val = Util.toFloat(input.value);
         if (!isNaN(val) && val > 0) {
             baseAmount = val;
             found = true;
             break; // 첫 번째로 발견된 유효한 금액을 기준 금액으로 사용
         }
     }
-
+    // 2. 기준 금액이 없는 경우 체크
+    if (!found) {
+        MessageUtil.alert("기준이 될 금액을 한 명의 입력칸에 적어주세요.", function() {
+            if(uiInputs[0]) uiInputs[0].focus();
+        });
+        return;
+    }
     // 4. 모든 칸에 같은 금액 채우기
     uiInputs.forEach((uiInput) => {
         uiInput.value = baseAmount;

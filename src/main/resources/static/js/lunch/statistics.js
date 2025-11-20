@@ -1,8 +1,3 @@
-
-
-// --- 전역 변수 및 포맷터 선언 ---
-const formatCurrency = (value) => new Intl.NumberFormat('ko-KR').format(value) + '원';
-
 // 차트 색상 상수
 const CHART_COLORS = {
     blueDark: 'rgba(59, 130, 246, 0.7)',
@@ -13,6 +8,7 @@ const CHART_COLORS = {
     redBorder: 'rgba(255, 99, 132, 1)'
 };
 
+const getFormattedMoney = (val) => Util.amtComma(val, '0') + '원';
 // --- 날짜 UI 업데이트 함수 (HTML에서 onchange 등으로 호출됨) ---
 function updateDateRange(dateStr) {
     if (!dateStr) return;
@@ -80,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
-                    plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } }
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }, // [수정]
+                    plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${getFormattedMoney(ctx.raw)}` } } } // [수정]
                 }
             });
         }
@@ -117,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } }
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }
                 }
             });
         }
@@ -146,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }, // [수정]
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -154,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 label: ctx => {
                                     const balance = summaryList[ctx.dataIndex].balance;
                                     const title = balance >= 0 ? "받을 금액" : "송금할 금액";
-                                    return `${title}: ${formatCurrency(ctx.raw)}`;
+                                    return `${title}: ${getFormattedMoney(ctx.raw)}`;
                                 }
                             }
                         }

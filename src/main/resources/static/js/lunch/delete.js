@@ -1,7 +1,3 @@
-/**
- * 점심/커피 삭제 화면 전용 스크립트
- */
-
 document.addEventListener('DOMContentLoaded', function() {
     // 1. 데이터 가져오기
     const userList = window.lunchData ? window.lunchData.userList : [];

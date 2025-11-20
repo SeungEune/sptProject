@@ -54,7 +54,7 @@ function confirmDelete(form) {
 document.addEventListener("DOMContentLoaded", function() {
     // 1. 초기 날짜 텍스트 설정
     const input = document.getElementById('searchMonthInput');
-    if(input && input.value) {
+    if(input && !Util.isEmpty(input.value)) {
         updateDateRange(input.value);
     }
 
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     rows.forEach(row => {
         const participantString = row.getAttribute('data-participants');
-        if (!participantString) return;
+        if (Util.isEmpty(participantString)) return;
 
         const participantMap = new Map();
         participantString.split(',').forEach(pair => {
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (parts.length === 2) {
                 const userId = parts[0].trim();
                 const amount = parseInt(parts[1].trim());
-                participantMap.set(userId, amount.toLocaleString());
+                participantMap.set(userId, Util.amtComma(amount, '0'));
             }
         });
 
