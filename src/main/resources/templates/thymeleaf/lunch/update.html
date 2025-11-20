@@ -1,23 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>점심/커피 내역 수정</title>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
 <div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
-
     <div th:fragment="content">
         <h1 class="content-title">점심/커피 내역 수정</h1>
         <div class="content-body lunch-layout">
             <form class="entry-form" th:action="@{/lunch/update.do}" method="post">
-
                 <input type="hidden" name="lunchId" th:value="${lunch.lunchId}">
 
                 <div class="form-group">
@@ -81,8 +73,7 @@
                         <button type="button" class="submit-btn" onclick="confirmUpdate()">수정</button>
                         <button type="button" class="submit-btn add-btn" onclick="confirmAdd()">추가</button>
                     </div>
-                </form>
-
+            </form>
                 <div class="amount-panel">
                     <h2 class="amount-panel-title">개인별 금액 입력</h2>
                     <div class="amount-list" id="amount-list-container">
@@ -91,10 +82,7 @@
                         </p>
                     </div>
                 </div>
-            </div>
-
         </div>
-
     </div>
 </div>
 
