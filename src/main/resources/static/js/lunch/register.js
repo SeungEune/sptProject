@@ -2,9 +2,9 @@
 const selectedParticipants = new Set();
 let selectedPayerId = null;
 
-// --- 참석자 검색 및 선택 로직 ---
+
+// --- 참석자 검색 및 필터링 ---
 function filterParticipants() {
-    // userList가 정의되지 않았을 경우 에러 방지
     if (typeof userList === 'undefined') {
         console.error("userList 데이터가 로드되지 않았습니다.");
         return;
@@ -13,14 +13,10 @@ function filterParticipants() {
     const query = document.getElementById('participant-search').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('search-results');
 
-    if (Util.isEmpty(query)) {
-        resultsDiv.style.display = 'none';
-        resultsDiv.innerHTML = '';
-        return;
-    }
-
+    // 검색어가 없어도 전체 목록 표시
     const filtered = userList.filter(user =>
-        user.userName.toLowerCase().includes(query) && !selectedParticipants.has(user.userId)
+        (Util.isEmpty(query) || user.userName.toLowerCase().includes(query)) &&
+        !selectedParticipants.has(user.userId)
     );
 
     if (filtered.length === 0) {
@@ -29,8 +25,9 @@ function filterParticipants() {
         return;
     }
 
+    // [중요] onclick에 event 객체 전달 (event.stopPropagation() 사용을 위해)
     resultsDiv.innerHTML = filtered.map(user =>
-        `<div onclick="addParticipant('${user.userId}', '${user.userName}')">
+        `<div onclick="addParticipant('${user.userId}', '${user.userName}', event)">
             ${user.userName}
         </div>`
     ).join('');
@@ -38,8 +35,12 @@ function filterParticipants() {
     resultsDiv.style.display = 'block';
 }
 
-// --- addParticipant ---
-function addParticipant(userId, userName) {
+// --- 참석자 추가 ---
+function addParticipant(userId, userName, event) {
+    if (event) {
+        event.stopPropagation();
+    }
+
     if (selectedParticipants.has(userId)) return;
 
     selectedParticipants.add(userId);
@@ -48,17 +49,17 @@ function addParticipant(userId, userName) {
     const placeholder = document.getElementById('amount-placeholder');
     placeholder.style.display = 'none';
 
-    // --- 새 HTML 구조(.amount-row)에 맞게 요소 생성 ---
+    // --- Row 생성 ---
     const amountRow = document.createElement('div');
     amountRow.className = 'amount-row';
     amountRow.id = 'participant-row-' + userId;
 
-    // 1. 이름
+    // 이름
     const nameSpan = document.createElement('span');
     nameSpan.className = 'name';
     nameSpan.innerText = userName;
 
-    // 2. 금액 입력 그룹
+    // 금액 입력 그룹
     const amountGroup = document.createElement('div');
     amountGroup.className = 'amount-input-group';
 
@@ -85,6 +86,7 @@ function addParticipant(userId, userName) {
 
     container.appendChild(amountRow);
 
+    // Hidden Fields 생성
     const hiddenFields = document.getElementById("hidden-fields");
 
     const hiddenUserInput = document.createElement("input");
@@ -106,12 +108,16 @@ function addParticipant(userId, userName) {
     hiddenFields.appendChild(hiddenUserInput);
     hiddenFields.appendChild(hiddenAmountInput);
 
-    document.getElementById('participant-search').value = '';
-    document.getElementById('search-results').style.display = 'none';
+    // 입력창 초기화 및 포커스 유지 (연속 입력)
+    const searchInput = document.getElementById('participant-search');
+    searchInput.value = '';
+    searchInput.focus();
+
+    // 목록 갱신 (닫히지 않음)
+    filterParticipants();
 }
 
-
-// --- removeParticipant ---
+// --- 참석자 삭제 ---
 function removeParticipant(userId) {
     selectedParticipants.delete(userId);
 
@@ -126,29 +132,33 @@ function removeParticipant(userId) {
     const container = document.getElementById('amount-list-container');
     const placeholder = document.getElementById('amount-placeholder');
 
-    // placeholder가 있는 상태에서 자식이 1개(placeholder 본인)만 남으면 다시 보여줌
-    // 혹은 container에 실제 입력 row가 없는지 체크
     const rows = container.querySelectorAll('.amount-row');
     if (rows.length === 0) {
         placeholder.style.display = 'block';
     }
+
+    // 삭제 시에도 목록 갱신 (혹시 검색창에 검색어가 있다면 반영)
+    if(document.getElementById('search-results').style.display === 'block'){
+        filterParticipants();
+    }
 }
 
-// --- 계산자 검색 ---
+
+// ============================================================
+// 2. 계산자 (Payer) 관련 로직 (수정됨)
+// ============================================================
+
+// --- 계산자 검색 및 필터링 ---
 function filterPayers() {
     if (typeof userList === 'undefined') return;
 
     const query = document.getElementById('payer-search').value.toLowerCase().trim();
     const resultsDiv = document.getElementById('payer-results');
 
-    if (Util.isEmpty(query)) {
-        resultsDiv.style.display = 'none';
-        resultsDiv.innerHTML = '';
-        return;
-    }
+    // [수정] 검색어 없어도 전체 목록 표시 (빈 값 체크 제거)
 
     const filtered = userList.filter(user =>
-        user.userName.toLowerCase().includes(query)
+        (Util.isEmpty(query) || user.userName.toLowerCase().includes(query))
     );
 
     if (filtered.length === 0) {
@@ -171,7 +181,43 @@ function selectPayer(userId, userName) {
     selectedPayerId = userId;
     document.getElementById('payerId').value = userId;
     document.getElementById('payer-search').value = userName;
+    // 계산자는 1명이므로 선택 후 닫는 것이 자연스러움
     document.getElementById('payer-results').style.display = 'none';
+}
+
+
+// ============================================================
+// 3. 공통 유틸 및 이벤트
+// ============================================================
+
+// 1/N 계산 함수
+function calculateDutchPay() {
+    const uiInputs = Array.from(document.querySelectorAll('.amount-input-group input[type="number"]'));
+    if (uiInputs.length === 0) {
+        MessageUtil.alert("참여자를 먼저 추가해주세요.");
+        return;
+    }
+    let baseAmount = 0;
+    let found = false;
+
+    for (let input of uiInputs) {
+        let val = Util.toFloat(input.value);
+        if (!isNaN(val) && val > 0) {
+            baseAmount = val;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        MessageUtil.alert("기준이 될 금액을 한 명의 입력칸에 적어주세요.", function() {
+            if(uiInputs[0]) uiInputs[0].focus();
+        });
+        return;
+    }
+    uiInputs.forEach((uiInput) => {
+        uiInput.value = baseAmount;
+        uiInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
 }
 
 // 확인 모달
@@ -182,74 +228,53 @@ function confirmAdd() {
         return;
     }
     MessageUtil.confirmed(
-        '내역 등록',                              // 메인 메시지 (Title)
-        function() { form.submit(); },           // 확인 시 실행할 콜백
-        '등록',                                  // 확인 버튼 텍스트
-        '취소',                                  // 취소 버튼 텍스트
-        '현재 내용으로 새로 등록하시겠습니까?'        // 서브 메시지 (HTML)
+        '내역 등록',
+        function() { form.submit(); },
+        '등록',
+        '취소',
+        '현재 내용으로 새로 등록하시겠습니까?'
     );
 }
-// [수정] 1/N 계산 함수 (한 명 금액 -> 전체 복사)
-function calculateDutchPay() {
-    // 1. 현재 화면에 있는 모든 금액 입력칸(UI Input) 가져오기
-    const uiInputs = Array.from(document.querySelectorAll('.amount-input-group input[type="number"]'));
-    // 1. 참여자가 없는 경우 체크
-    if (uiInputs.length === 0) {
-        MessageUtil.alert("참여자를 먼저 추가해주세요.");
-        return;
-    }
-    // 2. 기준이 될 금액 찾기 (가장 먼저 입력된 금액을 찾음)
-    let baseAmount = 0;
-    let found = false;
 
-    for (let input of uiInputs) {
-        let val = Util.toFloat(input.value);
-        if (!isNaN(val) && val > 0) {
-            baseAmount = val;
-            found = true;
-            break; // 첫 번째로 발견된 유효한 금액을 기준 금액으로 사용
-        }
-    }
-    // 2. 기준 금액이 없는 경우 체크
-    if (!found) {
-        MessageUtil.alert("기준이 될 금액을 한 명의 입력칸에 적어주세요.", function() {
-            if(uiInputs[0]) uiInputs[0].focus();
-        });
-        return;
-    }
-    // 4. 모든 칸에 같은 금액 채우기
-    uiInputs.forEach((uiInput) => {
-        uiInput.value = baseAmount;
-        uiInput.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-}
-// --- DOMContentLoaded 이벤트: 문서 로드 후 실행 ---
+// --- DOM 로드 후 실행 ---
 document.addEventListener('DOMContentLoaded', function() {
-    // 사이드바 토글 로직
-    const closeMenu = document.getElementById('close-menu');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
+    // 사이드바 등 기존 로직
     const btnDutchPay = document.getElementById('btnDutchPay');
     if (btnDutchPay) {
         btnDutchPay.addEventListener('click', calculateDutchPay);
     }
 
-    // 드롭다운 자동 숨김 처리
-    document.addEventListener('click', function(event) {
-        const participantSearchInput = document.getElementById('participant-search');
-        const payerSearchInput = document.getElementById('payer-search');
+    // [참석자] 입력창 이벤트: 클릭/포커스 시 전체 목록 노출
+    const participantSearchInput = document.getElementById('participant-search');
+    if (participantSearchInput) {
+        participantSearchInput.addEventListener('click', filterParticipants);
+        participantSearchInput.addEventListener('focus', filterParticipants);
+    }
 
-        if (participantSearchInput) {
-            const participantContainer = participantSearchInput.closest('.form-group');
-            if (!participantContainer.contains(event.target)) {
+    // [계산자] 입력창 이벤트: 클릭/포커스 시 전체 목록 노출 (추가됨)
+    const payerSearchInput = document.getElementById('payer-search');
+    if (payerSearchInput) {
+        payerSearchInput.addEventListener('click', filterPayers);
+        payerSearchInput.addEventListener('focus', filterPayers);
+    }
+
+    // 드롭다운 자동 숨김 (영역 밖 클릭 시)
+    document.addEventListener('click', function(event) {
+        const pInput = document.getElementById('participant-search');
+        const payInput = document.getElementById('payer-search');
+
+        if (pInput) {
+            const container = pInput.closest('.form-group');
+            // 클릭된 요소가 컨테이너 내부가 아니면 닫기
+            if (!container.contains(event.target)) {
                 const resDiv = document.getElementById('search-results');
                 if(resDiv) resDiv.style.display = 'none';
             }
         }
 
-        if (payerSearchInput) {
-            const payerContainer = payerSearchInput.closest('.form-group');
-            if (!payerContainer.contains(event.target)) {
+        if (payInput) {
+            const container = payInput.closest('.form-group');
+            if (!container.contains(event.target)) {
                 const resDiv = document.getElementById('payer-results');
                 if(resDiv) resDiv.style.display = 'none';
             }

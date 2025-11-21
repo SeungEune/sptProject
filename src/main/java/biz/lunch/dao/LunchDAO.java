@@ -20,9 +20,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 정보를 등록한다.
-     * @param lunchVO - 등록할 정보가 담긴 LunchVO
-     * @return int
-     * @exception Exception
      */
     public int registerLunch(LunchVO lunchVO) throws Exception {
         insert(NAMESPACE + "registerLunch", lunchVO);
@@ -31,9 +28,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 정보를 수정한다.
-     * @param lunchVO - 수정할 정보가 담긴 LunchVO
-     * @return int
-     * @exception Exception
      */
     public int updateLunch(LunchVO lunchVO) throws Exception {
         return update(NAMESPACE + "updateLunch", lunchVO);
@@ -41,9 +35,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 ID에 해당하는 참여자 정보를 삭제한다.
-     * @param lunchId - 삭제할 점심식대 ID
-     * @return int
-     * @exception Exception
      */
     public int deleteParticipantsByLunchId(int lunchId) throws Exception {
         return delete(NAMESPACE + "deleteParticipantsByLunchId", lunchId);
@@ -51,9 +42,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 참여자 정보를 일괄 등록한다.
-     * @param lunchVO - 등록할 참여자 정보가 담긴 LunchVO
-     * @return int
-     * @exception Exception
      */
     public int insertParticipantsBatch(LunchVO lunchVO) throws Exception {
         insert(NAMESPACE + "insertParticipantsBatch", lunchVO);
@@ -62,9 +50,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 목록을 조회한다.
-     * @param searchVO - 조회할 정보가 담긴 LunchVO
-     * @return List<LunchVO>
-     * @exception Exception
      */
     public List<LunchVO> getLunchList(LunchVO searchVO) throws Exception {
         return selectList(NAMESPACE + "getLunchList", searchVO);
@@ -72,11 +57,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 통계 정보를 조회한다.
-     * @param startDate - 조회 시작일
-     * @param endDate - 조회 종료일
-     * @param month - 조회 월
-     * @return List<SummaryVO>
-     * @exception Exception
      */
     public List<SummaryVO> getStatistics(String startDate, String endDate, String month) throws Exception {
         Map<String, Object> params = new HashMap<>();
@@ -88,10 +68,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 정산을 완료 처리한다.
-     * @param userId - 사용자 ID
-     * @param action - 처리 액션
-     * @return int
-     * @exception Exception
      */
     public int completeSettlement(String startDate, String endDate, String userId, String action) throws Exception {
         Map<String, Object> params = new HashMap<>();
@@ -105,8 +81,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 정보를 삭제한다.
-     * @param lunchId - 삭제할 점심식대 ID
-     * @return int
      */
     public int deleteLunch(int lunchId) {
         return delete(NAMESPACE + "deleteLunch", lunchId);
@@ -114,9 +88,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 변경사항 발생 후 월별 요약 정보를 업데이트한다.
-     * @param month - 업데이트할 월
-     * @return int
-     * @exception Exception
      */
     public int updateSummaryAfterChange(String month, String representativeName) throws Exception {
         Map<String, Object> params = new HashMap<>();
@@ -127,9 +98,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 점심식대 ID로 날짜를 조회한다.
-     * @param lunchId - 조회할 점심식대 ID
-     * @return String - 점심 날짜
-     * @exception Exception
      */
     public String getLunchDateById(int lunchId) throws Exception {
         return selectOne(NAMESPACE + "getLunchDateById", lunchId);
@@ -137,8 +105,6 @@ public class LunchDAO extends EgovComAbstractDAO { //
 
     /**
      * 전체 사용자 목록을 조회한다.
-     * @return List<UserVO>
-     * @exception Exception
      */
     public List<UserVO> getUserList() throws Exception {
         return selectList(NAMESPACE + "getUserList");
