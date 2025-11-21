@@ -11,13 +11,11 @@ public class EquipmentResponse {
 
     private Long id;
 
-//    private String code;
-//
-//    private String name;
-
     private String serialNumber;
 
     private String  accessNumber;
+
+    private String directorId;
 
     private String director;
 

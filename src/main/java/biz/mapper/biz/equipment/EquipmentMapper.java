@@ -1,4 +1,4 @@
-package biz.mapper;
+package biz.mapper.biz.equipment;
 
 
 import biz.equipment.vo.EquipmentVO;
@@ -29,14 +29,10 @@ public interface EquipmentMapper {
     // 전체 삭제
     void deleteAll();
 
-    String findBySerialNumber(@Param("serialNumber") String serialNumber);
+    String duplicateChkSerialNumber(@Param("serialNumber") String serialNumber);
 
-    String findByAccessNumber(@Param("accessNumber") String accessNumber);
+    String duplicateChkAccessNumber(@Param("accessNumber") String accessNumber);
 
-    // 담당자 변경
-    void updateDirector(@Param("id") Long id, @Param("director") String director);
-
-    // 상태 변경
-    void updateStatus(@Param("id") Long id, @Param("status") Status status);
+    EquipmentVO selectBySerialNumber(@Param("serialNumber") String serialNumber);
 
 }

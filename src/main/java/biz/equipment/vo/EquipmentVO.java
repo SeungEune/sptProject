@@ -10,18 +10,15 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-//@Setter
 public class EquipmentVO extends Base {
 
     private Long id;
 
-//    private String code;
-//
-//    private String name;
-
     private String serialNumber;
 
     private String  accessNumber;
+
+    private String directorId;
 
     private String director;
 
@@ -30,10 +27,9 @@ public class EquipmentVO extends Base {
 
     public EquipmentVO create(EquipmentRequest equipmentRequest) {
         return EquipmentVO.builder()
-//                .code(equipmentRequest.getCode())
-//                .name(equipmentRequest.getName())
                 .serialNumber(equipmentRequest.getSerialNumber())
                 .accessNumber(equipmentRequest.getAccessNumber())
+                .directorId(equipmentRequest.getDirectorId())
                 .director(equipmentRequest.getDirector())
                 .status(equipmentRequest.getStatus())
                 .build();
@@ -44,6 +40,7 @@ public class EquipmentVO extends Base {
                 .id(equipmentUpdate.getId())
                 .serialNumber(equipmentUpdate.getSerialNumber())
                 .accessNumber(equipmentUpdate.getAccessNumber())
+                .directorId(equipmentUpdate.getDirectorId())
                 .director(equipmentUpdate.getDirector())
                 .status(equipmentUpdate.getStatus())
                 .build();

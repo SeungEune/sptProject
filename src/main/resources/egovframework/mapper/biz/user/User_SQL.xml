@@ -231,16 +231,20 @@
         WHERE user_id = #{userId}
     </update>
 
-
-
-
-<!--  이름으로 단건 조회-->
-    <select id="findUserIdByName" parameterType="string"
-            resultType="string">
-        SELECT
-            user_nm      AS name
+<!--    이름으로 조회-->
+    <select id="findUserIdByName" parameterType="string" resultType="biz.user.vo.UserVO">
+        SELECT user_id,
+            user_nm AS name
         FROM tb_user
-        WHERE user_nm = #{userName}
+        WHERE to_tsvector(user_nm) @@ to_tsquery(replace(#{userName}, ' ', ' &amp; ') || ':*');
+    </select>
+
+<!--    이메일로 조회-->
+    <select id="selectUserByEmail" parameterType="string" resultType="biz.user.vo.UserVO">
+        SELECT user_id,
+               user_nm AS name
+        FROM   tb_user
+        WHERE  email_adres = #{email};
     </select>
 
 <!--직원목록-->

@@ -1,14 +1,12 @@
 package biz.equipment.service;
 
-
-
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentResponse;
 import biz.equipment.dto.EquipmentUpdate;
+import biz.equipment.vo.DirectorVO;
 import biz.equipment.vo.Status;
 
 import java.util.List;
-
 
 public interface EquipmentService {
     // 장비 조회
@@ -31,12 +29,6 @@ public interface EquipmentService {
 
     String checkAccessNumber(String accessNumber);
 
-    // 담당자 변경
-    void updateDirector(Long id, String director);
-
-    // 상태 변경
-    void updateStatus(Long id, Status status);
-
     // 관리자 검색
-    List<String> getDirector(String user) throws Exception;
+    List<DirectorVO> getDirector(String user) throws Exception;
 }

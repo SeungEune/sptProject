@@ -3,12 +3,57 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="biz.mapper.EquipmentCodeMapper">
+<mapper namespace="biz.mapper.biz.eqp_history.EqpHistoryMapper">
 
-    <!--조회-->
-<!--    <select id="findAll" resultType="biz.equipment_code.vo.EquipmentCodeVO">-->
-<!--        SELECT ID, CODE, NAME-->
-<!--        FROM EQUIPMENT_CODE-->
-<!--    </select>-->
+    <!-- resultMap 정의: 장비별 조회용 -->
+    <resultMap id="EqpHistoryResponseMap" type="biz.eqp_history.vo.EqpHistoryResponseVO">
+        <id column="id" property="id"/>
+        <result column="eqpId" property="eqpId"/>
+        <result column="directorId" property="directorId"/>
+        <result column="serialNumber" property="serialNumber"/>
+        <result column="director" property="director"/>
+        <result column="createdAt" property="createdAt"/>
+    </resultMap>
+
+    <!-- 저장 -->
+    <insert id="insertEqpHistory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO eqp_history(eqp_id, director_id)
+        VALUES (#{eqpId}, #{directorId})
+    </insert>
+
+    <resultMap id="EqpHistoryMap" type="biz.eqp_history.vo.EqpHistoryVO">
+        <result property="id" column="id"/>
+        <result property="eqpId" column="eqp_id"/>
+        <result property="directorId" column="director_id"/>
+    </resultMap>
+
+    <select id="getAllEqpHistory" resultMap="EqpHistoryMap">
+        SELECT
+            id,
+            eqp_id,
+            director_id
+        FROM eqp_history
+    </select>
+
+    <select id="getEqpHistoryByEqpId" resultType="biz.eqp_history.vo.EqpHistoryResponseVO" parameterType="long">
+        SELECT
+            h.id AS id,
+            h.eqp_id AS eqpId,
+            h.director_id AS directorId,
+            u.user_nm AS directorName,
+            e.serial_number AS serialNumber,
+            h.created_at AS createdAt
+        FROM eqp_history h
+                 JOIN equipment e ON h.eqp_id = e.id
+                 JOIN tb_user u ON h.director_id = u.user_id
+        WHERE h.eqp_id = #{eqpId}
+    </select>
+
+    <!-- 삭제 -->
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM eqp_history
+        WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
 
 </mapper>

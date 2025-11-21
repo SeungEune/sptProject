@@ -1,5 +1,7 @@
 package biz.user.service;
 
+import biz.equipment.vo.DirectorVO;
+import biz.user.vo.UserVO;
 import egovframework.EgovBootApplication;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,7 @@ public class UserServiceTest {
 
     @Test
     public void findUserByName() throws Exception {
-        List<String> list = userService.getUserByName("테스트사용자");
+        List<UserVO> list = userService.getUserByName("테스트사용자");
         Assertions.assertThat(list).size().isEqualTo(2);
     }
 

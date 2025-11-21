@@ -28,5 +28,5 @@ public interface UserService {
 
     void updateUserExceptPw(UserVO vo) throws Exception;
 
-    List<String> getUserByName(String userName) throws Exception;
+    List<UserVO> getUserByName(String userName) throws Exception;
 }

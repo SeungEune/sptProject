@@ -43,7 +43,7 @@ public class UserDAO extends EgovAbstractMapper {
         return selectOne("UserDAO.countUserList", cond);
     }
 
-    public List<String> findUserByName(String userName) throws Exception {
+    public List<UserVO> findUserByName(String userName) throws Exception {
         return selectList("UserDAO.findUserIdByName",userName);
     }
 
@@ -53,6 +53,10 @@ public class UserDAO extends EgovAbstractMapper {
 
     public List<String> selectUserRoles(String userId) throws Exception {
         return selectList("UserDAO.selectUserRoles", userId);
+    }
+
+    public UserVO selectUserByEmail(String email) {
+        return selectOne("UserDAO.selectUserByEmail", email);
     }
 
     /** 전화번호 중복 (등록용) */

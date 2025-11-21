@@ -1,4 +1,4 @@
-package biz.mapper;
+package biz.mapper.biz.equipment_code;
 
 
 import biz.equipment_code.vo.EquipmentCodeVO;

@@ -1,13 +1,14 @@
 package biz.equipment.dao;
 
+import egovframework.com.cmm.exception.custom.NoContentException;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
-import biz.mapper.EquipmentMapper;
+import biz.mapper.biz.equipment.EquipmentMapper;
 import biz.equipment.vo.EquipmentVO;
-import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository("equipmentDAO")
 @RequiredArgsConstructor
@@ -40,18 +41,18 @@ public class EquipmentDAO extends EgovComAbstractDAO {
     }
 
     public String findBySerialNumber(String serialNumber) {
-        return equipmentMapper.findBySerialNumber(serialNumber);
+        return equipmentMapper.duplicateChkSerialNumber(serialNumber);
     }
 
     public String findByAccessNumber(String accessNumber) {
-        return equipmentMapper.findByAccessNumber(accessNumber);
+        return equipmentMapper.duplicateChkAccessNumber(accessNumber);
     }
 
-    public void updateDirector(Long id, String director) {
-        equipmentMapper.updateDirector(id, director);
+    public EquipmentVO findByIdOrElseThrow(Long id) {
+       return Optional.ofNullable(findById(id)).orElseThrow(NoContentException::new);
     }
 
-    public void updateStatus(Long id, Status status) {
-        equipmentMapper.updateStatus(id, status);
+    public EquipmentVO selectBySerialNumber(String serialNumber) {
+        return equipmentMapper.selectBySerialNumber(serialNumber);
     }
 }

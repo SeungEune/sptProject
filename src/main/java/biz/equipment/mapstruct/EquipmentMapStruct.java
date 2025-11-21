@@ -2,12 +2,8 @@ package biz.equipment.mapstruct;
 
 import biz.equipment.dto.EquipmentResponse;
 import biz.equipment.vo.EquipmentVO;
-import lombok.Data;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring")
