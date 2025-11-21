@@ -33,6 +33,8 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
     @Value("${lunch.settlement.end-day:25}")
     private int endDay;
 
+    @Value("${lunch.representative.name:이승은}")
+    private String representativeName;
     /**
      * 날짜 문자열(yyyy-MM-dd)을 기반으로 해당 월의 통계 정보를 갱신한다.
      */
@@ -40,8 +42,8 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
         if (EgovStringUtil.isEmpty(dateStr) || dateStr.length() < 7) {
             return;
         }
-        String month = dateStr.substring(0, 7); // yyyy-MM
-        lunchDAO.updateSummaryAfterChange(month);
+        String month = dateStr.substring(0, 7);
+        lunchDAO.updateSummaryAfterChange(month, this.representativeName);
     }
 
     @Override

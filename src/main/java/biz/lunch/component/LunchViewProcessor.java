@@ -1,7 +1,6 @@
 package biz.lunch.component;
 
 import biz.lunch.vo.LunchVO;
-import egovframework.com.cmm.service.EgovProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

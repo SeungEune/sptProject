@@ -118,9 +118,11 @@ public class LunchDAO extends EgovComAbstractDAO { //
      * @return int
      * @exception Exception
      */
-    public int updateSummaryAfterChange(String month) throws Exception {
-        insert(NAMESPACE + "updateSummaryAfterChange", month);
-        return 1;
+    public int updateSummaryAfterChange(String month, String representativeName) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("month", month);
+        params.put("representativeName", representativeName);
+        return insert(NAMESPACE + "updateSummaryAfterChange", params);
     }
 
     /**
