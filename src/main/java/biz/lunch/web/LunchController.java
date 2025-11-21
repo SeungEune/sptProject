@@ -77,15 +77,8 @@ public class LunchController {
             // 데이터 가공
             lunchVO.makeParticipantList();
 
-            // 유효성 검사 (StoreName 체크 예시)
-            if (lunchVO.getStoreName() == null || lunchVO.getStoreName().isEmpty()) {
-                log.warn("가게 이름 누락");
-                return "redirect:/lunch/register.do?error=storeName";
-            }
-
             log.info("점심/커피 등록 요청: {}", lunchVO);
             lunchService.registerLunch(lunchVO);
-
             return "redirect:/lunch/list.do";
         } catch (Exception e) {
             log.error("점심/커피 등록 처리 실패", e);
