@@ -7,17 +7,15 @@ import biz.lunch.vo.ParticipantVO;
 import biz.lunch.vo.SummaryVO;
 import biz.lunch.vo.UserVO;
 import biz.util.EgovStringUtil;
+import egovframework.com.cmm.service.EgovProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.egovframe.rte.fdl.cmmn.EgovAbstractServiceImpl;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service("lunchService")
@@ -25,14 +23,9 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
 
     @Resource(name = "lunchDAO")
     private LunchDAO lunchDAO;
-
-    // 정산 기준일 (예: 전월 26일 ~ 당월 25일)
-    @Value("${lunch.settlement.start-day:26}")
-    private int startDay;
-
-    @Value("${lunch.settlement.end-day:25}")
-    private int endDay;
-
+    String representativeName = EgovProperties.getProperty("lunch.representative.name");
+    int startDay = Integer.parseInt(EgovProperties.getProperty("lunch.settlement.start-day"));
+    int endDay = Integer.parseInt(EgovProperties.getProperty("lunch.settlement.end-day"));
     /**
      * 날짜 문자열(yyyy-MM-dd)을 기반으로 해당 월의 통계 정보를 갱신한다.
      */
@@ -41,7 +34,8 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
             return;
         }
         String month = dateStr.substring(0, 7); // yyyy-MM
-        lunchDAO.updateSummaryAfterChange(month);
+
+        lunchDAO.updateSummaryAfterChange(month, representativeName);
     }
 
     @Override
@@ -54,7 +48,7 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
         // 1. 화면에서 넘어온 배열 데이터(ID, 금액)를 List<ParticipantVO>로 변환
         lunchVO.makeParticipantList();
 
-        // 2. 총 금액 계산 (프론트에서 계산해서 넘겨주더라도 서버에서 재검증)
+        // 2. 총 금액 계산
         int totalAmount = 0;
         if (lunchVO.getParticipantList() != null) {
             for (ParticipantVO p : lunchVO.getParticipantList()) {
@@ -63,7 +57,7 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
         }
         lunchVO.setTotalAmount(totalAmount);
 
-        // 3. Lunch Master 등록 (insert 후 selectKey를 통해 lunchVO.lunchId에 값이 세팅됨)
+        // 3. Lunch Master 등록
         int result = lunchDAO.registerLunch(lunchVO);
 
         // 4. 참여자 정보 등록
@@ -132,12 +126,10 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
 
     @Override
     public List<LunchVO> getLunchList(LunchVO searchVO) throws Exception {
-        // 날짜 범위 검색 조건 설정 (YYYY-MM이 들어오면 해당 월의 정산 기간으로 변환)
         if (searchVO != null && !EgovStringUtil.isEmpty(searchVO.getDate()) && searchVO.getDate().length() == 7) {
             String monthStr = searchVO.getDate();
             YearMonth yearMonth = YearMonth.parse(monthStr);
 
-            // 예: 2024-07 검색 -> 2024-06-26 ~ 2024-07-25
             LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(startDay);
             LocalDate endDate = yearMonth.atDay(endDay);
 
@@ -154,8 +146,10 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
 
         if (!EgovStringUtil.isEmpty(searchMonth) && searchMonth.length() == 7) {
             YearMonth yearMonth = YearMonth.parse(searchMonth);
+
             LocalDate start = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(startDay);
             LocalDate end = yearMonth.atDay(endDay);
+
             startDate = start.toString();
             endDate = end.toString();
         }
@@ -167,8 +161,8 @@ public class LunchServiceImpl extends EgovAbstractServiceImpl implements LunchSe
         if (EgovStringUtil.isEmpty(month) || EgovStringUtil.isEmpty(userId)) {
             throw new IllegalArgumentException("필수 파라미터 누락");
         }
-        //조회할 때처럼 날짜 범위(startDate, endDate)를 계산해서 넘겨야 함
         YearMonth yearMonth = YearMonth.parse(month);
+
         LocalDate startDate = yearMonth.atDay(1).minusMonths(1).withDayOfMonth(startDay);
         LocalDate endDate = yearMonth.atDay(endDay);
 

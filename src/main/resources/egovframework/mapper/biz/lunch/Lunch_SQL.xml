@@ -170,7 +170,7 @@
              , #{month}
              , COALESCE(p.total_paid, 0)
              , COALESCE(o.total_owed, 0)
-             , (SELECT user_id FROM tb_user WHERE user_nm = '이승은' LIMIT 1) FROM T_PAID p
+             , (SELECT user_id FROM tb_user WHERE user_nm = #{representativeName} LIMIT 1) FROM T_PAID p
             FULL OUTER JOIN T_OWED o ON p.user_id = o.user_id
     </insert>
 

@@ -84,9 +84,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --- Chart 3: 일자별 점심/커피 구분 ---
-    if (lunchList.length > 0) {
-        const ctxType = document.getElementById('dailyTypeChart');
-        if (ctxType) {
+    const ctxType = document.getElementById('dailyTypeChart'); // [수정] if문 밖으로 꺼냄
+    if (ctxType) {
+        // 1. 기본값 빈 배열로 초기화
+        let labels = [];
+        let lunch = [];
+        let coffee = [];
+
+        // 2. 데이터가 존재할 때만 데이터 가공 로직 실행
+        if (typeof lunchList !== 'undefined' && lunchList.length > 0) {
             const map = new Map();
             const sorted = [...lunchList].reverse();
 
@@ -98,25 +104,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 else if (item.type === '커피') map.get(date).coffee += item.totalAmount;
             }
 
-            const labels = Array.from(map.keys());
-            const lunch = labels.map(d => map.get(d).lunch);
-            const coffee = labels.map(d => map.get(d).coffee);
-
-            new Chart(ctxType.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: '점심', data: lunch, backgroundColor: CHART_COLORS.blueDark },
-                        { label: '커피', data: coffee, backgroundColor: CHART_COLORS.blueLight }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }
-                }
-            });
+            labels = Array.from(map.keys());
+            lunch = labels.map(d => map.get(d).lunch);
+            coffee = labels.map(d => map.get(d).coffee);
         }
+
+        // 3. 차트 생성 (데이터가 비어있으면 빈 그래프가 그려짐)
+        new Chart(ctxType.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: '점심', data: lunch, backgroundColor: CHART_COLORS.blueDark },
+                    { label: '커피', data: coffee, backgroundColor: CHART_COLORS.blueLight }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: v => getFormattedMoney(v),
+                        },
+                    }
+                }
+            }
+        });
     }
 
     // --- Chart 4: 사용자별 송금/수금 총액 ---

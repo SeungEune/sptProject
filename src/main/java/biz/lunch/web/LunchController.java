@@ -7,6 +7,7 @@ import biz.lunch.vo.SummaryVO;
 import biz.lunch.vo.UserVO;
 import biz.util.EgovDateUtil;
 import biz.util.EgovStringUtil;
+import egovframework.com.cmm.EgovMessageSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +34,8 @@ public class LunchController {
     private LunchService lunchService;
     @Resource(name = "lunchViewProcessor")
     private LunchViewProcessor viewProcessor;
-
+    @Resource(name = "egovMessageSource")
+    EgovMessageSource egovMessageSource;
     // 날짜 기본값 설정
     private void setDefaultDate(LunchVO searchVO) {
         if (EgovStringUtil.isEmpty(searchVO.getDate())) {
@@ -58,7 +60,7 @@ public class LunchController {
         } catch (Exception e) {
             log.error("점심/커피 등록 화면 조회 실패", e);
             // 에러 발생 시 처리 (공통 에러 페이지로 이동하거나 메시지 전달)
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.msg"));
             return "error/404";
         }
     }
@@ -87,7 +89,7 @@ public class LunchController {
             return "redirect:/lunch/list.do";
         } catch (Exception e) {
             log.error("점심/커피 등록 처리 실패", e);
-            model.addAttribute("message", "등록 중 오류가 발생했습니다.");
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
             return "error/404";
         }
     }
@@ -123,7 +125,7 @@ public class LunchController {
 
         } catch (Exception e) {
             log.error("점심/커피 목록 조회 실패", e);
-            model.addAttribute("message", "목록 조회 중 오류가 발생했습니다.");
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
             return "error/404";
         }
     }
