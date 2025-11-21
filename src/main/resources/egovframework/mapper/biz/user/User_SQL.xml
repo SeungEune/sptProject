@@ -77,7 +77,6 @@
         </if>
 
         <!-- endDate만 있으면 end 이하 전체 (inclusive) -->
-        <!-- endDate만 있으면 end 이하 전체 (inclusive) -->
         <if test="endDate != null and endDate != ''">
             AND u.regist_dt &lt; (#{endDate}::date + INTERVAL '1 day')
         </if>
@@ -180,7 +179,7 @@
         WHERE user_id = #{userId}
     </select>
 
-    <!-- 1) 전화번호 전체 중복 체크 (등록용) -->
+    <!-- 전화번호 전체 중복 체크 (등록용) -->
     <select id="countByPhone"
             parameterType="string"
             resultType="int">
@@ -189,7 +188,7 @@
         WHERE MOBLPHON_NO = #{phone}
     </select>
 
-    <!-- 2) 전화번호 중복 체크 (수정용: 자기 자신 제외) -->
+    <!-- 전화번호 중복 체크 (수정용: 자기 자신 제외) -->
     <select id="countByPhoneExceptUser"
             parameterType="map"
             resultType="int">
@@ -199,7 +198,7 @@
         AND USER_ID != #{userId}
     </select>
 
-    <!-- 3) 이메일 전체 중복 체크 (등록용) -->
+    <!-- 이메일 전체 중복 체크 (등록용) -->
     <select id="countByEmail"
             parameterType="string"
             resultType="int">
@@ -208,7 +207,7 @@
         WHERE EMAIL_ADRES = #{email}
     </select>
 
-    <!-- 4) 이메일 중복 체크 (수정용: 자기 자신 제외) -->
+    <!-- 이메일 중복 체크 (수정용: 자기 자신 제외) -->
     <select id="countByEmailExceptUser"
             parameterType="map"
             resultType="int">
@@ -218,6 +217,7 @@
         AND USER_ID != #{userId}
     </select>
 
+    <!--  비밀번호 제외하고 수정  -->
     <update id="updateUserExceptPw"
             parameterType="biz.user.vo.UserVO">
         UPDATE tb_user
@@ -234,7 +234,7 @@
 
 
 
-<!--    이름으로 단건 조회-->
+<!--  이름으로 단건 조회-->
     <select id="findUserIdByName" parameterType="string"
             resultType="string">
         SELECT

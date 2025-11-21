@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>점심/커피 내역 등록</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
-
    <link rel="stylesheet" th:href="@{/css/user/manage.css}">
 
 </head>
@@ -108,28 +105,6 @@
 
                 </table>
 
-                <!-- 페이지네이션 -->
-<!--                <div class="pagination">-->
-<!--                    &lt;!&ndash; 이전 페이지 &ndash;&gt;-->
-<!--                    <a th:if="${page > 1}"-->
-<!--                       th:href="@{'/enter/manage'(page=${page - 1})}">-->
-<!--                        &laquo;-->
-<!--                    </a>-->
-
-<!--                    &lt;!&ndash; 페이지 번호들 &ndash;&gt;-->
-<!--                    <a th:each="p : ${#numbers.sequence(1, totalPages)}"-->
-<!--                       th:href="@{'/enter/manage'(page=${p})}"-->
-<!--                       th:text="${p}"-->
-<!--                       th:classappend="${p == page} ? ' active' : ''">-->
-<!--                    </a>-->
-
-<!--                    &lt;!&ndash; 다음 페이지 &ndash;&gt;-->
-<!--                    <a th:if="${page < totalPages}"-->
-<!--                       th:href="@{'/enter/manage'(page=${page + 1})}">-->
-<!--                        &raquo;-->
-<!--                    </a>-->
-<!--                </div>-->
-
                 <!-- 페이지네이션 (JS로 채움) -->
                 <div id="paging-area" class="pagination"></div>
 
@@ -144,7 +119,7 @@
                 </script>
 
 
-                <!-- ★ 여기서만 Thymeleaf 값을 JS 전역에 싣고 -->
+                <!-- 여기서만 Thymeleaf 값을 JS 전역에 싣고 -->
                 <script th:inline="javascript">
                     window.ENTER_PAGING = {
                         totalCount : /*[[${totalCount}]]*/ 0,
@@ -153,8 +128,8 @@
                     };
                 </script>
 
-                <!-- ★ 나머지 로직은 전부 외부 파일 -->
-                <script src="/js/enter/new/manage.js"></script>
+                <!-- 나머지 로직은 전부 외부 파일 -->
+                <script src="/js/enter/manage.js"></script>
 
 
 

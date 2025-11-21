@@ -61,7 +61,7 @@
     display: flex;
     justify-content: flex-end;
 }
-
+/*동작버튼*/
 .submit-btn {
     margin-top: 0 !important;
     width: 60px !important;
@@ -80,6 +80,7 @@
     align-items: center;
     transition: opacity 0.2s;
 }
+/*취소버튼*/
 .cancel-btn{
     margin-top: 0 !important;
     width: 60px !important;

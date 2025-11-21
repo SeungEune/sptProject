@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="EnterDAO">
+    <!-- 출입목록  -->
     <select id="selectEnterList" resultType="biz.enter.vo.EnterVO">
         SELECT
             e.enter_id     AS enterId,
@@ -26,12 +27,12 @@
             LIMIT #{size} OFFSET #{offset}
     </select>
 
-
+    <!--  출입 총 갯수  -->
     <select id="selectEnterCount" resultType="int">
         SELECT COUNT(*) FROM tb_enter
     </select>
 
-
+    <!-- 출입 등록 -->
     <insert id="insertEnter" parameterType="biz.enter.vo.EnterVO">
         INSERT INTO tb_enter (
         enter_id,
@@ -111,7 +112,7 @@
         WHERE enter_id = #{enterId}
     </update>
 
-
+    <!--  삭제 -->
     <delete id="deleteEnter" parameterType="String">
         DELETE FROM tb_enter
         WHERE enter_id = #{enterId}
