@@ -62,10 +62,10 @@
         <p id="accessMessage" style="color: red; margin-top: 4px;"></p>
     </div>
 
-    <!-- 담당자 아코디언 -->
     <div class="accordion-item">
         <label for="managerInput">담당자</label><br>
         <input id="managerInput" placeholder="담당자 이름을 입력해주세요" name="director" th:value="${param.director}">
+        <input type="hidden" id="directorIdInput" name="directorId">
         <button type="button" id="managerBtn" class="accordion-header">
             <span class="arrow">▼</span>
         </button>
@@ -231,29 +231,46 @@
     const managerInput = document.getElementById('managerInput');
     const managerList = document.getElementById('managerList');
     const managerBtn = document.getElementById('managerBtn');
+    const directorIdInput = document.getElementById('directorIdInput');
 
     managerBtn.addEventListener('click', () => {
         const name = managerInput.value.trim();
+
+        directorIdInput.value = '';
 
         fetch(`/equipment/director/view?name=${encodeURIComponent(name)}`)
             .then(res => res.json())
             .then(result => {
                 managerList.innerHTML = '';
+                managerList.style.display = 'block';
 
                 result.forEach(item => {
                     const li = document.createElement('li');
-                    li.textContent = item;
+
+                    li.textContent = `${item.director} (${item.directorId})`;
 
                     li.addEventListener('click', () => {
-                        managerInput.value = item;
-                        selectedManager = item;
+                        // ✅ 수정된 부분: 선택 시 "이름 (아이디)" 형식으로 입력창에 표시
+                        managerInput.value = `${item.director} (${item.directorId})`;
+
+                        // ID는 숨겨진 필드에 별도로 저장 (서버 전송용)
+                        directorIdInput.value = item.directorId;
+
+                        // 기존 변수 로직 유지
+                        selectedManager = item.director;
+
                         managerList.style.display = 'none';
                     });
                     managerList.appendChild(li);
                 });
+
+                if (result.length === 0) {
+                    managerList.style.display = 'none';
+                }
             })
             .catch(err => {
                 console.error(err);
+                managerList.style.display = 'none';
             });
     });
 

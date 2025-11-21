@@ -4,7 +4,6 @@ import egovframework.com.cmm.exception.custom.NoContentException;
 import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import biz.mapper.biz.equipment.EquipmentMapper;
 import biz.equipment.vo.EquipmentVO;
-import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -49,8 +48,8 @@ public class EquipmentDAO extends EgovComAbstractDAO {
         return equipmentMapper.duplicateChkAccessNumber(accessNumber);
     }
 
-    public void findByIdOrElseThrow(Long id) {
-        Optional.ofNullable(findById(id)).orElseThrow(NoContentException::new);
+    public EquipmentVO findByIdOrElseThrow(Long id) {
+       return Optional.ofNullable(findById(id)).orElseThrow(NoContentException::new);
     }
 
     public EquipmentVO selectBySerialNumber(String serialNumber) {

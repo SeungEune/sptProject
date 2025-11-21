@@ -7,22 +7,23 @@
 
     <!--조회-->
     <select id="findAll" resultType="biz.equipment.vo.EquipmentVO">
-        SELECT ID, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
+        SELECT id, serial_number, access_number, director_id, director, status
         FROM EQUIPMENT
     </select>
 
     <!--단건조회    -->
     <select id="findById" resultType="biz.equipment.vo.EquipmentVO">
-        SELECT ID, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
+        SELECT id, serial_number, access_number, director_id, director, status
         FROM EQUIPMENT
         WHERE ID = #{id}
     </select>
 
     <!--등록    -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO EQUIPMENT(SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS)
+        INSERT INTO EQUIPMENT(serial_number, access_number, director_id, director, status)
         VALUES ( #{equipment.serialNumber}, #{equipment.accessNumber},
-                #{equipment.director}, #{equipment.status})
+                 #{equipment.directorId},
+                 #{equipment.director}, #{equipment.status})
     </insert>
 
     <!--    수정-->
@@ -30,6 +31,7 @@
         UPDATE EQUIPMENT
         SET SERIAL_NUMBER = #{equipment.serialNumber},
             ACCESS_NUMBER = #{equipment.accessNumber},
+            director_id = #{equipment.directorId},
             DIRECTOR      = #{equipment.director},
             STATUS = #{equipment.status}
         WHERE ID = #{equipment.id, jdbcType=BIGINT}
@@ -59,20 +61,6 @@
         DELETE
         FROM EQUIPMENT
     </delete>
-
-    <!--    담당자 수정-->
-    <update id="updateDirector" >
-        UPDATE EQUIPMENT
-        SET DIRECTOR = #{director}
-        WHERE ID = #{id, jdbcType=BIGINT}
-    </update>
-
-    <!--    상태 수정-->
-    <update id="updateStatus">
-        UPDATE EQUIPMENT
-        SET STATUS = #{status}
-        WHERE ID = #{id, jdbcType=BIGINT}
-    </update>
 
 <!--    시리얼 번호로 찾기-->
     <select id="selectBySerialNumber" resultType="biz.equipment.vo.EquipmentVO">

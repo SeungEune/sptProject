@@ -3,6 +3,7 @@ package biz.equipment.service;
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentResponse;
 import biz.equipment.dto.EquipmentUpdate;
+import biz.equipment.vo.DirectorVO;
 import biz.equipment.vo.Status;
 
 import java.util.List;
@@ -29,5 +30,5 @@ public interface EquipmentService {
     String checkAccessNumber(String accessNumber);
 
     // 관리자 검색
-    List<String> getDirector(String user) throws Exception;
+    List<DirectorVO> getDirector(String user) throws Exception;
 }

@@ -35,10 +35,10 @@ public class EquipmentServiceTest {
     @BeforeEach
     public void setUp() throws Exception {
         equipmentDAO.deleteAll();
-        testVO = createEquipmentVO("serialNumber1","accessNumber1", "홍길동", Status.STORAGE);
+        testVO = createEquipmentVO("serialNumber1","accessNumber1", "ID홍길동","홍길동", Status.STORAGE);
         equipmentDAO.save(testVO);
 
-        equipmentDAO.save(createEquipmentVO("serialNumber2","accessNumber2", "김철수", Status.USE));
+        equipmentDAO.save(createEquipmentVO("serialNumber2","accessNumber2", "ID김철수","김철수", Status.USE));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class EquipmentServiceTest {
 
     @Test
     void 장비_등록을_성공한다() {
-        equipmentService.insertEquipment(createRequest("serialNumber3", "accessNumber3", "김영희", Status.REPAIR));
+        equipmentService.insertEquipment(createRequest("serialNumber3", "accessNumber3", "ID김영희","김영희", Status.REPAIR));
         assertThat(equipmentDAO.findAll().size()).isEqualTo(3);
     }
 
@@ -59,7 +59,7 @@ public class EquipmentServiceTest {
     void 장비_수정을_성공한다() {
         //given
         equipmentService.updateEquipment(
-                createUpdate(testVO.getId(), "serialNumber5", "accessNumber5","고양이", Status.USE));
+                createUpdate(testVO.getId(), "serialNumber5", "accessNumber5","ID고양이","고양이", Status.USE));
 
         assertThat(equipmentDAO.findById(testVO.getId()).getSerialNumber()).isEqualTo("serialNumber5");
         assertThat(equipmentDAO.findById(testVO.getId()).getDirector()).isEqualTo("고양이");
@@ -87,24 +87,26 @@ public class EquipmentServiceTest {
         assertThat(equipmentService.getDirector("테스트사용자")).size().isEqualTo(2) ;
     }
 
-    private EquipmentVO createEquipmentVO(String serialNumber, String accessNumber, String director, Status status) {
-        return new EquipmentVO().create(createRequest(serialNumber, accessNumber, director, status));
+    private EquipmentVO createEquipmentVO(String serialNumber, String accessNumber, String directorId,String director, Status status) {
+        return new EquipmentVO().create(createRequest(serialNumber, accessNumber, directorId,director, status));
     }
 
-    private EquipmentRequest createRequest(String serialNumber, String accessNumber, String director, Status status) {
+    private EquipmentRequest createRequest(String serialNumber, String accessNumber, String directorId, String director, Status status) {
         return EquipmentRequest.builder()
                 .serialNumber(serialNumber)
                 .accessNumber(accessNumber)
+                .directorId(directorId)
                 .director(director)
                 .status(status)
                 .build();
     }
 
-    private EquipmentUpdate createUpdate(Long id, String serialNumber, String accessNumber, String director, Status status) {
+    private EquipmentUpdate createUpdate(Long id, String serialNumber, String accessNumber, String directorId, String director, Status status) {
         return EquipmentUpdate.builder()
                 .id(id)
                 .serialNumber(serialNumber)
                 .accessNumber(accessNumber)
+                .directorId(directorId)
                 .director(director)
                 .status(status)
                 .build();

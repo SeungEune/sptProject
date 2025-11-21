@@ -33,12 +33,6 @@ public interface EquipmentMapper {
 
     String duplicateChkAccessNumber(@Param("accessNumber") String accessNumber);
 
-    // 담당자 변경
-    void updateDirector(@Param("id") Long id, @Param("director") String director);
-
-    // 상태 변경
-    void updateStatus(@Param("id") Long id, @Param("status") Status status);
-
     EquipmentVO selectBySerialNumber(@Param("serialNumber") String serialNumber);
 
 }

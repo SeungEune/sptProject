@@ -43,7 +43,7 @@ public class UserDAO extends EgovAbstractMapper {
         return selectOne("UserDAO.countUserList", cond);
     }
 
-    public List<String> findUserByName(String userName) throws Exception {
+    public List<UserVO> findUserByName(String userName) throws Exception {
         return selectList("UserDAO.findUserIdByName",userName);
     }
 

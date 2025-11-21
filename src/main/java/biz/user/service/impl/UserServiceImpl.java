@@ -73,7 +73,7 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
     }
 
     @Override
-    public List<String> getUserByName(String name) throws Exception {
+    public List<UserVO> getUserByName(String name) throws Exception {
         return userDAO.findUserByName(name);
     }
 

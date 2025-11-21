@@ -3,6 +3,7 @@ package biz.equipment.web;
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.dto.EquipmentUpdate;
 import biz.equipment.service.EquipmentService;
+import biz.equipment.vo.DirectorVO;
 import biz.equipment.vo.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -80,7 +81,7 @@ public class EquipmentController {
      //관리자 찾기
     @GetMapping("/director/view")
     @ResponseBody
-    public List<String> getDirector(@RequestParam("name") String name) throws Exception {
+    public List<DirectorVO> getDirector(@RequestParam("name") String name) throws Exception {
         return equipmentService.getDirector(name);
     }
 }

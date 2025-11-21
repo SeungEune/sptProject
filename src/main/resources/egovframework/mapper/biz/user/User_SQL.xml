@@ -231,8 +231,8 @@
     </update>
 
 <!--    이름으로 조회-->
-    <select id="findUserIdByName" parameterType="string" resultType="string">
-        SELECT
+    <select id="findUserIdByName" parameterType="string" resultType="biz.user.vo.UserVO">
+        SELECT user_id,
             user_nm AS name
         FROM tb_user
         WHERE to_tsvector(user_nm) @@ to_tsquery(replace(#{userName}, ' ', ' &amp; ') || ':*');
