@@ -42,11 +42,11 @@ public class EquipmentDAO extends EgovComAbstractDAO {
     }
 
     public String findBySerialNumber(String serialNumber) {
-        return equipmentMapper.findBySerialNumber(serialNumber);
+        return equipmentMapper.duplicateChkSerialNumber(serialNumber);
     }
 
     public String findByAccessNumber(String accessNumber) {
-        return equipmentMapper.findByAccessNumber(accessNumber);
+        return equipmentMapper.duplicateChkSerialNumber(accessNumber);
     }
 
     public void updateDirector(Long id, String director) {
@@ -60,5 +60,9 @@ public class EquipmentDAO extends EgovComAbstractDAO {
 
     public void findByIdOrElseThrow(Long id) {
         Optional.ofNullable(findById(id)).orElseThrow(NoContentException::new);
+    }
+
+    public EquipmentVO selectBySerialNumber(String serialNumber) {
+        return equipmentMapper.selectBySerialNumber(serialNumber);
     }
 }

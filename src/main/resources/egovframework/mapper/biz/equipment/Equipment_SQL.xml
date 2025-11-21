@@ -42,13 +42,13 @@
         WHERE ID = #{id,jdbcType=BIGINT}
     </delete>
 
-    <select id="findBySerialNumber" resultType="String">
+    <select id="duplicateChkSerialNumber" resultType="String">
         SELECT SERIAL_NUMBER
         FROM EQUIPMENT
         WHERE SERIAL_NUMBER = #{serialNumber}
     </select>
 
-    <select id="findByAccessNumber" resultType="String">
+    <select id="duplicateChkAccessNumber" resultType="String">
         SELECT ACCESS_NUMBER
         FROM EQUIPMENT
         WHERE ACCESS_NUMBER = #{accessNumber}
@@ -73,5 +73,12 @@
         SET STATUS = #{status}
         WHERE ID = #{id, jdbcType=BIGINT}
     </update>
+
+<!--    시리얼 번호로 찾기-->
+    <select id="selectBySerialNumber" resultType="biz.equipment.vo.EquipmentVO">
+        SELECT id
+        FROM EQUIPMENT
+        WHERE SERIAL_NUMBER = #{serialNumber}
+    </select>
 
 </mapper>

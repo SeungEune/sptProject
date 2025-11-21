@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 @Data
 public class UserVO {
+
     @NotBlank @Size(min = 4, max = 20)
     private String userId;
 
@@ -33,4 +34,62 @@ public class UserVO {
     private String registerId;
 
     private Timestamp registDt;
+
+
+    public static UserVOBuilder builder() {
+        return new UserVOBuilder();
+    }
+
+    public static class UserVOBuilder {
+        private final UserVO user = new UserVO();
+
+        public UserVOBuilder userId(String userId) {
+            user.setUserId(userId);
+            return this;
+        }
+
+        public UserVOBuilder password(String password) {
+            user.setPassword(password);
+            return this;
+        }
+
+        public UserVOBuilder passwordChk(String passwordChk) {
+            user.setPasswordChk(passwordChk);
+            return this;
+        }
+
+        public UserVOBuilder jssfcCd(String jssfcCd) {
+            user.setJssfcCd(jssfcCd);
+            return this;
+        }
+
+        public UserVOBuilder name(String name) {
+            user.setName(name);
+            return this;
+        }
+
+        public UserVOBuilder phone(String phone) {
+            user.setPhone(phone);
+            return this;
+        }
+
+        public UserVOBuilder email(String email) {
+            user.setEmail(email);
+            return this;
+        }
+
+        public UserVOBuilder registerId(String registerId) {
+            user.setRegisterId(registerId);
+            return this;
+        }
+
+        public UserVOBuilder registDt(Timestamp registDt) {
+            user.setRegistDt(registDt);
+            return this;
+        }
+
+        public UserVO build() {
+            return user;
+        }
+    }
 }

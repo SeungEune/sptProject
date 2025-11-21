@@ -53,4 +53,8 @@ public class UserDAO extends EgovAbstractMapper {
         return selectList("UserDAO.selectUserRoles", userId);
     }
 
+    public UserVO selectUserByEmail(String email) {
+        return selectOne("UserDAO.selectUserByEmail", email);
+    }
+
 }
