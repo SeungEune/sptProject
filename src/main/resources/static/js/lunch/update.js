@@ -10,7 +10,8 @@ let selectedPayerId = null;
 const MESSAGES = {
     storeName: '가게 이름을 입력해주세요.',
     payerId: '계산자(결제자)를 선택해주세요.',
-    participants: '참석자를 최소 1명 이상 추가해주세요.'
+    participants: '참석자를 최소 1명 이상 추가해주세요.',
+    amount: '참석자 금액은 0원 이상이어야 합니다.'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -274,6 +275,14 @@ function validateForm() {
     if (selectedParticipants.size === 0) {
         MessageUtil.alert(MESSAGES.participants);
         return false;
+    }
+    const amountInputs = document.querySelectorAll('.amount-input-group input[type="number"]');
+    for (const input of amountInputs) {
+        // 값이 비어있거나 0 이하인 경우 체크
+        if (!input.value || parseInt(input.value) <= 0) {
+            MessageUtil.alert(MESSAGES.amount); // "참석자 금액은 0원 이상이어야 합니다."
+            return false;
+        }
     }
 
     const payerValue = document.getElementById('payerId').value;
