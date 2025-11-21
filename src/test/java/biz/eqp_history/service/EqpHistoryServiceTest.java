@@ -52,7 +52,7 @@ public class EqpHistoryServiceTest {
             String serialNumber = serialCreator(i);
             String userId = userIdCreator(name);
 
-            userService.createUser(createUserVO( userId,email, name));
+            userService.createUser(createUserVO(userId, email, name));
             directorIdArray[i] = userDAO.selectUserByEmail(email).getUserId();
 
             equipmentService.insertEquipment(createEquipmentRequest(serialNumber, name));
@@ -67,7 +67,7 @@ public class EqpHistoryServiceTest {
     }
 
     @Test
-    public void 장비별_이력_조회를_성공한다(){
+    public void 장비별_이력_조회를_성공한다() {
         eqpHistoryService.insertEqpHistoryVO(createEqpHistoryVO(0, 0));
         eqpHistoryService.insertEqpHistoryVO(createEqpHistoryVO(1, 0));
         eqpHistoryService.insertEqpHistoryVO(createEqpHistoryVO(2, 0));
@@ -81,7 +81,7 @@ public class EqpHistoryServiceTest {
                 .build();
     }
 
-    private UserVO createUserVO(String userId,String email, String name) {
+    private UserVO createUserVO(String userId, String email, String name) {
         return UserVO.builder()
                 .userId(userId)
                 .email(email)
@@ -103,14 +103,14 @@ public class EqpHistoryServiceTest {
     }
 
     private String emailCreator(int i) {
-        return "testemail"+ i+"@spt.com";
+        return "testemail" + i + "@spt.com";
     }
 
-    private String serialCreator(int i){
-        return  "serial" + i;
+    private String serialCreator(int i) {
+        return "serial" + i;
     }
 
-    private String userIdCreator(String name){
-        return name+"Id123";
+    private String userIdCreator(String name) {
+        return name + "Id123";
     }
 }
