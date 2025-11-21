@@ -202,7 +202,7 @@ function calculateDutchPay() {
 
     for (let input of uiInputs) {
         let val = Util.toFloat(input.value);
-        if (!isNaN(val) && val > 0) {
+        if (val > 0) {
             baseAmount = val;
             found = true;
             break;
