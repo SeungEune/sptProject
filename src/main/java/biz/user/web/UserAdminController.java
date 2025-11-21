@@ -4,6 +4,7 @@ import biz.user.service.UserService;
 import biz.user.vo.UserSearchCond;
 import biz.user.vo.UserVO;
 import biz.util.EgovStringUtil;
+import egovframework.com.cmm.EgovMessageSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -20,6 +21,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/user")
 public class UserAdminController {
+    @Resource(name = "egovMessageSource")
+    EgovMessageSource egovMessageSource;
+
    @Resource(name = "userService")
    private  UserService userService;
 
@@ -75,8 +79,8 @@ public class UserAdminController {
         }
         catch (Exception e) {
             log.error("계정 등록 실패", e);
-            model.addAttribute("message", "등록 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+            return "error/404";
         }
     }
 
@@ -126,8 +130,8 @@ public class UserAdminController {
       }
       catch (Exception e) {
           log.error("계정목록 조회 실패", e);
-          model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-          return "common/error";
+          model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+          return "error/404";
       }
     }
 
@@ -149,8 +153,8 @@ public class UserAdminController {
         }
         catch (Exception e) {
             log.error("계정 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
     // 수정 화면(입력 가능)
@@ -164,8 +168,8 @@ public class UserAdminController {
         }
         catch (Exception e) {
             log.error("계정 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
 
@@ -217,8 +221,8 @@ public class UserAdminController {
         }
         catch (Exception e) {
             log.error("계정 변경 실패", e);
-            model.addAttribute("message", "변경 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.update"));
+            return "error/404";
         }
     }
 
@@ -235,8 +239,8 @@ public class UserAdminController {
         }
         catch (Exception e) {
             log.error("계정 삭제 실패", e);
-            model.addAttribute("message", "삭제 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.delete"));
+            return "error/404";
         }
     }
 

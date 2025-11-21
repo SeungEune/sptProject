@@ -7,6 +7,7 @@ import biz.user.vo.UserSearchCond;
 import biz.user.vo.UserVO;
 import biz.util.EgovDateUtil;
 import biz.util.EgovStringUtil;
+import egovframework.com.cmm.EgovMessageSource;
 import egovframework.com.cmm.exception.custom.NoContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/enter")
 public class EnterController {
+    @Resource(name = "egovMessageSource")
+    EgovMessageSource egovMessageSource;
+
     @Resource(name = "enterService")
     private EnterService enterService;
 
@@ -48,8 +52,8 @@ public class EnterController {
         }
         catch (Exception e) {
             log.error("출입 목록 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
 
@@ -72,8 +76,8 @@ public class EnterController {
         }
         catch (Exception e) {
             log.error("계정목록 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
 
@@ -112,8 +116,8 @@ public class EnterController {
         }
         catch (Exception e) {
             log.error("출입 등록 실패", e);
-            model.addAttribute("message", "등록 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
+            return "error/404";
         }
     }
 
@@ -134,8 +138,8 @@ public class EnterController {
         }
         catch (Exception e) {
             log.error("출입 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
 
@@ -171,8 +175,8 @@ public class EnterController {
         }
         catch (Exception e) {
             log.error("출입 변경 실패", e);
-            model.addAttribute("message", "변경 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.update"));
+            return "error/404";
         }
     }
 
@@ -188,8 +192,8 @@ public class EnterController {
         }
         catch (Exception e) {
             log.error("출입 삭제 실패", e);
-            model.addAttribute("message", "삭제 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.delete"));
+            return "error/404";
         }
     }
 

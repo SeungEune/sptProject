@@ -1,6 +1,7 @@
 package biz.enter.dao;
 
 import biz.enter.vo.EnterVO;
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository("enterDAO")
-public class EnterDAO extends EgovAbstractMapper {
+public class EnterDAO extends EgovComAbstractDAO {
     public List<EnterVO> selectEnterList(int offset, int size)  throws Exception {
         Map<String, Object> param = new HashMap<>();
         param.put("offset", offset);

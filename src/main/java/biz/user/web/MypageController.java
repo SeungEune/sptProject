@@ -5,6 +5,7 @@ import biz.user.service.UserService;
 import biz.user.vo.UserVO;
 import biz.util.EgovStringUtil;
 import biz.util.SessionUtil;
+import egovframework.com.cmm.EgovMessageSource;
 import egovframework.com.cmm.exception.custom.NoContentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,9 @@ import javax.validation.Valid;
 @Slf4j
 @Controller
 public class MypageController {
+    @Resource(name = "egovMessageSource")
+    EgovMessageSource egovMessageSource;
+
     @Resource(name = "userService")
     private UserService userService;
 
@@ -32,8 +36,8 @@ public class MypageController {
         }
         catch (Exception e) {
             log.error("계정 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
     @GetMapping("/mypage/{id}/update.do")
@@ -45,8 +49,8 @@ public class MypageController {
         }
         catch (Exception e) {
             log.error("계정 조회 실패", e);
-            model.addAttribute("message", "조회 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.select"));
+            return "error/404";
         }
     }
     @PostMapping("/mypage/update/{id}.do")
@@ -101,8 +105,8 @@ public class MypageController {
         }
         catch (Exception e) {
             log.error("계정 변경 실패", e);
-            model.addAttribute("message", "변경 중 오류가 발생했습니다.");
-            return "common/error";
+            model.addAttribute("message", egovMessageSource.getMessage("fail.common.update"));
+            return "error/404";
         }
     }
 

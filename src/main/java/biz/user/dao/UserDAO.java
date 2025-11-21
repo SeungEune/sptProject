@@ -2,6 +2,7 @@ package biz.user.dao;
 
 import biz.user.vo.UserSearchCond;
 import biz.user.vo.UserVO;
+import egovframework.com.cmm.service.impl.EgovComAbstractDAO;
 import org.egovframe.rte.psl.dataaccess.EgovAbstractMapper;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository("userDAO")
-public class UserDAO extends EgovAbstractMapper {
+public class UserDAO extends EgovComAbstractDAO {
 
     public int selectCountByUserId(String userId) {
         return selectOne("UserDAO.selectCountByUserId", userId);
