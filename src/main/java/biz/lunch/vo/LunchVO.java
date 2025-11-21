@@ -56,9 +56,9 @@ public class LunchVO {
             if (userId == null || userId.trim().isEmpty()) {
                 continue;
             }
-            // 5. 금액 null 방어
-            if (amount == null) {
-                amount = 0;
+            // 금액이 없거나 0 이하이면 예외 발생
+            if (amount == null || amount <= 0) {
+                throw new IllegalArgumentException("금액 누락");
             }
             ParticipantVO vo = ParticipantVO.builder()
                     .userId(userId)
