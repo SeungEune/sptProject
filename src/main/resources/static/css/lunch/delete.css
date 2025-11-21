@@ -1,0 +1,27 @@
+/* delete.css */
+
+/* 읽기 전용 폼 스타일 강화 */
+.readonly-form input:disabled {
+    background-color: #f9fafb; /* 아주 연한 회색 */
+    color: #6b7280; /* 진한 회색 글씨 */
+    border-color: #e5e7eb;
+    cursor: not-allowed; /* 금지 커서 */
+}
+
+.readonly-form input[type="radio"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* 참석자 요약 필드 */
+#participant-summary {
+    color: #6b7280;
+}
+
+/* 금액 입력칸 읽기 전용 스타일 (JS에서 생성되는 요소) */
+.amount-input-group input:disabled {
+    background-color: #f3f4f6;
+    color: #374151;
+    cursor: not-allowed;
+    border: 1px solid #e5e7eb;
+}

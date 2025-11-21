@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <link rel="stylesheet" th:href="@{/css/lunch/list.css}">
+</head>
+<body>
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+    <div th:fragment="content">
+        <h1 class="content-title">점심/커피 내역 조회</h1>
+
+        <div class="content-body lunch-layout">
+
+            <form th:action="@{/lunch/list.do}" method="get" class="search-area">
+                <div class="date-picker-box">
+                    <span id="date-range-text" class="date-text">날짜 계산 중...</span>
+
+                    <i class="far fa-calendar-alt calendar-icon"></i>
+
+                    <input type="month" id="searchMonthInput" name="date"
+                           class="date-input-overlay"
+                           th:value="${lunchVO.date}"
+                           onclick="this.showPicker()"
+                           onchange="updateDateRange(this.value); this.form.submit();" />
+                </div>
+            </form>
+
+            <div class="table-container">
+                <table class="lunch-table">
+                    <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>가게</th>
+
+                        <th th:each="user : ${summaryList}"
+                            th:text="${user.userName}"
+                            th:data-user-id="${user.userId}">
+                        </th>
+
+                        <th>합계</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="lunch-table-body">
+                    <tr th:each="row : ${flatLunchList}"
+                        class="detail-row"
+                        th:classappend="${row.rowType == 'PAY'} ? 'pay-row' : ''"
+                        th:attr="data-participants=${row.rowType == 'DETAIL' ? row.participants : null}">
+
+                        <td class="date-cell"
+                            th:if="${row.isFirstOfDate}"
+                            th:rowspan="${row.dateRowSpan}"
+                            th:text="${#strings.substring(row.date, 5)}">
+                        </td>
+
+                        <td th:class="${row.rowType == 'DETAIL' ? 'store-name-cell' : 'pay-label'}"
+                            th:text="${row.rowType == 'DETAIL' ? row.storeName : '결제금액'}">
+                        </td>
+
+                        <td th:each="user : ${summaryList}"
+                            th:class="${row.rowType == 'DETAIL' ? 'user-cell cell-user-' + user.userId : 'pay-amount'}">
+
+                            <span th:if="${row.rowType == 'DETAIL'}">-</span>
+
+                            <span th:if="${row.rowType == 'PAY'}">
+                                    <span th:if="${user.userId == row.payerId}"
+                                          th:text="${#numbers.formatInteger(row.totalAmount, 0, 'COMMA')}"></span>
+                                    <span th:unless="${user.userId == row.payerId}">-</span>
+                                </span>
+                        </td>
+
+                        <td th:class="${row.rowType == 'DETAIL' ? 'row-total' : 'pay-total'}"
+                            th:text="${#numbers.formatInteger(row.totalAmount, 0, 'COMMA')}">
+                        </td>
+
+                        <td class="action-cell">
+                            <div th:if="${row.rowType == 'DETAIL'}" class="action-buttons">
+                                <a th:href="@{/lunch/update.do(lunchId=${row.lunchId})}" class="btn-text edit">수정</a>
+                                <span class="divider">/</span>
+                                <a th:href="@{/lunch/delete.do(lunchId=${row.lunchId})}" class="btn-text delete">삭제</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="summary-row total-row">
+                        <td colspan="2">총 합계</td>
+                        <td th:each="user : ${summaryList}"
+                            th:text="${#numbers.formatInteger(user.totalOwed, 0, 'COMMA')}">
+                        </td>
+                        <td th:text="${#numbers.formatInteger(#aggregates.sum(summaryList.?[userId != null].![totalOwed]), 0, 'COMMA')}"></td>
+                        <td></td>
+                    </tr>
+
+                    <tr class="summary-row balance-row">
+                        <td colspan="2">송금 총액</td>
+                        <td th:each="user : ${summaryList}"
+                            th:classappend="${user.balance < 0 ? 'text-red' : 'text-blue'}"
+                            th:text="${#numbers.formatInteger(user.balance, 0, 'COMMA')}">
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr class="settlement-row">
+                        <td colspan="2">정산처리</td>
+                        <td th:each="user : ${summaryList}">
+                            <div th:if="${user.totalOwed > 0}">
+                                <form th:if="${user.isSettled == 'N'}"
+                                      th:action="@{/lunch/completeSettlement.do}" method="post">
+                                    <input type="hidden" name="month" th:value="${lunchVO.date}" />
+                                    <input type="hidden" name="userId" th:value="${user.userId}" />
+                                    <input type="hidden" name="action" value="complete" />
+                                    <button type="button" class="btn-settle complete" onclick="confirmAdd(this.form)">정산완료</button>
+                                </form>
+
+                                <form th:if="${user.isSettled == 'Y'}"
+                                      th:action="@{/lunch/completeSettlement.do}" method="post">
+                                    <input type="hidden" name="month" th:value="${lunchVO.date}" />
+                                    <input type="hidden" name="userId" th:value="${user.userId}" />
+                                    <input type="hidden" name="action" value="cancel" />
+                                    <button type="button" class="btn-settle cancel" onclick="confirmDelete(this.form)">정산취소</button>
+                                </form>
+                            </div>
+                            <span th:if="${user.totalOwed <= 0}" class="no-settle">해당 없음</span>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{/js/lunch/list.js}"></script>
+</body>
+</html>

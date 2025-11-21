@@ -1,0 +1,130 @@
+:root{
+    --brand: #5b6cff;        /* 포커스 하이라이트 색 */
+    --border: #e5e7eb;
+    --bg: #fff;
+    --muted:#6b7280;
+    --radius: 12px;
+    --gap: 20px;
+}
+
+/* 페이지 2열 그리드 */
+.two-col-page{
+    display: grid;
+    grid-template-columns: 320px 1fr;  /* 왼쪽 폭 고정, 오른쪽 가변 */
+    gap: var(--gap);
+    padding: 24px;
+}
+
+/* 공통 카드(패널) */
+.panel{
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: box-shadow .15s ease, border-color .15s ease;
+    /* 포커스 들어왔을 때 강조 */
+}
+.panel:focus-within{
+    outline: none;
+    border-color: color-mix(in srgb, var(--brand) 60%, #fff);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+/* 왼쪽: 검색조건 */
+.search-form .field{
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.search-form label{
+    color: var(--muted);
+    font-size: 13px;
+}
+.search-form input,
+.search-form select{
+    height: 36px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 100%;
+}
+.search-actions{
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+/* 오른쪽: 툴바 + 테이블 */
+.result-wrap{
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 12px;
+    min-height: 420px;
+}
+.toolbar{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.toolbar .meta{
+    color: var(--muted);
+    font-size: 13px;
+}
+.btn{
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #f9fafb;
+    cursor: pointer;
+}
+.btn.primary{
+    background: #ff8a00;
+    color: #fff;
+    border-color: #ff8a00;
+}
+.btn.danger{
+    background: #ef4444;
+    color:#fff;
+    border-color:#ef4444;
+}
+.btn:focus-visible{
+    outline: 3px solid color-mix(in srgb, var(--brand) 40%, transparent);
+    outline-offset: 1px;
+}
+.table-card{
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+}
+.table-card table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.table-card thead th{
+    text-align: left;
+    background: #f3f4f6;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+}
+.table-card tbody td{
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    vertical-align: middle;
+}
+.table-card tbody tr:hover{
+    background: #fafafa;
+}
+
+/* 반응형: 좁아지면 상하 배치 */
+@media (max-width: 1100px){
+    .two-col-page{
+        grid-template-columns: 1fr;
+    }
+}

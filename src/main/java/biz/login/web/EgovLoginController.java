@@ -2,6 +2,7 @@ package biz.login.web;
 
 import biz.login.service.EgovLoginService;
 import biz.login.vo.LoginVO;
+import biz.user.service.UserService;
 import biz.util.SessionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * 로그인을 처리하는 컨트롤러 클래스
@@ -26,6 +28,9 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class EgovLoginController {
 
+    @Resource(name = "userService")
+    private UserService userService;
+
     @Resource(name = "loginService")
     private EgovLoginService loginService;
 
@@ -35,6 +40,13 @@ public class EgovLoginController {
      * @param model Model 객체
      * @return 로그인 페이지
      */
+
+    @PostMapping("/login/password/resetRequest.do")
+    public String userPasswordReset(Model model) {
+        //LoginVO loginVO = SessionUtil.getLoginUser();
+        return "system/user/password/reset";
+    }
+
     @GetMapping("/login/loginForm.do")
     public String loginForm(Model model) {
         // 이미 로그인된 사용자는 메인 페이지로 리다이렉트
@@ -70,6 +82,15 @@ public class EgovLoginController {
             if (resultVO != null && resultVO.getUserId() != null && !resultVO.getUserId().equals("")) {
                 // 로그인 성공 - 세션에 정보 저장
                 SessionUtil.setAttribute("LoginVO", resultVO);
+
+                // ★ 여기 추가 : tb_user_role 에서 롤 가져오기
+                List<String> roles = userService.getUserRoles(resultVO.getUserId());
+                session.setAttribute("roles", roles);
+
+                // “ADMIN만 전체 메뉴” 로 하고 싶으면
+                boolean isAdmin = (roles != null && roles.contains("ADMIN"));
+                session.setAttribute("isAdmin", isAdmin);
+
                 return "redirect:/main/mainForm.do";
             } else {
                 // 로그인 실패 - Service에서 설정한 실패 사유 사용
@@ -91,7 +112,7 @@ public class EgovLoginController {
      * @param request HttpServletRequest
      * @return 리다이렉트 URL
      */
-    @GetMapping("/login/logout.do")
+    @GetMapping("/logout.do")
     public String logout(HttpServletRequest request) {
         SessionUtil.removeAttribute("LoginVO");
         request.getSession().invalidate();

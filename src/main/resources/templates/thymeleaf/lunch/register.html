@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">
+</head>
+<body>
+
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+    <div th:fragment="content">
+        <h1 class="content-title">점심/커피 내역 등록</h1>
+
+        <div class="content-body lunch-layout">
+
+            <form class="entry-form"
+                  th:action="@{/lunch/register.do}"
+                  method="post">
+
+                <div class="form-group">
+                    <label for="date-input">날짜</label>
+                    <input type="date" id="date-input" name="date"
+                           th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="store-name">가게명</label>
+                    <input type="text" id="store-name" name="storeName" placeholder="내용을 입력하세요" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="participant-search">참석자 선택
+                        <span class="label-description">이름을 검색하여 클릭하면 금액 입력란이 생성됩니다</span>
+                    </label>
+                    <input type="text" id="participant-search"
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
+                           onkeyup="filterParticipants()"
+                           placeholder="내용을 입력하세요">
+                    <div id="search-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-search">계산자 선택
+                        <span class="label-description">계산한 사람의 이름을 검색하여 선택하세요.</span>
+                    </label>
+                    <input type="text" id="payer-search"
+                           onkeydown="if(event.key === 'Enter') event.preventDefault();"
+                           onkeyup="filterPayers()"
+                           placeholder="내용을 입력하세요">
+                    <input type="hidden" id="payerId" name="payerId" required>
+                    <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
+                </div>
+
+                <fieldset class="form-group">
+                    <legend class="legend-title">유형 선택</legend>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="type-lunch" name="type" value="점심" checked>
+                            <label for="type-lunch">점심</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="type-coffee" name="type" value="커피">
+                            <label for="type-coffee">커피</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div id="hidden-fields"></div>
+
+                <button type="button" class="submit-btn" onclick="confirmAdd()">등록</button>
+            </form>
+
+            <div class="amount-panel">
+                <div class="amount-header">
+
+                    <h2 class="amount-panel-title">개인별 금액 입력</h2>
+
+                    <button type="button" id="btnDutchPay" class="btn-s-blue btn-calc">
+                        1/N 적용
+                    </button>
+                </div>
+
+                <div class="amount-list" id="amount-list-container">
+                    <p id="amount-placeholder" class="amount-placeholder" style="display: block;">
+                        참석자를 선택하면 여기에 입력칸이 생성됩니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            const userList = /*[[${userList}]]*/ [];
+            console.log("Data loaded from Thymeleaf:", userList.length);
+        </script>
+
+        <script type="text/javascript" th:src="@{/js/lunch/register.js}"></script>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 등록</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
+
+   <link rel="stylesheet" th:href="@{/css/user/manage.css}">
+</head>
+<body>
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+    <div th:fragment="content">
+        <h1 class="content-title">계정관리</h1>
+
+        <div class="content-body">
+
+            <!-- ✅ 여기부터 전부 하나의 form 으로 묶자 -->
+            <form id="search-form" th:action="@{/user/manage.do}" method="get" style="display:flex; width:100%;">
+
+                <!-- 왼쪽 : 추가 필터 영역 -->
+                <div class="search-filter">
+                    <h3>검색필터</h3>
+
+                    <!-- 검색 기준 -->
+                    <div class="search-option-field">
+                        <label for="search-option">검색 기준</label>
+                        <select id="search-option" name="option">
+                            <option value="all"
+                                    th:selected="${search == null or search.option == 'all'}">전체</option>
+                            <option value="id"
+                                    th:selected="${search != null and search.option == 'id'}">아이디</option>
+                            <option value="tel"
+                                    th:selected="${search != null and search.option == 'tel'}">전화번호</option>
+                            <option value="email"
+                                    th:selected="${search != null and search.option == 'email'}">이메일</option>
+                            <option value="name"
+                                    th:selected="${search != null and search.option == 'name'}">이름</option>
+                        </select>
+                    </div>
+
+                    <!-- 직책 필터 -->
+                    <div class="search-option-field">
+                        <label for="search-option-position">직책 필터</label>
+                        <select id="search-option-position" name="jssfcCd">
+                            <option value="" th:selected="${search == null or search.jssfcCd == null}">전체</option>
+                            <option value="HEAD" th:selected="${search != null and search.jssfcCd == 'HEAD'}">사장</option>
+                            <option value="PM"   th:selected="${search != null and search.jssfcCd == 'PM'}">부장</option>
+                            <option value="SM"   th:selected="${search != null and search.jssfcCd == 'SM'}">차장</option>
+                            <option value="PL"   th:selected="${search != null and search.jssfcCd == 'PL'}">과장</option>
+                            <option value="AS"   th:selected="${search != null and search.jssfcCd == 'AS'}">대리</option>
+                            <option value="NEW"  th:selected="${search != null and search.jssfcCd == 'NEW'}">담당</option>
+                        </select>
+                    </div>
+
+                    <!-- 등록일 기간 필터 -->
+                    <div class="search-option-field">
+                        <label for="search-startDate">등록일 시작</label>
+                        <input id="search-startDate"
+                               type="date"
+                               name="startDate"
+                               th:value="${search != null ? search.startDate : ''}">
+                    </div>
+
+                    <div class="search-option-field">
+                        <label for="search-endDate">등록일 종료</label>
+                        <input id="search-endDate"
+                               type="date"
+                               name="endDate"
+                               th:value="${search != null ? search.endDate : ''}">
+                    </div>
+
+                </div>
+
+                <!-- 오른쪽 : 검색어 + 테이블 -->
+                <div class="table-area">
+                    <div id="search-keyword-form-content">
+                        <label for="search-keyword">검색어</label>
+                        <input id="search-keyword"
+                               name="keyword"
+                               th:value="${search != null ? search.keyword : ''}">
+                        <button type="submit" class="submit-btn">찾기</button>
+                    </div>
+
+                    <!-- ↓↓↓ 여기부터는 기존 테이블 그대로 ↓↓↓ -->
+                    <table class="auto-index">
+                        <colgroup>
+                            <col style="width:8%;">
+                            <col style="width:16%;">
+                            <col style="width:16%;">
+                            <col style="width:22%;">
+                            <col style="width:10%;">
+                            <col style="width:10%;">
+                            <col style="width:18%;">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>번호</th><th>아이디</th><th>전화번호</th><th>이메일</th><th>이름</th><th>직책</th><th>등록일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user, stat : ${userList}"
+                            th:onclick="|location.href='@{/user/edit/{id}.do(id=${user.userId})}'|"
+                            style="cursor: pointer;">
+                            <td th:text="${stat.count}"></td>
+                            <td th:text="${user.userId}"></td>
+                            <td class="ellipsis-cell" th:text="${user.phone}"
+                                th:attr="title=${user.phone}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.name}"></td>
+                            <td th:switch="${user.jssfcCd}">
+                                <!-- 코드 → 한글 매핑 -->
+                                <span th:case="'HEAD'">사장</span>
+                                <span th:case="'PM'">부장</span>
+                                <span th:case="'SM'">차장</span>
+                                <span th:case="'PL'">과장</span>
+                                <span th:case="'AS'">대리</span>
+                                <span th:case="'NEW'">담당</span>
+
+                                <!-- 기타 코드 -->
+                                <span th:case="*"></span>
+                            </td>
+                            <td th:text="${#dates.format(user.registDt, 'yyyy/MM/dd')}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ✅ 여기 추가 -->
+                    <!-- 페이지네이션 -->
+<!--                    <div class="pagination">-->
+
+<!--                        &lt;!&ndash; 이전 페이지 &ndash;&gt;-->
+<!--                        <a th:if="${page > 1}"-->
+<!--                           th:href="@{'/user/manage'(page=${page - 1})}">-->
+<!--                            &laquo;-->
+<!--                        </a>-->
+
+<!--                        &lt;!&ndash; 페이지 번호들 &ndash;&gt;-->
+<!--                        <a th:each="p : ${#numbers.sequence(1, totalPages)}"-->
+<!--                           th:href="@{'/user/manage'(page=${p})}"-->
+<!--                           th:text="${p}"-->
+<!--                           th:classappend="${p == page} ? ' active' : ''">-->
+<!--                        </a>-->
+
+<!--                        &lt;!&ndash; 다음 페이지 &ndash;&gt;-->
+<!--                        <a th:if="${page < totalPages}"-->
+<!--                           th:href="@{'/user/manage'(page=${page + 1})}">-->
+<!--                            &raquo;-->
+<!--                        </a>-->
+
+
+<!--                    </div>-->
+                    <!-- 페이지네이션 (JS로 채움) -->
+                    <div id="paging-area" class="pagination"></div>
+
+
+
+                    <div class="regist-area">
+                        <button type="button" class="submit-btn" onclick="location.href='/user/create.do'">등록</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/js/module/paginationModule.js"></script>
+
+<script th:inline="javascript">
+    // flash attribute 로 넘어온 메시지 (없으면 '')
+    const ALERT_MESSAGE = /*[[${alertMessage} ?: '']]*/ '';
+
+    if (ALERT_MESSAGE) {
+        MessageUtil.alert(ALERT_MESSAGE);
+    }
+</script>
+
+<!-- ★ 여기서만 Thymeleaf 값을 JS 전역에 싣고 -->
+<script th:inline="javascript">
+    window.ACCOUNT_PAGING = {
+        totalCount : /*[[${totalCount}]]*/ 0,
+        page       : /*[[${page}]]*/ 1,
+        totalPages : /*[[${totalPages}]]*/ 1
+    };
+</script>
+
+<!--  나머지 로직은 전부 외부 파일 -->
+<script src="/js/user/new/manage.js"></script>
+
+
+</body>
+</html>

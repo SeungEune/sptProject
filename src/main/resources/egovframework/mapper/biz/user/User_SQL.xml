@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserDAO">
+
+    <!-- 아이디 중복 체크 -->
+    <select id="selectCountByUserId" parameterType="string" resultType="int">
+        SELECT COUNT(1)
+        FROM   tb_user
+        WHERE  user_id = #{userId}
+    </select>
+
+
+
+    <!-- 사용자 등록 (PostgreSQL) -->
+    <insert id="insertUser" parameterType="biz.user.vo.UserVO">
+        INSERT INTO tb_user (
+            user_id, user_nm, user_password, email_adres, moblphon_no,user_sttus_cd,use_yn,jssfc_cd,
+            register_id, regist_dt
+        ) VALUES (
+                     #{userId}, #{name}, #{password}, #{email}, #{phone},'NORMAL','Y',#{jssfcCd},
+                     #{registerId}, NOW()
+                 )
+    </insert>
+
+    <!-- 계정 목록 조회 -->
+    <select id="selectUserList"
+            parameterType="biz.user.vo.UserSearchCond"
+            resultType="biz.user.vo.UserVO">
+
+        SELECT u.user_id     AS userId
+        , u.user_nm     AS name
+        , u.moblphon_no AS phone
+        , u.email_adres AS email
+        , u.jssfc_cd    AS jssfcCd
+        , u.regist_dt   AS registDt
+        FROM tb_user u
+        WHERE u.use_yn = 'Y'
+
+        <!-- ① 검색어(option + keyword) -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="option == 'id'">
+                    AND u.user_id ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'tel'">
+                    AND u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'email'">
+                    AND u.email_adres ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'name'">
+                    AND u.user_nm ILIKE '%' || #{keyword} || '%'
+                </when>
+                <!-- option == 'all' 이면 여러 컬럼 OR 검색 -->
+                <otherwise>
+                    AND (
+                    u.user_id     ILIKE '%' || #{keyword} || '%'
+                    OR u.user_nm     ILIKE '%' || #{keyword} || '%'
+                    OR u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                    OR u.email_adres ILIKE '%' || #{keyword} || '%'
+                    )
+                </otherwise>
+            </choose>
+        </if>
+
+        <!-- ② 직책 코드 필터 -->
+        <if test="jssfcCd != null and jssfcCd != ''">
+            AND u.jssfc_cd = #{jssfcCd}
+        </if>
+
+        <!--  ③ 등록일 기간 필터 -->
+        <!-- startDate만 있으면 start 이상 전체 -->
+        <if test="startDate != null and startDate != ''">
+            AND u.regist_dt >= #{startDate}::date
+        </if>
+
+        <!-- endDate만 있으면 end 이하 전체 (inclusive) -->
+        <!-- endDate만 있으면 end 이하 전체 (inclusive) -->
+        <if test="endDate != null and endDate != ''">
+            AND u.regist_dt &lt; (#{endDate}::date + INTERVAL '1 day')
+        </if>
+
+        ORDER BY u.regist_dt DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+
+    <!-- 총 개수 -->
+    <select id="countUserList"
+            parameterType="biz.user.vo.UserSearchCond"
+            resultType="int">
+
+        SELECT COUNT(*)
+        FROM tb_user u
+        WHERE u.use_yn = 'Y'
+
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="option == 'id'">
+                    AND u.user_id ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'tel'">
+                    AND u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'email'">
+                    AND u.email_adres ILIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="option == 'name'">
+                    AND u.user_nm ILIKE '%' || #{keyword} || '%'
+                </when>
+                <otherwise>
+                    AND (
+                    u.user_id     ILIKE '%' || #{keyword} || '%'
+                    OR u.user_nm     ILIKE '%' || #{keyword} || '%'
+                    OR u.moblphon_no ILIKE '%' || #{keyword} || '%'
+                    OR u.email_adres ILIKE '%' || #{keyword} || '%'
+                    )
+                </otherwise>
+            </choose>
+        </if>
+
+        <if test="jssfcCd != null and jssfcCd != ''">
+            AND u.jssfc_cd = #{jssfcCd}
+        </if>
+
+        <!--  ③ 등록일 기간 필터 -->
+        <if test="startDate != null and startDate != ''">
+            AND u.regist_dt >= #{startDate}::date
+        </if>
+
+        <if test="endDate != null and endDate != ''">
+            AND u.regist_dt &lt; (#{endDate}::date + INTERVAL '1 day')
+        </if>
+
+    </select>
+
+
+    <!-- 한 명 조회 -->
+    <select id="selectUser" parameterType="string"
+            resultType="biz.user.vo.UserVO">
+        SELECT
+            user_id      AS userId,
+            user_nm      AS name,
+            user_password AS password,
+            email_adres  AS email,
+            moblphon_no  AS phone,
+            jssfc_cd     AS jssfcCd,
+            register_id  AS registerId,
+            regist_dt    AS registDt
+        FROM tb_user
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 수정 -->
+    <update id="updateUser" parameterType="biz.user.vo.UserVO">
+        UPDATE tb_user
+        SET
+            user_password = #{password},
+            user_nm       = #{name},
+            email_adres   = #{email},
+            moblphon_no   = #{phone}
+        <if test="jssfcCd != null">
+            , jssfc_cd = #{jssfcCd}
+        </if>
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id="deleteUser" parameterType="string">
+        DELETE FROM tb_user
+        WHERE user_id = #{userId}
+    </delete>
+
+    <!-- 권한 -->
+    <select id="selectUserRoles" parameterType="string" resultType="string">
+        SELECT role_cd
+        FROM tb_user_role
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 1) 전화번호 전체 중복 체크 (등록용) -->
+    <select id="countByPhone"
+            parameterType="string"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE MOBLPHON_NO = #{phone}
+    </select>
+
+    <!-- 2) 전화번호 중복 체크 (수정용: 자기 자신 제외) -->
+    <select id="countByPhoneExceptUser"
+            parameterType="map"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE MOBLPHON_NO = #{phone}
+        AND USER_ID != #{userId}
+    </select>
+
+    <!-- 3) 이메일 전체 중복 체크 (등록용) -->
+    <select id="countByEmail"
+            parameterType="string"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE EMAIL_ADRES = #{email}
+    </select>
+
+    <!-- 4) 이메일 중복 체크 (수정용: 자기 자신 제외) -->
+    <select id="countByEmailExceptUser"
+            parameterType="map"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE EMAIL_ADRES = #{email}
+        AND USER_ID != #{userId}
+    </select>
+
+    <update id="updateUserExceptPw"
+            parameterType="biz.user.vo.UserVO">
+        UPDATE tb_user
+        SET
+        user_nm       = #{name},
+        email_adres   = #{email},
+        moblphon_no   = #{phone}
+        <if test="jssfcCd != null">
+            , jssfc_cd = #{jssfcCd}
+        </if>
+        WHERE user_id = #{userId}
+    </update>
+
+<!--    이름으로 조회-->
+    <select id="findUserIdByName" parameterType="string" resultType="string">
+        SELECT
+            user_nm AS name
+        FROM tb_user
+        WHERE to_tsvector(user_nm) @@ to_tsquery(replace(#{userName}, ' ', ' &amp; ') || ':*');
+    </select>
+
+<!--    이메일로 조회-->
+    <select id="selectUserByEmail" parameterType="string" resultType="biz.user.vo.UserVO">
+        SELECT user_id,
+               user_nm AS name
+        FROM   tb_user
+        WHERE  email_adres = #{email};
+    </select>
+
+<!--직원목록-->
+    <select id="selectUserTotalList" resultType="biz.user.vo.UserVO">
+        SELECT
+            user_id      AS userId,
+            user_nm      AS name,
+            user_password AS password,
+            email_adres  AS email,
+            moblphon_no  AS phone,
+            jssfc_cd     AS jssfcCd,
+            register_id  AS registerId,
+            regist_dt    AS registDt
+        FROM tb_user
+    </select>
+</mapper>

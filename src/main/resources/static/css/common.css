@@ -1,73 +1,119 @@
-@charset "utf-8";
+/*@charset "utf-8";*/
+
+/*:root {*/
+/*	--Primary:#7A64E4;*/
+/*	--Secondary:#F5F5F5;*/
+/*	--Tertiary:#E7EBF2;*/
+
+/*	--White:#FFFFFF;*/
+/*	--Black:#000000;*/
+/*	--Gray:#667080;*/
+
+/*	--Point:#003B68;*/
+/*	--Error:#FF5757;*/
+
+/*	--Primary-100:#E4E0FA;*/
+/*	--Primary-200:#CAC1F4;*/
+/*	--Primary-300:#AFA2EF;*/
+/*	--Primary-400:#9583E9;*/
+/*	--Primary-500:#7A64E4;*/
+/*	--Primary-600:#6250B6;*/
+/*	--Primary-700:#493C89;*/
+/*	--Primary-800:#31285B;*/
+/*	--Primary-900:#18142E;*/
+
+/*	--Gray-100:#E0E2E6;*/
+/*	--Gray-200:#C2C6CC;*/
+/*	--Gray-300:#A3A9B3;*/
+/*	--Gray-400:#858D99;*/
+/*	--Gray-500:#667080;*/
+/*	--Gray-600:#525A66;*/
+/*	--Gray-700:#3D434D;*/
+/*	--Gray-800:#292D33;*/
+/*	--Gray-900:#14161A;*/
+
+/*	--border-01:1px solid #E0E0E0;*/
+/*	--border-02:1px solid #C2C6CC;*/
+
+/*	--font-default:#14161A;*/
+/*}*/
+
+/*!* core.css 사이트 전체 공통 디자인*!*/
+/*html {*/
+/*	font-size: 62.5%;*/
+/*}*/
+/**{*/
+/*	font-size:1.7rem;*/
+/*	font-weight: 500;*/
+/*	color: var(--font-default);*/
+/*}*/
+
+/*input{*/
+/*	padding:8px;*/
+/*	border:var(--border-02);*/
+/*	text-overflow: ellipsis;*/
+/*  white-space: nowrap;*/
+/*  overflow: hidden;*/
+/*}*/
+
+/*button {*/
+/*	border: 0px;*/
+/*	background: transparent;*/
+/*	cursor: pointer;*/
+/*}*/
+
+/*!*focus*!*/
+/*select:focus:focus,*/
+/*input:focus,*/
+/*textarea:focus {*/
+/*    outline: 2px solid rgba(122, 100, 228, 0.3);*/
+/*}*/
+/*body {*/
+/*  font-size: 1.7rem;*/
+/*}*/
+
+/* common.css */
 
 :root {
-	--Primary:#7A64E4;
-	--Secondary:#F5F5F5;
-	--Tertiary:#E7EBF2;
-
-	--White:#FFFFFF;
-	--Black:#000000;
-	--Gray:#667080;
-
-	--Point:#003B68;
-	--Error:#FF5757;
-
-	--Primary-100:#E4E0FA;
-	--Primary-200:#CAC1F4;
-	--Primary-300:#AFA2EF;
-	--Primary-400:#9583E9;
-	--Primary-500:#7A64E4;
-	--Primary-600:#6250B6;
-	--Primary-700:#493C89;
-	--Primary-800:#31285B;
-	--Primary-900:#18142E;
-
-	--Gray-100:#E0E2E6;
-	--Gray-200:#C2C6CC;
-	--Gray-300:#A3A9B3;
-	--Gray-400:#858D99;
-	--Gray-500:#667080;
-	--Gray-600:#525A66;
-	--Gray-700:#3D434D;
-	--Gray-800:#292D33;
-	--Gray-900:#14161A;
-
-	--border-01:1px solid #E0E0E0;
-	--border-02:1px solid #C2C6CC;
-
-	--font-default:#14161A;
+    --color-primary: #0088ff;
+    --color-text-primary: #1e2124;
+    --color-text-secondary: #464c53;
+    --color-text-placeholder: #8a949e;
+    --color-text-light: #777777;
+    --color-white: #ffffff;
+    --color-border: #58616a;
+    --color-border-light: #e5e7eb;
+    --color-bg-gray: #eaeaea;
+    --color-bg-footer: #f4f5f6;
+    --font-abel: 'Abel', sans-serif;
+    --font-inter: 'Inter', sans-serif;
+    --font-abeezee: 'ABeeZee', sans-serif;
+    --font-noto: 'Noto Sans KR', sans-serif;
 }
 
-/* core.css 사이트 전체 공통 디자인*/
-html {
-	font-size: 62.5%;
-}
-*{
-	font-size:1.7rem;
-	font-weight: 500;
-	color: var(--font-default);
-}
+* { box-sizing: border-box; }
 
-input{
-	padding:8px;
-	border:var(--border-02);
-	text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-button {
-	border: 0px;
-	background: transparent;
-	cursor: pointer;
-}
-
-/*focus*/
-select:focus:focus,
-input:focus,
-textarea:focus {
-    outline: 2px solid rgba(122, 100, 228, 0.3);
-}
 body {
-  font-size: 1.7rem;
+    margin: 0;
+    font-family: var(--font-abel);
+    background-color: var(--color-white);
+    color: var(--color-text-primary);
 }
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+input, button {
+    font-family: inherit;
+}
+
+.page-wrapper {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    background-color: var(--color-white);
+    min-height: 100vh;
+}
+

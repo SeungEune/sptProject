@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>출입관리 등록</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/enter/create.css}">-->
+
+        <link rel="stylesheet" th:href="@{/css/user/form.css}">
+
+    <style>
+        .field-error{color: red;}
+    </style>
+</head>
+<body>
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+<div id="overlay" class="mobile-overlay"></div>
+
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+    <div th:fragment="content">
+        <h1 class="content-title">출입관리 등록</h1>
+
+        <div class="content-body form">
+            <section>
+                <div class="form-container">
+
+                    <form class="profile-form"
+                          th:action="@{/enter/create.do}"
+                          th:object="${enter}"
+                          method="post">
+
+                        <div class="form-group">
+                            <label>출입번호</label>
+                            <input id="enterId" name="enterId" type="text" pattern="\d{4}" maxlength="4" placeholder="4자리입력(0000)" required>
+                            <div class="field-error"
+                                 th:if="${#fields.hasErrors('enterId')}"
+                                 th:errors="*{enterId}"></div>
+                        </div>
+
+                        <!-- 1) 유형 선택 -->
+                        <div class="form-group">
+                            <label>유형</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio"
+                                           th:field="*{type}"
+                                           value="GUEST">
+                                    <span>게스트</span>
+                                </label>
+
+                                <label class="radio-option">
+                                    <input type="radio"
+                                           th:field="*{type}"
+                                           value="EMP">
+                                    <span>직원</span>
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- 2) 공통 출입수단 -->
+                        <div class="form-group">
+                            <label>출입수단</label>
+                            <select th:field="*{method}">
+                                <option value="CARD">카드</option>
+                                <option value="FINGER">지문</option>
+                                <option value="PW">비밀번호</option>
+                            </select>
+                        </div>
+
+                        <!-- 3) 게스트 전용 필드 (이름, 연락처, 마감일) -->
+                        <div id="guest-section" class="form-section">
+                            <div class="form-group">
+                                <label for="guest-name">게스트 이름</label>
+                                <input id="guest-name" th:field="*{guestNm}" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label for="guest-phone">전화번호</label>
+                                <input id="guest-phone" th:field="*{guestPhone}" type="tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="guest-email">Email</label>
+                                <input id="guest-email" th:field="*{guestEmail}" type="email">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="guest-start">게스트 시작일</label>
+                                <input id="guest-start" th:field="*{startGuestDt}" type="date">
+                            </div>
+                            <!-- ★ 게스트 마감일 -->
+                            <div class="form-group">
+                                <label for="guest-end">게스트 마감일</label>
+                                <input id="guest-end" th:field="*{endGuestDt}" type="date">
+                                <div class="field-error"
+                                     th:if="${#fields.hasErrors('endGuestDt')}"
+                                     th:errors="*{endGuestDt}"></div>
+                            </div>
+                        </div>
+
+                        <!-- 4) 직원 전용 필드 -->
+                        <div id="emp-section" class="form-section">
+                            <div class="form-group">
+                                <label for="user-id">직원 아이디</label>
+                                <select id="user-id" th:field="*{userId}">
+                                    <option value="">-- 직원 선택 --</option>
+                                    <option th:each="u : ${userList}"
+                                            th:value="${u.userId}"
+                                            th:text="${u.userId + ' / ' + u.name}">
+                                    </option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group hidden">
+                                <label for="emp-name">이름</label>
+                                <input id="emp-name" th:field="*{name}" type="text" readonly>
+                            </div>
+                            <div class="form-group hidden">
+                                <label for="emp-phone">전화번호</label>
+                                <input id="emp-phone" th:field="*{phone}" type="tel" readonly>
+                            </div>
+                            <div class="form-group hidden">
+                                <label for="emp-email">Email</label>
+                                <input id="emp-email" th:field="*{email}" type="email" readonly>
+                            </div>
+                            <div class="form-group hidden">
+                                <label for="jssfc">직책</label>
+                                <select id="jssfc" th:field="*{jssfcCd}">
+                                    <option value="HEAD">사장</option>
+                                    <option value="PM">부장</option>
+                                    <option value="SM">차장</option>
+                                    <option value="PL">과장</option>
+                                    <option value="AS">대리</option>
+                                    <option value="NEW">담당</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-actions">
+                            <div class="btn-area">
+                                <button type="submit" class="submit-btn">등록</button>
+                                <button type="button" class="cancel-btn btn btn-cancel"
+                                        onclick="location.href='/enter/manage.do'">취소</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/enter/new/create.js}"></script>
+
+</body>
+</html>

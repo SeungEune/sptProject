@@ -1,0 +1,16 @@
+/* update.css */
+
+/* 중앙 정렬 버튼 그룹 */
+.btn-group-center {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+/* 추가 버튼 (회색 등 다른 색상 적용 시) */
+.add-btn {
+    background-color: #6b7280; /* gray-500 */
+}
+.add-btn:hover {
+    background-color: #4b5563; /* gray-600 */
+}

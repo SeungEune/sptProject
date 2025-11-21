@@ -9,6 +9,16 @@
     document.addEventListener('DOMContentLoaded', function() {
         initTocAccordion();
     });
+    // 토글 수행
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.has-submenu');
+        if (!btn) return;
+        const list = btn.parentElement.querySelector('.submenu-list');
+        if (!list) return;
+        const open = list.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+    });
+
 
     /**
      * TOC 아코디언 초기화 (이벤트 위임 방식)

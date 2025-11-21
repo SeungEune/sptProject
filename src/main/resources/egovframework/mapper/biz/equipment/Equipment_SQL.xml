@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="biz.mapper.biz.equipment.EquipmentMapper">
+
+    <!--조회-->
+    <select id="findAll" resultType="biz.equipment.vo.EquipmentVO">
+        SELECT ID, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
+        FROM EQUIPMENT
+    </select>
+
+    <!--단건조회    -->
+    <select id="findById" resultType="biz.equipment.vo.EquipmentVO">
+        SELECT ID, SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS
+        FROM EQUIPMENT
+        WHERE ID = #{id}
+    </select>
+
+    <!--등록    -->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO EQUIPMENT(SERIAL_NUMBER, ACCESS_NUMBER, DIRECTOR, STATUS)
+        VALUES ( #{equipment.serialNumber}, #{equipment.accessNumber},
+                #{equipment.director}, #{equipment.status})
+    </insert>
+
+    <!--    수정-->
+    <update id="update" parameterType="biz.equipment.vo.EquipmentVO">
+        UPDATE EQUIPMENT
+        SET SERIAL_NUMBER = #{equipment.serialNumber},
+            ACCESS_NUMBER = #{equipment.accessNumber},
+            DIRECTOR      = #{equipment.director},
+            STATUS = #{equipment.status}
+        WHERE ID = #{equipment.id, jdbcType=BIGINT}
+    </update>
+
+    <!--    삭제-->
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM EQUIPMENT
+        WHERE ID = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <select id="duplicateChkSerialNumber" resultType="String">
+        SELECT SERIAL_NUMBER
+        FROM EQUIPMENT
+        WHERE SERIAL_NUMBER = #{serialNumber}
+    </select>
+
+    <select id="duplicateChkAccessNumber" resultType="String">
+        SELECT ACCESS_NUMBER
+        FROM EQUIPMENT
+        WHERE ACCESS_NUMBER = #{accessNumber}
+    </select>
+
+    <!--전체 삭제-->
+    <delete id="deleteAll">
+        DELETE
+        FROM EQUIPMENT
+    </delete>
+
+    <!--    담당자 수정-->
+    <update id="updateDirector" >
+        UPDATE EQUIPMENT
+        SET DIRECTOR = #{director}
+        WHERE ID = #{id, jdbcType=BIGINT}
+    </update>
+
+    <!--    상태 수정-->
+    <update id="updateStatus">
+        UPDATE EQUIPMENT
+        SET STATUS = #{status}
+        WHERE ID = #{id, jdbcType=BIGINT}
+    </update>
+
+<!--    시리얼 번호로 찾기-->
+    <select id="selectBySerialNumber" resultType="biz.equipment.vo.EquipmentVO">
+        SELECT id
+        FROM EQUIPMENT
+        WHERE SERIAL_NUMBER = #{serialNumber}
+    </select>
+
+</mapper>

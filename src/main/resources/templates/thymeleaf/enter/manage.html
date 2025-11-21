@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심/커피 내역 등록</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
+
+   <link rel="stylesheet" th:href="@{/css/user/manage.css}">
+
+</head>
+<body>
+
+<button id="menu-toggle" class="mobile-menu-toggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div id="overlay" class="mobile-overlay"></div>
+
+
+<div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
+
+
+    <!-- ✅ 레이아웃에 넘길 조각을 반드시 감싸서 선언 -->
+    <div th:fragment="content">
+        <h1 class="content-title">출입관리</h1>
+
+        <div class="content-body">
+
+            <div class="table-area">
+                <div class="regist-area">
+                    <button type="button" class="submit-btn" onclick="location.href='/enter/create.do'">등록</button>
+                </div>
+                <table class="auto-index">
+                    <colgroup>
+                        <col style="width:8%;">   <!-- 번호 -->
+                        <col style="width:10%;">   <!-- 출입번호 -->
+                        <col style="width:10%;">  <!-- 아이디 -->
+                        <col style="width:13%;">  <!-- 전화번호 -->
+                        <col style="width:18%;">  <!-- 이메일 -->
+                        <col style="width:9%;">   <!-- 이름 -->
+                        <col style="width:9%;">   <!-- 출입수단 -->
+                        <col style="width:9%;">   <!-- 직책 -->
+                        <col style="width:8%;">   <!-- 상태 -->
+                        <col style="width:7%;">   <!-- 유형 -->
+                        <col style="width:15%;">  <!-- 등록일 -->
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>번호</th><th>출입번호</th><th>아이디</th><th>전화번호</th><th>이메일</th><th>이름</th><th>출입수단</th><th>직책</th><th>상태</th><th>유형</th><th>등록일</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="enter, stat : ${enterList}"
+                        th:onclick="|location.href='@{/enter/edit/{id}.do(id=${enter.enterId})}'|"
+                        style="cursor: pointer;">
+                        <!-- 번호 -->
+                        <td th:text="${stat.count}"></td>
+                        <td th:text="${enter.enterId}"></td>
+
+                        <!-- 아이디: 게스트면 공백 -->
+                        <td th:text="${enter.type == 'GUEST'} ? '' : ${enter.userId}"
+                            th:attr="title=${enter.type=='GUEST'}?'':${enter.userId}"></td>
+
+                        <!-- 전화번호: 게스트/직원 다르게 -->
+                        <td th:text="${enter.type == 'GUEST'} ? ${enter.guestPhone} : ${enter.phone}"
+                            th:attr="title=${enter.type=='GUEST'}?${enter.guestPhone}:${enter.phone}"></td>
+
+                        <!-- 이메일 -->
+                        <td th:text="${enter.type == 'GUEST'} ? ${enter.guestEmail} : ${enter.email}"
+                            th:attr="title=${enter.type=='GUEST'}?${enter.guestEmail}:${enter.email}"></td>
+
+                        <!-- 이름 -->
+                        <td th:text="${enter.type == 'GUEST'} ? ${enter.guestNm} : ${enter.name}"
+                            th:attr="title=${enter.type=='GUEST'}?${enter.guestNm}:${enter.name}"></td>
+
+                        <!-- 출입수단 -->
+                        <td th:text="${enter.method}"
+                            th:attr="title=${enter.method}"></td>
+
+                        <td th:switch="${enter.type == 'GUEST' ? 'GUEST' : enter.jssfcCd}">
+                            <!-- 게스트면 빈 칸 -->
+                            <span th:case="'GUEST'"></span>
+
+                            <!-- 코드 → 한글 매핑 -->
+                            <span th:case="'HEAD'">사장</span>
+                            <span th:case="'PM'">부장</span>
+                            <span th:case="'SM'">차장</span>
+                            <span th:case="'PL'">과장</span>
+                            <span th:case="'AS'">대리</span>
+                            <span th:case="'NEW'">담당</span>
+
+                            <!-- 기타 코드 -->
+                            <span th:case="*"></span>
+                        </td>
+
+
+
+                        <td th:text="${enter.status}"
+                            th:attr="title=${enter.status}"></td>
+                        <td th:text="${enter.type}"
+                            th:attr="title=${enter.type}"></td>
+                        <td th:text="${#dates.format(enter.registDt, 'yyyy/MM/dd')}"></td>
+                    </tr>
+                    </tbody>
+
+                </table>
+
+                <!-- 페이지네이션 -->
+<!--                <div class="pagination">-->
+<!--                    &lt;!&ndash; 이전 페이지 &ndash;&gt;-->
+<!--                    <a th:if="${page > 1}"-->
+<!--                       th:href="@{'/enter/manage'(page=${page - 1})}">-->
+<!--                        &laquo;-->
+<!--                    </a>-->
+
+<!--                    &lt;!&ndash; 페이지 번호들 &ndash;&gt;-->
+<!--                    <a th:each="p : ${#numbers.sequence(1, totalPages)}"-->
+<!--                       th:href="@{'/enter/manage'(page=${p})}"-->
+<!--                       th:text="${p}"-->
+<!--                       th:classappend="${p == page} ? ' active' : ''">-->
+<!--                    </a>-->
+
+<!--                    &lt;!&ndash; 다음 페이지 &ndash;&gt;-->
+<!--                    <a th:if="${page < totalPages}"-->
+<!--                       th:href="@{'/enter/manage'(page=${page + 1})}">-->
+<!--                        &raquo;-->
+<!--                    </a>-->
+<!--                </div>-->
+
+                <!-- 페이지네이션 (JS로 채움) -->
+                <div id="paging-area" class="pagination"></div>
+
+                <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+                <script src="/js/module/paginationModule.js"></script>
+
+                <script th:inline="javascript">
+                    const ALERT_MESSAGE = /*[[${alertMessage} ?: '']]*/ '';
+                    if (ALERT_MESSAGE) {
+                        MessageUtil.alert(ALERT_MESSAGE);
+                    }
+                </script>
+
+
+                <!-- ★ 여기서만 Thymeleaf 값을 JS 전역에 싣고 -->
+                <script th:inline="javascript">
+                    window.ENTER_PAGING = {
+                        totalCount : /*[[${totalCount}]]*/ 0,
+                        page       : /*[[${page}]]*/ 1,
+                        totalPages : /*[[${totalPages}]]*/ 1
+                    };
+                </script>
+
+                <!-- ★ 나머지 로직은 전부 외부 파일 -->
+                <script src="/js/enter/new/manage.js"></script>
+
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

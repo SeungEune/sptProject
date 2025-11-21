@@ -19,34 +19,30 @@
     <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/main.css}" >
     <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/header.css}" >
     <link type="text/css" rel="stylesheet" th:href="@{/css/cmm/footer.css}" >
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <!-- header -->
-    <div th:replace="~{cmm/header :: headerLayout}">
-        <p>header<p>
-    </div>
+<!-- header -->
+<div th:replace="~{cmm/header :: headerLayout}"></div>
 
-    <!-- TOC와 콘텐츠를 flex로 배치 -->
-    <main class="main-content">
-        <div class="dashboard-container">
-            <!-- TOC 사이드바 -->
-            <div th:replace="~{cmm/layout/tocLayout :: tocLayout}"></div>
-            
-            <!-- 메인 콘텐츠 -->
-            <div class="dashboard-content">
-                <th:block th:replace="${content}">
-                    <p>contents</p>
-                </th:block>
-            </div>
-        </div>
+<!-- TOC와 콘텐츠를 flex로 배치 -->
+<div class="main-container">
+        <!-- TOC 사이드바 -->
+        <div th:replace="~{cmm/layout/tocLayout :: tocLayout}"></div>
+
+    <!-- 본문 슬롯 -->
+    <main class="content-area">
+        <div class="content-inner" th:insert="${content}"></div>
+            <!-- 여기 내용은 개별 페이지에서 덮어씌움 -->
     </main>
+</div>
 
-    <!-- footer -->
-    <div th:replace="~{cmm/footer :: footerLayout}">
-        <p>footerLayout<p>
-    </div>
+<!-- footer 조각 사용 -->
+<div th:replace="~{cmm/footer :: footerLayout}"></div>
 
-    <!-- loading -->
-    <div th:replace="~{cmm/loading :: loadingLayout}"></div>
+<!-- loading -->
+<!--<div th:replace="~{cmm/loading :: loadingLayout}"></div>-->
 </body>
 </html>

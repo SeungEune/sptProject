@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="biz.lunch.dao.LunchDAO">
+
+    <insert id="registerLunch" parameterType="biz.lunch.vo.LunchVO" useGeneratedKeys="true" keyProperty="lunchId" keyColumn="lunch_id">
+        INSERT INTO lunch_master (
+            date, store_name, payer_id, total_amount, type, created_at
+        ) VALUES (
+                     TO_DATE(#{date}, 'YYYY-MM-DD'),
+                     #{storeName},
+                     #{payerId},
+                     #{totalAmount},
+                     #{type},
+                     NOW()
+                 )
+    </insert>
+
+    <update id="updateLunch" parameterType="biz.lunch.vo.LunchVO">
+        UPDATE lunch_master
+        SET store_name = #{storeName},
+            payer_id = #{payerId},
+            date = TO_DATE(#{date}, 'YYYY-MM-DD'),
+            total_amount = #{totalAmount},
+            type = #{type}
+        WHERE lunch_id = #{lunchId}
+    </update>
+
+    <delete id="deleteParticipantsByLunchId" parameterType="int">
+        DELETE FROM lunch_participant
+        WHERE lunch_id = #{lunchId}
+    </delete>
+
+    <insert id="insertParticipantsBatch" parameterType="biz.lunch.vo.LunchVO">
+        INSERT INTO lunch_participant (
+        lunch_id, user_id, individual_amount, is_paid
+        ) VALUES
+        <foreach collection="participantList" item="item" separator=",">
+            (
+            #{lunchId},
+            #{item.userId},
+            #{item.individualAmount}::integer,
+            'N'
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteLunch" parameterType="int">
+        DELETE FROM lunch_master
+        WHERE lunch_id = #{lunchId}
+    </delete>
+
+    <select id="getLunchList" parameterType="biz.lunch.vo.LunchVO" resultType="biz.lunch.vo.LunchVO">
+        SELECT m.lunch_id AS lunchId,
+        TO_CHAR(m.date, 'YYYY-MM-DD') AS date,
+        m.store_name AS storeName,
+        m.total_amount AS totalAmount,
+        m.type,
+        m.payer_id AS payerId,
+        u.user_nm AS payerName,
+        STRING_AGG(p.user_id || ':' || p.individual_amount, ',') AS participants,
+        SUM(p.individual_amount) AS totalParticipantAmount
+        FROM lunch_master m
+        JOIN tb_user u ON m.payer_id = u.user_id
+        LEFT JOIN lunch_participant p ON m.lunch_id = p.lunch_id
+        WHERE 1=1
+        <if test="lunchId != null">
+            AND m.lunch_id = #{lunchId}
+        </if>
+        <if test="type != null and type != ''">
+            AND m.type = #{type}
+        </if>
+        <if test="startDate != null">
+            AND m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null">
+            AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        </if>
+        GROUP BY m.lunch_id, m.date, m.store_name, m.total_amount, m.type, m.payer_id, u.user_nm
+        ORDER BY m.date DESC
+    </select>
+
+    <select id="getStatistics" parameterType="map" resultType="biz.lunch.vo.SummaryVO">
+        WITH T_DATA AS (
+            SELECT p.user_id
+                 , m.payer_id
+                 , p.individual_amount
+                 , m.total_amount
+                 , p.is_paid
+            FROM lunch_master m
+                     LEFT JOIN lunch_participant p ON m.lunch_id = p.lunch_id
+            WHERE m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+              AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        ),
+             T_OWED AS (
+                 SELECT user_id, SUM(individual_amount) as total_owed
+                 FROM T_DATA
+                 WHERE user_id IS NOT NULL
+                 GROUP BY user_id
+             ),
+             T_PAID AS (
+                 SELECT payer_id AS user_id, SUM(total_amount) as total_paid
+                 FROM lunch_master
+                 WHERE date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            AND date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        GROUP BY payer_id
+            ),
+            T_UNPAID AS (
+        SELECT DISTINCT user_id
+        FROM T_DATA
+        WHERE is_paid = 'N'
+          AND individual_amount > 0
+            )
+        SELECT u.user_id AS userId
+             , u.user_nm AS userName
+             , #{month} AS month
+             , COALESCE(tp.total_paid, 0) AS totalPaid
+             , COALESCE(to_d.total_owed, 0) AS totalOwed
+             , (COALESCE(tp.total_paid, 0) - COALESCE(to_d.total_owed, 0)) AS balance
+             , 'SYSTEM' AS representativePayerId
+             , '이승은' AS representativePayerName
+             , CASE
+                 WHEN COALESCE(to_d.total_owed, 0) = 0 THEN 'Y'
+                 WHEN tu.user_id IS NULL THEN 'Y'
+                 ELSE 'N'
+        END AS isSettled
+          FROM tb_user u
+          LEFT JOIN T_PAID tp ON u.user_id = tp.user_id
+          LEFT JOIN T_OWED to_d ON u.user_id = to_d.user_id
+          LEFT JOIN T_UNPAID tu ON u.user_id = tu.user_id
+         WHERE u.user_sttus_cd = 'NORMAL'
+           AND u.use_yn = 'Y'
+         ORDER BY balance DESC
+    </select>
+
+    <update id="completeSettlement" parameterType="map">
+        UPDATE lunch_participant p
+        SET is_paid = CASE WHEN #{action} = 'cancel' THEN 'N' ELSE 'Y' END
+          , paid_at = CASE WHEN #{action} = 'cancel' THEN NULL ELSE NOW() END
+            FROM lunch_master m
+        WHERE p.lunch_id = m.lunch_id
+          AND p.user_id = #{userId}
+          AND m.date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+          AND m.date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+          AND p.is_paid = CASE WHEN #{action} = 'cancel' THEN 'Y' ELSE 'N' END
+    </update>
+
+    <insert id="updateSummaryAfterChange">
+        WITH deleted AS (
+        DELETE FROM lunch_summary WHERE month = #{month} RETURNING 1
+            ),
+            T_OWED AS (
+        SELECT p.user_id, SUM(p.individual_amount) AS total_owed
+        FROM lunch_participant p
+            JOIN lunch_master m ON p.lunch_id = m.lunch_id
+        WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
+        GROUP BY p.user_id
+            ),
+            T_PAID AS (
+        SELECT m.payer_id AS user_id, SUM(m.total_amount) AS total_paid
+        FROM lunch_master m
+        WHERE TO_CHAR(m.date, 'YYYY-MM') = #{month}
+        GROUP BY m.payer_id
+            )
+        INSERT INTO lunch_summary (
+            user_id, month, total_paid, total_owed, representative_payer_id
+        )
+        SELECT COALESCE(p.user_id, o.user_id) AS user_id
+             , #{month}
+             , COALESCE(p.total_paid, 0)
+             , COALESCE(o.total_owed, 0)
+             , (SELECT user_id FROM tb_user WHERE user_nm = '이승은' LIMIT 1) FROM T_PAID p
+            FULL OUTER JOIN T_OWED o ON p.user_id = o.user_id
+    </insert>
+
+    <select id="getLunchDateById" parameterType="int" resultType="String">
+        SELECT TO_CHAR(date, 'YYYY-MM-DD')
+        FROM lunch_master
+        WHERE lunch_id = #{lunchId}
+    </select>
+
+    <select id="getUserList" resultType="biz.lunch.vo.UserVO">
+        SELECT user_id AS userId, user_nm AS userName
+        FROM tb_user
+        WHERE use_yn = 'Y'
+        ORDER BY user_nm
+    </select>
+
+</mapper>

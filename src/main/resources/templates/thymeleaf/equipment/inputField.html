@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- input + 중복 확인 -->
+<div th:fragment="inputField(labelText, inputId, inputName, placeholder)">
+    <label th:text="${labelText}"></label>
+    <br>
+    <input type="text" th:id="${inputId}" th:name="${inputName}" th:placeholder="${placeholder}">
+    <button>중복 확인</button>
+</div>
+</body>
+</html>
