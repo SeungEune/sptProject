@@ -5,24 +5,17 @@ import biz.eqp_history.vo.EqpHistoryVO;
 import biz.equipment.dao.EquipmentDAO;
 import biz.equipment.dto.EquipmentRequest;
 import biz.equipment.service.EquipmentService;
-import biz.equipment.vo.EquipmentVO;
 import biz.equipment.vo.Status;
 import biz.user.dao.UserDAO;
-import biz.user.service.UserService;
 import biz.user.service.impl.UserServiceImpl;
 import biz.user.vo.UserVO;
 import egovframework.EgovBootApplication;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Transactional
 @SpringBootTest(classes = EgovBootApplication.class)
