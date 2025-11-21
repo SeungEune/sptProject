@@ -29,27 +29,31 @@ public class EqpHistoryServiceTest {
 
     @Autowired
     private UserDAO userDAO;
+
     @Autowired
     private EquipmentDAO equipmentDAO;
 
-    String[] directorArray = {"김철수", "홍길동", "김영희"};
-    String[]  directorIdArray = new String[directorArray.length];
-    Long[] eqpIdArray = new Long[directorArray.length];
     @Autowired
     private UserServiceImpl userService;
+
     @Autowired
     private EqpHistoryDAO eqpHistoryDAO;
+
+    String[] directorArray = {"김철수", "홍길동", "김영희"};
+    String[] directorIdArray = new String[directorArray.length];
+    Long[] eqpIdArray = new Long[directorArray.length];
 
     @BeforeEach
     public void init() throws Exception {
 
         for (int i = 0; i < directorArray.length; i++) {
             String name = directorArray[i];
-            String email = "emailssss" + i+"@spt.com";
-            userService.createUser(createUserVO(email, name));
-            directorIdArray[i] = userDAO.selectUserByEmail(email).getUserId();
+            String email = emailCreator(i);
+            String serialNumber = serialCreator(i);
+            String userId = userIdCreator(name);
 
-            String serialNumber = "serial" + i;
+            userService.createUser(createUserVO( userId,email, name));
+            directorIdArray[i] = userDAO.selectUserByEmail(email).getUserId();
 
             equipmentService.insertEquipment(createEquipmentRequest(serialNumber, name));
             eqpIdArray[i] = equipmentDAO.selectBySerialNumber(serialNumber).getId();
@@ -77,9 +81,9 @@ public class EqpHistoryServiceTest {
                 .build();
     }
 
-    private UserVO createUserVO(String email, String name) {
+    private UserVO createUserVO(String userId,String email, String name) {
         return UserVO.builder()
-                .userId(name+1234)
+                .userId(userId)
                 .email(email)
                 .jssfcCd("jssfcCd")
                 .name(name)
@@ -96,5 +100,17 @@ public class EqpHistoryServiceTest {
                 .director(name)
                 .status(Status.USE)
                 .build();
+    }
+
+    private String emailCreator(int i) {
+        return "testemail"+ i+"@spt.com";
+    }
+
+    private String serialCreator(int i){
+        return  "serial" + i;
+    }
+
+    private String userIdCreator(String name){
+        return name+"Id123";
     }
 }
