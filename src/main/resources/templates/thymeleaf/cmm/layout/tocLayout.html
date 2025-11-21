@@ -4,10 +4,6 @@
 <div th:fragment="tocLayout">
 <aside class="sidebar" id="sidebar">
 
-    <button id="close-menu" class="mobile-close-btn">
-        <i class="fas fa-times"></i>
-    </button>
-
     <nav class="sidebar-nav">
         <div class="nav-group" th:if="${session.isAdmin}">
             <h3 class="nav-title">계정관리</h3>
