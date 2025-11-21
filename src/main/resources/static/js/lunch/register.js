@@ -223,10 +223,35 @@ function calculateDutchPay() {
 // 확인 모달
 function confirmAdd() {
     const form = document.querySelector('.entry-form');
+    // 1. 가게명, 날짜 등 기본 HTML 태그 검사
+    // (이 단계에서 storeName이 비어있으면 브라우저 말풍선이 뜨고 멈춥니다)
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
     }
+
+    const storeName = document.getElementById('store-name').value.trim();
+    if (!storeName) {
+        MessageUtil.alert('가게 이름을 입력해주세요.');
+        return;
+    }
+
+    // 3. 참석자 수동 검사
+    // 전역 변수 selectedParticipants의 개수를 확인합니다.
+    if (selectedParticipants.size === 0) {
+        MessageUtil.alert('참석자를 최소 1명 이상 추가해주세요.');
+        return;
+    }
+
+    // 2. 계산자 수동 검사
+    const payerValue = document.getElementById('payerId').value;
+    if (!payerValue) {
+        // 서버로 가기 전에 막고 알림창 띄움
+        MessageUtil.alert('계산자(결제자)를 선택해주세요.');
+        return;
+    }
+
+    // 4. 모든 검사 통과 시 서버 전송 확인창 표시
     MessageUtil.confirmed(
         '내역 등록',
         function() { form.submit(); },
@@ -237,8 +262,27 @@ function confirmAdd() {
 }
 
 // --- DOM 로드 후 실행 ---
+// --- DOM 로드 후 실행 ---
 document.addEventListener('DOMContentLoaded', function() {
-    // 사이드바 등 기존 로직
+    // URL 파라미터에서 error 값 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+
+    if (error) {
+        if (error === 'storeName') {
+            MessageUtil.alert('가게 이름을 입력해주세요.');
+        }
+        else if (error === 'payerId') {
+            MessageUtil.alert('계산자(결제자)를 선택해주세요.');
+        }
+        else if (error === 'participants') {
+            MessageUtil.alert('참석자를 최소 1명 이상 추가해주세요.');
+        }
+
+    }
+
+
+    // --- 기존 로직 유지 ---
     const btnDutchPay = document.getElementById('btnDutchPay');
     if (btnDutchPay) {
         btnDutchPay.addEventListener('click', calculateDutchPay);
@@ -251,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
         participantSearchInput.addEventListener('focus', filterParticipants);
     }
 
-    // [계산자] 입력창 이벤트: 클릭/포커스 시 전체 목록 노출 (추가됨)
+    // [계산자] 입력창 이벤트: 클릭/포커스 시 전체 목록 노출
     const payerSearchInput = document.getElementById('payer-search');
     if (payerSearchInput) {
         payerSearchInput.addEventListener('click', filterPayers);

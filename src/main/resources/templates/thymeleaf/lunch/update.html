@@ -16,13 +16,13 @@
 
                 <div class="form-group">
                     <label for="date-input">날짜</label>
-                    <input type="date" id="date-input" name="date" th:value="${lunch.date}" required>
+                    <input type="date" id="date-input" name="date" th:value="${lunch.date}">
                 </div>
 
                 <div class="form-group">
                     <label for="store-name">가게명</label>
                     <input type="text" id="store-name" name="storeName"
-                           th:value="${lunch.storeName}" placeholder="내용을 입력하세요" required>
+                           th:value="${lunch.storeName}" placeholder="내용을 입력하세요">
                 </div>
 
                 <div class="form-group">
@@ -47,7 +47,7 @@
                            onkeyup="filterPayers()"
                            placeholder="내용을 입력하세요"
                            th:value="${lunch.payerName}">
-                    <input type="hidden" id="payerId" name="payerId" th:value="${lunch.payerId}" required>
+                    <input type="hidden" id="payerId" name="payerId" th:value="${lunch.payerId}">
                     <div id="payer-results" class="search-results-dropdown" style="display: none;"></div>
                 </div>
 
