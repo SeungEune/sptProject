@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <title>계정 수정</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- 공통 main/header/footer.css 는 mainLayout에서 이미 포함하니까 여기선 빼기 -->
-<!--    <link rel="stylesheet" th:href="@{/css/user/form.css}">-->
-    <!-- ✅ 공통 기초 스타일 -->
-
-
     <link rel="stylesheet" th:href="@{/css/user/form.css}">
 
     <style>
@@ -24,7 +18,7 @@
 </button>
 <div id="overlay" class="mobile-overlay"></div>
 
-<!-- ✅ 여기: mainLayout 사용 -->
+<!-- 여기: mainLayout 사용 -->
 <div th:replace="~{cmm/layout/mainLayout :: layout (~{::content})}">
 
     <div th:fragment="content">
@@ -148,7 +142,7 @@
 </div>
 
 
-<script th:src="@{/js/user/new/edit.js}"></script>
+<script th:src="@{/js/user/edit.js}"></script>
 
 
 

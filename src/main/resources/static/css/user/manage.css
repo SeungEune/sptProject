@@ -97,6 +97,7 @@
     justify-content: flex-end;
     align-items: center;
 }
+/* 동작버튼 */
 .submit-btn {
     margin-top: 0 !important;
     width: 60px !important;
