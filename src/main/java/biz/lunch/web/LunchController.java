@@ -77,16 +77,13 @@ public class LunchController {
             // 데이터 가공
             lunchVO.makeParticipantList();
 
-            // 유효성 검사 (StoreName 체크 예시)
-            if (lunchVO.getStoreName() == null || lunchVO.getStoreName().isEmpty()) {
-                log.warn("가게 이름 누락");
-                return "redirect:/lunch/register.do?error=storeName";
-            }
-
             log.info("점심/커피 등록 요청: {}", lunchVO);
             lunchService.registerLunch(lunchVO);
-
             return "redirect:/lunch/list.do";
+        } catch (IllegalArgumentException e) {
+            // VO에서 던진 "금액 누락 에러를 잡는 곳
+            log.warn("잘못된 데이터 요청: {}", e.getMessage());
+            return "redirect:/lunch/register.do?error=amount";
         } catch (Exception e) {
             log.error("점심/커피 등록 처리 실패", e);
             model.addAttribute("message", egovMessageSource.getMessage("fail.common.insert"));
@@ -165,6 +162,11 @@ public class LunchController {
             lunchVO.makeParticipantList();
             lunchService.updateLunch(lunchVO);
             return "redirect:/lunch/list.do";
+
+        } catch (IllegalArgumentException e) {
+            // 수정 중 금액 누락 발생 시 수정 화면으로 리다이렉트
+            return "redirect:/lunch/update.do?error=amount";
+
         } catch (Exception e) {
             log.error("점심/커피 수정 처리 실패", e);
             return "error/404";
