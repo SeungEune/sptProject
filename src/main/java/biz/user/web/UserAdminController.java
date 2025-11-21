@@ -201,6 +201,9 @@ public class UserAdminController {
             user.setUserId(userId);
 
             if (EgovStringUtil.isEmpty(user.getPassword()) && EgovStringUtil.isEmpty(user.getPasswordChk())) {
+                // 성공 메시지 flash 로 실어서 보냄
+                rttr.addFlashAttribute("alertMessage", "계정이 수정되었습니다.");
+
                 userService.updateUserExceptPw(user);
                 return "redirect:/user/manage.do";
             }

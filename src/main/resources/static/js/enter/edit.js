@@ -1,7 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 템플릿에서 세팅해준 값 사용
+    // ===== 0) 정규식 선언 =====
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // 01로 시작, 중간 3~4자리, 마지막 4자리 (하이픈은 있어도/없어도 허용)
+    const TEL_RE = /^01[0-9]-?\d{3,4}-?\d{4}$/;
 
+
+    // 템플릿에서 세팅해준 값 사용
     const { mode: initialMode = 'view', enter_Id: enterId = '' } = window.ENTER_PAGE || {};
 
     // === 1) 게스트/직원 섹션 토글 ===
@@ -93,15 +98,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if ($deleteBtn && enterId) {
         $deleteBtn.addEventListener('click', () => {
-            MessageUtil.confirm(enterId+" 정말 삭제할까요?", function(confirmed) {
+            MessageUtil.confirm(enterId + " 출입을 삭제하시겠습니까?", function (confirmed) {
                 if (confirmed) {
-                    // 확인
-                    document.getElementById('deleteForm').submit();
-                } else {
-                    // 취소
-                    console.log("삭제 취소");
+                    document.getElementById('deleteForm')?.submit();
                 }
             });
         });
     }
+
+    // === 5) 폼 submit 시, 게스트일 때 이메일/전화번호 검증 ===
+    const $form = document.querySelector('.profile-form');
+    if ($form) {
+        $form.addEventListener('submit', (e) => {
+            const type = document.querySelector('input[name="type"]:checked')?.value;
+
+            if (type !== 'GUEST') return;   // 직원이면 통과
+
+            const guestEmail = document.getElementById('guest-email')?.value.trim() || '';
+            const guestPhone = document.getElementById('guest-phone')?.value.trim() || '';
+
+            if (guestEmail && !EMAIL_RE.test(guestEmail)) {
+                e.preventDefault();
+                MessageUtil.alert('게스트 이메일 형식이 올바르지 않습니다.\n예: example@test.com');
+                document.getElementById('guest-email')?.focus();
+                return;
+            }
+
+            if (guestPhone && !TEL_RE.test(guestPhone)) {
+                e.preventDefault();
+                MessageUtil.alert('게스트 전화번호 형식이 올바르지 않습니다.\n예: 010-1234-5678');
+                document.getElementById('guest-phone')?.focus();
+                return;
+            }
+        });
+    }
+
 });

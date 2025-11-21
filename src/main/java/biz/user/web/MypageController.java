@@ -85,13 +85,17 @@ public class MypageController {
 
             if (EgovStringUtil.isEmpty(user.getPassword()) && EgovStringUtil.isEmpty(user.getPasswordChk())) {
                 userService.updateUserExceptPw(user);
-                return "redirect:/user/manage.do";
+
+                // 성공 메시지 flash 로 실어서 보냄
+                rttr.addFlashAttribute("alertMessage", "계정이 수정되었습니다.");
+
+                return "redirect:/mypage.do";
             }
 
             userService.updateUser(user);
 
             // 성공 메시지 flash 로 실어서 보냄
-            rttr.addFlashAttribute("alertMessage", "계정이 삭제되었습니다.");
+            rttr.addFlashAttribute("alertMessage", "계정이 수정되었습니다.");
 
             return "redirect:/mypage.do";
         }
