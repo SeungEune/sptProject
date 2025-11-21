@@ -1,6 +1,7 @@
 (function (window, $) {
 
     // 페이지 클릭 시 호출될 함수 (전역으로 노출)
+    // => 페이지번호 바꾸고 이동
     window.goEnterPage = function (pageNo) {
         // 현재 URL 기준으로 page 파라미터만 교체
         const url    = new URL(window.location.href);
