@@ -15,6 +15,8 @@ public class EquipmentResponse {
 
     private String  accessNumber;
 
+    private String directorId;
+
     private String director;
 
     private Status status;

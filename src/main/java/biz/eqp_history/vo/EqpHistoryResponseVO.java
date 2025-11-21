@@ -13,8 +13,8 @@ public class EqpHistoryResponseVO {
 
     Long id;
     Long eqpId;
-    String directorId;
     String serialNumber;
+    String directorId;
     String directorName;
     LocalDateTime createdAt;
 }
