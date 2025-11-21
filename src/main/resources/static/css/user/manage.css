@@ -130,7 +130,10 @@
     margin-top: 16px;
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 40px !important;
+}
+.pagination ul{
+    gap: 10px !important;
 }
 
 .pagination a {
