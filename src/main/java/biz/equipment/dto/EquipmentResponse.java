@@ -11,10 +11,6 @@ public class EquipmentResponse {
 
     private Long id;
 
-//    private String code;
-//
-//    private String name;
-
     private String serialNumber;
 
     private String  accessNumber;

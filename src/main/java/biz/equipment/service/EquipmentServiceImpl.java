@@ -62,17 +62,6 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public void updateDirector(Long id, String director) {
-        equipmentDAO.updateDirector(id, director);
-    }
-
-    @Override
-    public void updateStatus(Long id, Status status) {
-        equipmentDAO.updateStatus(id, status);
-    }
-
-    //TODO fulltext Search로 변경!!!
-    @Override
     public List<String> getDirector(String name) throws Exception {
         return userService.getUserByName(name);
     }

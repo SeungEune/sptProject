@@ -28,12 +28,6 @@ public interface EquipmentService {
 
     String checkAccessNumber(String accessNumber);
 
-    // 담당자 변경
-    void updateDirector(Long id, String director);
-
-    // 상태 변경
-    void updateStatus(Long id, Status status);
-
     // 관리자 검색
     List<String> getDirector(String user) throws Exception;
 }

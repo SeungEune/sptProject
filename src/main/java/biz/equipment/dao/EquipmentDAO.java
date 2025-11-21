@@ -46,17 +46,8 @@ public class EquipmentDAO extends EgovComAbstractDAO {
     }
 
     public String findByAccessNumber(String accessNumber) {
-        return equipmentMapper.duplicateChkSerialNumber(accessNumber);
+        return equipmentMapper.duplicateChkAccessNumber(accessNumber);
     }
-
-    public void updateDirector(Long id, String director) {
-        equipmentMapper.updateDirector(id, director);
-    }
-
-    public void updateStatus(Long id, Status status) {
-        equipmentMapper.updateStatus(id, status);
-    }
-
 
     public void findByIdOrElseThrow(Long id) {
         Optional.ofNullable(findById(id)).orElseThrow(NoContentException::new);

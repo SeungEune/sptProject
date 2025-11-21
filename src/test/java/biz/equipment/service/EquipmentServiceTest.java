@@ -72,25 +72,14 @@ public class EquipmentServiceTest {
     }
 
     @Test
-    void 관리자_수정을_성공한다(){
-        equipmentService.updateDirector(testVO.getId(), "수정자");
-        assertThat(equipmentDAO.findById(testVO.getId()).getDirector()).isEqualTo("수정자");
-    }
-
-    @Test
     void 일련_번호_중복_조회를_성공한다(){
         assertThat(equipmentService.checkSerialNumber("serialNumber1")).isNotNull();
     }
 
     @Test
     void 자산_번호_중복_조회를_성공한다(){
+        log.info("값 확인 " + equipmentService.checkAccessNumber("accessNumber1"));
         assertThat(equipmentService.checkAccessNumber("accessNumber1")).isNotNull();
-    }
-
-    @Test
-    void 장비_상태_변경을_성공한다(){
-        equipmentService.updateStatus(testVO.getId(), Status.DISPOSAL);
-        assertThat(equipmentDAO.findById(testVO.getId()).getStatus()).isEqualTo(Status.DISPOSAL);
     }
 
     @Test
@@ -104,8 +93,6 @@ public class EquipmentServiceTest {
 
     private EquipmentRequest createRequest(String serialNumber, String accessNumber, String director, Status status) {
         return EquipmentRequest.builder()
-//                .code(code)
-//                .name(name)
                 .serialNumber(serialNumber)
                 .accessNumber(accessNumber)
                 .director(director)

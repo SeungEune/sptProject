@@ -77,32 +77,10 @@ public class EquipmentController {
         return equipmentService.checkAccessNumber(accessNumber);
     }
 
-    // 관리자 수정
-    @GetMapping("/director/update.do")
-    public String updateDirectorForm(@RequestParam("id") Long id, Model model) {
-        model.addAttribute(equipmentService.getEquipment(id));
-        return "equipment/director/update";
-    }
-
      //관리자 찾기
     @GetMapping("/director/view")
     @ResponseBody
     public List<String> getDirector(@RequestParam("name") String name) throws Exception {
         return equipmentService.getDirector(name);
     }
-
-    // 관리자 수정
-    @PostMapping("/director/update.do")
-    public String updateDirector(@RequestParam("id") Long id, @RequestParam("director") String director) {
-        equipmentService.updateDirector(id, director);
-        return "redirect:/equipment/list.do";
-    }
-
-    // 상태 수정
-    @PostMapping("/status/update.do")
-    public String updateStatusEquipment(@RequestParam("id")Long id, @RequestParam("status") Status status) {
-        equipmentService.updateStatus(id, status);
-        return "redirect:/equipment/status/list.do";
-    }
-
 }
