@@ -1,7 +1,7 @@
 package biz.lunch.component;
 
 import biz.lunch.vo.LunchVO;
-import org.springframework.beans.factory.annotation.Value;
+import egovframework.com.cmm.service.EgovProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -11,10 +11,9 @@ import java.util.*;
  */
 @Component
 public class LunchViewProcessor {
-    @Value("${lunch.representative.name:이승은}")
-    private String representativeName;
 
     public List<Map<String, Object>> convertToFlatList(List<LunchVO> lunchList) {
+        String representativeName = EgovProperties.getProperty("lunch.representative.name");
         List<Map<String, Object>> flatLunchList = new ArrayList<>();
 
         // 1. 날짜별 그룹화
@@ -29,7 +28,6 @@ public class LunchViewProcessor {
             List<Map<String, Object>> dailyRows = new ArrayList<>();
 
             for (LunchVO item : itemsForDate) {
-                // 변경된 변수 사용
                 boolean isRepresentative = representativeName.equals(item.getPayerName());
 
                 Map<String, Object> detailRow = toMap(item);
