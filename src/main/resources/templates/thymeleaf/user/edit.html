@@ -6,11 +6,11 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- 공통 main/header/footer.css 는 mainLayout에서 이미 포함하니까 여기선 빼기 -->
-<!--    <link rel="stylesheet" th:href="@{/css/account/form.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/user/form.css}">-->
     <!-- ✅ 공통 기초 스타일 -->
 
 
-    <link rel="stylesheet" th:href="@{/css/account/form.css}">
+    <link rel="stylesheet" th:href="@{/css/user/form.css}">
 
     <style>
         .field-error{color: red;}
@@ -35,26 +35,27 @@
                 <div class="form-container">
 
                     <form class="profile-form"
-                          th:action="@{/account/edit/{id}(id=${user.userId})}"
+                          th:classappend="${mode} == 'view' ? ' view-mode' : ' edit-mode'"
+                          th:action="@{/user/edit/{id}.do(id=${user.userId})}"
                           th:object="${user}"
                           method="post">
 
                         <!-- 아이디 -->
                         <div class="form-group">
                             <label for="user-id">아이디</label>
-                            <input id="user-id" th:field="*{userId}" type="text" readonly>
+                            <input id="user-id" th:field="*{userId}" type="text" readonly class="emp-fixed">
                         </div>
 
                         <!-- 비밀번호 (edit 모드일 때만) -->
                         <div class="form-group" th:if="${mode == 'edit'}">
                             <label for="password">비밀번호</label>
-                            <input id="password" th:field="*{password}" type="password" required>
+                            <input id="password" th:field="*{password}" type="password">
                             <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                         </div>
 
                         <div class="form-group" th:if="${mode == 'edit'}">
                             <label for="passwordChk">비밀번호 확인</label>
-                            <input id="passwordChk" th:field="*{passwordChk}" type="password" required>
+                            <input id="passwordChk" th:field="*{passwordChk}" type="password">
                             <div class="field-error" th:if="${#fields.hasErrors('passwordChk')}" th:errors="*{passwordChk}"></div>
                         </div>
 
@@ -85,6 +86,7 @@
                             <label for="phone">전화번호</label>
                             <input id="phone" th:field="*{phone}" type="tel"
                                    th:readonly="${mode == 'view'}">
+                            <div class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                         </div>
 
                         <!-- 이메일 -->
@@ -92,20 +94,23 @@
                             <label for="email">Email</label>
                             <input id="email" th:field="*{email}" type="email"
                                    th:readonly="${mode == 'view'}">
+                            <div class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
 
                         <!-- 버튼 영역 -->
                         <div class="form-actions">
                             <div class="btn-area edit" th:if="${mode == 'view'}">
                                 <button type="button" class="cancel-btn btn btn-cancel"
-                                        onclick="location.href='/account/manage'">목록</button>
+                                        onclick="location.href='/user/manage.do'">목록</button>
 
-                                <button type="button" class="submit-btn"
-                                        th:onclick="|location.href='@{/account/edit/{id}/update(id=${user.userId})}'|">
+                                <button type="button" class="submit-btn btn"
+                                        th:onclick="|location.href='@{/user/edit/{id}/update.do(id=${user.userId})}'|">
                                     수정
                                 </button>
 
-                                <button type="button" class="submit-btn" id="btn-delete">
+                                <button id="btn-delete" class="submit-btn btn"
+                                        type="button"
+                                        th:data-user-id="${user.userId}">
                                     삭제
                                 </button>
 
@@ -116,9 +121,9 @@
                             </div>
 
                             <div class="btn-area edit" th:if="${mode == 'edit'}">
-                                <button type="submit" class="submit-btn">확인</button>
+                                <button type="submit" class="submit-btn btn">확인</button>
                                 <button type="button" class="cancel-btn btn btn-cancel"
-                                        th:onclick="|location.href='@{/account/edit/{id}(id=${user.userId})}'|">
+                                        th:onclick="|location.href='@{/user/edit/{id}.do(id=${user.userId})}'|">
                                     취소
                                 </button>
                             </div>
@@ -129,7 +134,7 @@
                     <!-- 상세 페이지 제일 아래쪽 정도에 추가 -->
                     <form id="deleteForm"
                           th:if="${mode == 'view'}"
-                          th:action="@{/account/delete/{id}(id=${user.userId})}"
+                          th:action="@{/user/delete/{id}.do(id=${user.userId})}"
                           method="post">
                         <!-- CSRF 쓰면 토큰 hidden -->
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}" th:if="${_csrf != null}">
@@ -143,29 +148,7 @@
 </div>
 
 
-<script th:inline="javascript">
-    const userId = /*[[${user.userId}]]*/ '';
-
-    document.getElementById('btn-delete').addEventListener('click', function () {
-        openDeleteModal(userId);
-    });
-
-    function openDeleteModal(userId) {
-        Swal.fire({
-            title: '계정 삭제',
-            text: userId + ' 계정을 삭제하시겠습니까?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: '삭제',
-            cancelButtonText: '취소',
-            allowOutsideClick: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteForm').submit();
-            }
-        });
-    }
-</script>
+<script th:src="@{/js/user/new/edit.js}"></script>
 
 
 

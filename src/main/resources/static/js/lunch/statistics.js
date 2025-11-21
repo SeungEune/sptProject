@@ -1,11 +1,3 @@
-/*
- * 파일 경로: src/main/resources/static/js/lunch/statistics.js
- * 설명: 점심/커피 통계 페이지 전용 스크립트 (Chart.js 및 UI 로직)
- */
-
-// --- 전역 변수 및 포맷터 선언 ---
-const formatCurrency = (value) => new Intl.NumberFormat('ko-KR').format(value) + '원';
-
 // 차트 색상 상수
 const CHART_COLORS = {
     blueDark: 'rgba(59, 130, 246, 0.7)',
@@ -16,6 +8,7 @@ const CHART_COLORS = {
     redBorder: 'rgba(255, 99, 132, 1)'
 };
 
+const getFormattedMoney = (val) => Util.amtComma(val, '0') + '원';
 // --- 날짜 UI 업데이트 함수 (HTML에서 onchange 등으로 호출됨) ---
 function updateDateRange(dateStr) {
     if (!dateStr) return;
@@ -40,43 +33,19 @@ function updateDateRange(dateStr) {
 // --- DOMContentLoaded 이벤트: 문서 로드 후 실행 ---
 document.addEventListener("DOMContentLoaded", function() {
 
-    // 1. 사이드바 토글 로직 (register.js와 동일)
-    const menuToggle = document.getElementById('menu-toggle');
-    const closeMenu = document.getElementById('close-menu');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-
-    if (menuToggle) {
-        function openSidebar() {
-            if (sidebar) sidebar.classList.add('active');
-            if (overlay) overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeSidebarFunc() {
-            if (sidebar) sidebar.classList.remove('active');
-            if (overlay) overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        menuToggle.addEventListener('click', openSidebar);
-        if (closeMenu) closeMenu.addEventListener('click', closeSidebarFunc);
-        if (overlay) overlay.addEventListener('click', closeSidebarFunc);
-    }
-
-    // 2. 초기 날짜 텍스트 세팅
+    // 초기 날짜 텍스트 세팅
     const input = document.getElementById('searchMonthInput');
     if(input && input.value) {
         updateDateRange(input.value);
     }
 
-    // 3. 데이터 유효성 검사 (HTML에서 넘어온 데이터 확인)
+    // 데이터 유효성 검사 (HTML에서 넘어온 데이터 확인)
     if (typeof summaryList === 'undefined' || typeof lunchList === 'undefined') {
         console.error("데이터가 로드되지 않았습니다.");
         return;
     }
 
-    // --- Chart 1: 사용자별 부담금/결제금 ---
+    // Chart 1: 사용자별 부담금/결제금 ---
     if (summaryList.length > 0) {
         const ctxUser = document.getElementById('userSummaryChart');
         if (ctxUser) {
@@ -107,44 +76,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
-                    plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.raw)}` } } }
-                }
-            });
-        }
-    }
-
-    // --- Chart 2: 일별 지출 추이 ---
-    if (lunchList.length > 0) {
-        const ctxDaily = document.getElementById('dailyExpenseChart');
-        if (ctxDaily) {
-            // 시간순 정렬 (오래된 순)
-            const list = [...lunchList].reverse();
-            const labels = list.map(i => i.date.substring(5));
-            const amounts = list.map(i => i.totalAmount);
-
-            new Chart(ctxDaily.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '지출 내역',
-                        data: amounts,
-                        fill: true,
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: CHART_COLORS.blueBorderDark,
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointBackgroundColor: CHART_COLORS.blueBorderDark,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
-                    plugins: { tooltip: { callbacks: { label: ctx => `금액: ${formatCurrency(ctx.raw)}` } } }
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }, // [수정]
+                    plugins: { tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${getFormattedMoney(ctx.raw)}` } } } // [수정]
                 }
             });
         }
@@ -180,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } }
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }
                 }
             });
         }
@@ -209,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => getFormattedMoney(v) } } }, // [수정]
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -217,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 label: ctx => {
                                     const balance = summaryList[ctx.dataIndex].balance;
                                     const title = balance >= 0 ? "받을 금액" : "송금할 금액";
-                                    return `${title}: ${formatCurrency(ctx.raw)}`;
+                                    return `${title}: ${getFormattedMoney(ctx.raw)}`;
                                 }
                             }
                         }

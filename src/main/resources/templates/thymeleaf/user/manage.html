@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 
-   <link rel="stylesheet" th:href="@{/css/account/manage.css}">
+   <link rel="stylesheet" th:href="@{/css/user/manage.css}">
 </head>
 <body>
 
@@ -27,7 +27,7 @@
         <div class="content-body">
 
             <!-- ✅ 여기부터 전부 하나의 form 으로 묶자 -->
-            <form id="search-form" th:action="@{/account/manage}" method="get" style="display:flex; width:100%;">
+            <form id="search-form" th:action="@{/user/manage.do}" method="get" style="display:flex; width:100%;">
 
                 <!-- 왼쪽 : 추가 필터 영역 -->
                 <div class="search-filter">
@@ -64,14 +64,23 @@
                         </select>
                     </div>
 
-                    <!-- 등록월 필터 -->
+                    <!-- 등록일 기간 필터 -->
                     <div class="search-option-field">
-                        <label for="search-option-registDate">등록월 필터</label>
-                        <input id="search-option-registDate"
-                               type="month"
-                               name="registMonth"
-                               th:value="${search != null ? search.registMonth : ''}">
+                        <label for="search-startDate">등록일 시작</label>
+                        <input id="search-startDate"
+                               type="date"
+                               name="startDate"
+                               th:value="${search != null ? search.startDate : ''}">
                     </div>
+
+                    <div class="search-option-field">
+                        <label for="search-endDate">등록일 종료</label>
+                        <input id="search-endDate"
+                               type="date"
+                               name="endDate"
+                               th:value="${search != null ? search.endDate : ''}">
+                    </div>
+
                 </div>
 
                 <!-- 오른쪽 : 검색어 + 테이블 -->
@@ -87,10 +96,10 @@
                     <!-- ↓↓↓ 여기부터는 기존 테이블 그대로 ↓↓↓ -->
                     <table class="auto-index">
                         <colgroup>
-                            <col style="width:6%;">
-                            <col style="width:12%;">
-                            <col style="width:14%;">
-                            <col style="width:30%;">
+                            <col style="width:8%;">
+                            <col style="width:16%;">
+                            <col style="width:16%;">
+                            <col style="width:22%;">
                             <col style="width:10%;">
                             <col style="width:10%;">
                             <col style="width:18%;">
@@ -102,11 +111,12 @@
                         </thead>
                         <tbody>
                         <tr th:each="user, stat : ${userList}"
-                            th:onclick="|location.href='@{/account/edit/{id}(id=${user.userId})}'|"
+                            th:onclick="|location.href='@{/user/edit/{id}.do(id=${user.userId})}'|"
                             style="cursor: pointer;">
                             <td th:text="${stat.count}"></td>
                             <td th:text="${user.userId}"></td>
-                            <td th:text="${user.phone}"></td>
+                            <td class="ellipsis-cell" th:text="${user.phone}"
+                                th:attr="title=${user.phone}"></td>
                             <td th:text="${user.email}"></td>
                             <td th:text="${user.name}"></td>
                             <td th:switch="${user.jssfcCd}">
@@ -128,33 +138,36 @@
 
                     <!-- ✅ 여기 추가 -->
                     <!-- 페이지네이션 -->
-                    <div class="pagination">
+<!--                    <div class="pagination">-->
 
-                        <!-- 이전 페이지 -->
-                        <a th:if="${page > 1}"
-                           th:href="@{'/account/manage'(page=${page - 1})}">
-                            &laquo;
-                        </a>
+<!--                        &lt;!&ndash; 이전 페이지 &ndash;&gt;-->
+<!--                        <a th:if="${page > 1}"-->
+<!--                           th:href="@{'/user/manage'(page=${page - 1})}">-->
+<!--                            &laquo;-->
+<!--                        </a>-->
 
-                        <!-- 페이지 번호들 -->
-                        <a th:each="p : ${#numbers.sequence(1, totalPages)}"
-                           th:href="@{'/account/manage'(page=${p})}"
-                           th:text="${p}"
-                           th:classappend="${p == page} ? ' active' : ''">
-                        </a>
+<!--                        &lt;!&ndash; 페이지 번호들 &ndash;&gt;-->
+<!--                        <a th:each="p : ${#numbers.sequence(1, totalPages)}"-->
+<!--                           th:href="@{'/user/manage'(page=${p})}"-->
+<!--                           th:text="${p}"-->
+<!--                           th:classappend="${p == page} ? ' active' : ''">-->
+<!--                        </a>-->
 
-                        <!-- 다음 페이지 -->
-                        <a th:if="${page < totalPages}"
-                           th:href="@{'/account/manage'(page=${page + 1})}">
-                            &raquo;
-                        </a>
+<!--                        &lt;!&ndash; 다음 페이지 &ndash;&gt;-->
+<!--                        <a th:if="${page < totalPages}"-->
+<!--                           th:href="@{'/user/manage'(page=${page + 1})}">-->
+<!--                            &raquo;-->
+<!--                        </a>-->
 
 
-                    </div>
+<!--                    </div>-->
+                    <!-- 페이지네이션 (JS로 채움) -->
+                    <div id="paging-area" class="pagination"></div>
+
 
 
                     <div class="regist-area">
-                        <button type="button" class="submit-btn" onclick="location.href='/account/create'">등록</button>
+                        <button type="button" class="submit-btn" onclick="location.href='/user/create.do'">등록</button>
                     </div>
                 </div>
             </form>
@@ -164,6 +177,29 @@
 
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/js/module/paginationModule.js"></script>
+
+<script th:inline="javascript">
+    // flash attribute 로 넘어온 메시지 (없으면 '')
+    const ALERT_MESSAGE = /*[[${alertMessage} ?: '']]*/ '';
+
+    if (ALERT_MESSAGE) {
+        MessageUtil.alert(ALERT_MESSAGE);
+    }
+</script>
+
+<!-- ★ 여기서만 Thymeleaf 값을 JS 전역에 싣고 -->
+<script th:inline="javascript">
+    window.ACCOUNT_PAGING = {
+        totalCount : /*[[${totalCount}]]*/ 0,
+        page       : /*[[${page}]]*/ 1,
+        totalPages : /*[[${totalPages}]]*/ 1
+    };
+</script>
+
+<!--  나머지 로직은 전부 외부 파일 -->
+<script src="/js/user/new/manage.js"></script>
 
 
 </body>

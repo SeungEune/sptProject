@@ -36,7 +36,7 @@
 
 /* 셀렉트/월 입력 공통 스타일 */
 .search-filter .search-option-field select,
-.search-filter .search-option-field input[type="month"] {
+.search-filter .search-option-field input[type="date"] {
     height: 34px;
     padding: 4px 10px;
     border: 1px solid #d1d5db;
@@ -60,9 +60,16 @@
     margin-top: 8px;
 }
 
+/* 테이블을 감싸는 영역 – 가로 스크롤 담당 */
+.table-area {
+    width: 60vw;
+    overflow-x: hidden;   /* 기본(데스크톱)에선 스크롤 안 보이게 */
+}
+
 /*테이블*/
 .auto-index {
-    width: 50vw;
+    /*width: 100%;*/
+    width: 60vw;
     table-layout: fixed;           /* 열폭 고정해서 헤더/바디 일치 */
     border-collapse: collapse;
 }
@@ -74,6 +81,10 @@
     text-align: left;              /* 필요시 center/right */
     border-bottom: 1px solid #eee;
     box-sizing: border-box;        /* 패딩 포함 폭 계산 */
+
+    white-space: nowrap;      /* 줄바꿈 금지 */
+    overflow: hidden;         /* 넘치는 부분 숨김 */
+    text-overflow: ellipsis;  /* ... 으로 표시 */
 }
 .auto-index th{
     background:#fafafa;
@@ -81,14 +92,28 @@
 /*폼*/
 #search-keyword-form, .regist-area{
     display: flex;
-    width: 50vw;
+    width: 60vw;
     height: 50px;
     justify-content: flex-end;
     align-items: center;
 }
-.submit-btn{
+.submit-btn {
+    margin-top: 0 !important;
     width: 60px !important;
+    background-color: #256ef4;
+    border-radius: 8px;
     height: 32px !important;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: 'Abel', sans-serif;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 28.5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s;
 }
 
 /*검색어*/
@@ -99,6 +124,7 @@
     align-items: center;
 }
 /*페이지네이션*/
+
 .pagination {
     margin-top: 16px;
     display: flex;
@@ -114,15 +140,85 @@
     text-align: center;
     font-size: 14px;
     text-decoration: none;
-    color: #333;
+    /*color: #333;*/
+
+    text-indent: 0;         /* 혹시 -9999px 되어 있으면 덮어쓰기 */
+    color: #111827;         /* 글자색 */
 }
 
 .pagination a.active {
     background-color: #256ef4;
-    color: #fff;
+    color: black !important;
     border-color: #256ef4;
 }
 
 .pagination a:hover {
     background-color: #f0f0f0;
+}
+
+
+/* ================== 반응형 : 가로 스크롤 허용 ================== */
+
+/* ① 1200px 이하 – 테이블/폼 폭을 조금 넓혀주고, 스크롤 허용 */
+@media (max-width: 1200px) {
+    .table-area {
+        overflow-x: auto;      /* 가로 스크롤 가능 */
+    }
+
+    .auto-index,
+    #search-keyword-form,
+    .regist-area {
+        width: 80vw;           /* 데스크톱보다 조금 더 넓게 */
+    }
+
+    #search-keyword-form-content {
+        width: 40vw;
+    }
+}
+
+/* ② 768px 이하 – 필터/테이블 세로로 쌓고, 테이블 폭 고정 + 스크롤 */
+@media (max-width: 768px) {
+
+    /* 계정관리처럼 필터 + 테이블 같이 있는 화면용 */
+    #search-form {
+        display: flex;
+        flex-direction: column;  /* 필터 위, 테이블 아래 */
+        gap: 12px;
+    }
+
+    .search-filter {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    .table-area {
+        width: 100%;
+        overflow-x: auto;       /* 여기서도 가로 스크롤 허용 */
+    }
+
+    /* 테이블이 화면보다 넓게 → 자연스럽게 가로 스크롤 생김 */
+    .auto-index,
+    #search-keyword-form,
+    .regist-area {
+        width: 720px;          /* 고정 폭 (414px 같은 모바일에서 스크롤) */
+    }
+
+    #search-keyword-form-content {
+        width: 75vw;
+    }
+}
+
+/* ③ 480px 이하 – 더 작은 폰에서 테이블 조금 더 넓게 */
+@media (max-width: 480px) {
+
+    .auto-index,
+    #search-keyword-form,
+    .regist-area {
+        width: 800px;          /* 기기폭보다 확실히 넓게 */
+    }
+
+    #search-keyword-form-content {
+        width: 85vw;
+    }
 }

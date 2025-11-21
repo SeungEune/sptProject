@@ -4,21 +4,27 @@
 <div th:fragment="tocLayout">
 <aside class="sidebar" id="sidebar">
 
-    <button id="close-menu" class="mobile-close-btn">
-        <i class="fas fa-times"></i>
-    </button>
-
     <nav class="sidebar-nav">
         <div class="nav-group" th:if="${session.isAdmin}">
             <h3 class="nav-title">계정관리</h3>
             <ul class="nav-list">
-                <li><a th:href="@{/account/manage}">계정관리</a></li>
+                <li>
+                    <a th:href="@{/user/manage.do}"
+                       th:classappend="${#httpServletRequest.requestURI.endsWith('/user/manage.do')} ? ' active'">
+                      계정관리
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="nav-group" th:if="${session.isAdmin}">
             <h3 class="nav-title">출입관리</h3>
             <ul class="nav-list">
-                <li><a th:href="@{/enter/manage}">출입관리</a></li>
+                <li>
+                    <a th:href="@{/enter/manage.do}"
+                       th:classappend="${#httpServletRequest.requestURI.endsWith('/enter/manage.do')} ? ' active'">
+                        출입관리
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="nav-group" th:if="${session.isAdmin}">

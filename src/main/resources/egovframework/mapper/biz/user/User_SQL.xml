@@ -70,9 +70,16 @@
             AND u.jssfc_cd = #{jssfcCd}
         </if>
 
-        <!-- ③ 등록월 필터 (YYYY-MM 형식) -->
-        <if test="registMonth != null and registMonth != ''">
-            AND to_char(u.regist_dt, 'YYYY-MM') = #{registMonth}
+        <!--  ③ 등록일 기간 필터 -->
+        <!-- startDate만 있으면 start 이상 전체 -->
+        <if test="startDate != null and startDate != ''">
+            AND u.regist_dt >= #{startDate}::date
+        </if>
+
+        <!-- endDate만 있으면 end 이하 전체 (inclusive) -->
+        <!-- endDate만 있으면 end 이하 전체 (inclusive) -->
+        <if test="endDate != null and endDate != ''">
+            AND u.regist_dt &lt; (#{endDate}::date + INTERVAL '1 day')
         </if>
 
         ORDER BY u.regist_dt DESC
@@ -118,8 +125,13 @@
             AND u.jssfc_cd = #{jssfcCd}
         </if>
 
-        <if test="registMonth != null and registMonth != ''">
-            AND to_char(u.regist_dt, 'YYYY-MM') = #{registMonth}
+        <!--  ③ 등록일 기간 필터 -->
+        <if test="startDate != null and startDate != ''">
+            AND u.regist_dt >= #{startDate}::date
+        </if>
+
+        <if test="endDate != null and endDate != ''">
+            AND u.regist_dt &lt; (#{endDate}::date + INTERVAL '1 day')
         </if>
 
     </select>
@@ -167,6 +179,57 @@
         WHERE user_id = #{userId}
     </select>
 
+    <!-- 1) 전화번호 전체 중복 체크 (등록용) -->
+    <select id="countByPhone"
+            parameterType="string"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE MOBLPHON_NO = #{phone}
+    </select>
+
+    <!-- 2) 전화번호 중복 체크 (수정용: 자기 자신 제외) -->
+    <select id="countByPhoneExceptUser"
+            parameterType="map"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE MOBLPHON_NO = #{phone}
+        AND USER_ID != #{userId}
+    </select>
+
+    <!-- 3) 이메일 전체 중복 체크 (등록용) -->
+    <select id="countByEmail"
+            parameterType="string"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE EMAIL_ADRES = #{email}
+    </select>
+
+    <!-- 4) 이메일 중복 체크 (수정용: 자기 자신 제외) -->
+    <select id="countByEmailExceptUser"
+            parameterType="map"
+            resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE EMAIL_ADRES = #{email}
+        AND USER_ID != #{userId}
+    </select>
+
+    <update id="updateUserExceptPw"
+            parameterType="biz.user.vo.UserVO">
+        UPDATE tb_user
+        SET
+        user_nm       = #{name},
+        email_adres   = #{email},
+        moblphon_no   = #{phone}
+        <if test="jssfcCd != null">
+            , jssfc_cd = #{jssfcCd}
+        </if>
+        WHERE user_id = #{userId}
+    </update>
+
 <!--    이름으로 조회-->
     <select id="findUserIdByName" parameterType="string" resultType="string">
         SELECT
@@ -181,5 +244,19 @@
                user_nm AS name
         FROM   tb_user
         WHERE  email_adres = #{email};
+    </select>
+
+<!--직원목록-->
+    <select id="selectUserTotalList" resultType="biz.user.vo.UserVO">
+        SELECT
+            user_id      AS userId,
+            user_nm      AS name,
+            user_password AS password,
+            email_adres  AS email,
+            moblphon_no  AS phone,
+            jssfc_cd     AS jssfcCd,
+            register_id  AS registerId,
+            regist_dt    AS registDt
+        FROM tb_user
     </select>
 </mapper>

@@ -20,11 +20,10 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
     private UserDAO userDAO;
 
     @Override
-    public boolean isDuplicatedId(String userId) {
+    public boolean isDuplicatedId(String userId){
         return userDAO.selectCountByUserId(userId) > 0;
     }
 
-    @Transactional
     @Override
     public void createUser(UserVO vo) throws Exception {
         // 등록자(관리자) 세팅(선택)
@@ -42,7 +41,7 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
     }
 
     @Override
-    public List<UserVO> getUserList(UserSearchCond cond) throws Exception {
+    public List<UserVO> getUserList(UserSearchCond cond)  throws Exception {
         return userDAO.selectUserList(cond);
     }
 
@@ -52,7 +51,7 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
         return userDAO.selectUser(userId);
     }
 
-    @Transactional
+
     @Override
     public void updateUser(UserVO vo) throws Exception {
         // 비밀번호를 수정 폼에서 다시 받는다면 암호화
@@ -79,13 +78,38 @@ public class UserServiceImpl extends EgovAbstractServiceImpl implements UserServ
     }
 
     @Override
-    public List<UserVO> getUserTotalList() {
+    public List<UserVO> getUserTotalList() throws Exception {
         return userDAO.selectUserTotalList();
     }
 
     @Override
     public List<String> getUserRoles(String userId) throws Exception {
         return userDAO.selectUserRoles(userId);
+    }
+
+    @Override
+    public boolean isDuplicatedPhone(String phone) throws Exception {
+        return userDAO.countByPhone(phone) > 0;
+    }
+
+    @Override
+    public boolean isDuplicatedPhoneExceptUser(String phone, String userId) throws Exception {
+        return userDAO.countByPhoneExceptUser(phone, userId) > 0;
+    }
+
+    @Override
+    public boolean isDuplicatedEmail(String email) throws Exception {
+        return userDAO.countByEmail(email) > 0;
+    }
+
+    @Override
+    public boolean isDuplicatedEmailExceptUser(String email, String userId) throws Exception {
+        return userDAO.countByEmailExceptUser(email, userId) > 0;
+    }
+
+    @Override
+    public void updateUserExceptPw(UserVO vo) throws Exception {
+        userDAO.updateUserExceptPw(vo);
     }
 
 }

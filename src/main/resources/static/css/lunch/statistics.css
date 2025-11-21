@@ -54,14 +54,15 @@
     gap: 1.5rem; /* gap-6 */
 }
 
-/* 데스크탑(LG) 화면에서 2열 배치 */
+/* 데스크탑 화면에서 2열 배치 */
 @media (min-width: 1024px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .stats-card.full-width-card {
+        grid-column: span 2;
+    }
 }
-
-/* 차트 카드 디자인 */
 .stats-card {
     background-color: #ffffff;
     padding: 1.5rem; /* p-6 */
@@ -74,45 +75,4 @@
     font-weight: 600; /* font-semibold */
     margin-bottom: 1rem; /* mb-4 */
     color: #111827;
-}
-
-/* 카드 하단 리스트 영역 */
-.card-footer {
-    margin-top: 1.5rem; /* mt-6 */
-    border-top: 1px solid #e5e7eb; /* border-gray-200 */
-    padding-top: 1rem; /* pt-4 */
-}
-
-.card-subtitle {
-    font-size: 1.125rem; /* text-lg */
-    font-weight: 600; /* font-semibold */
-    margin-bottom: 0.5rem; /* mb-2 */
-    color: #374151;
-}
-
-.user-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.user-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0; /* py-2 */
-    border-bottom: 1px solid #e5e7eb; /* divide-y 효과 */
-}
-
-.user-list-item:last-child {
-    border-bottom: none;
-}
-
-.user-name {
-    font-weight: 500; /* font-medium */
-    color: #1f2937; /* text-gray-800 */
-}
-
-.user-amount {
-    color: #4b5563; /* text-gray-600 */
 }

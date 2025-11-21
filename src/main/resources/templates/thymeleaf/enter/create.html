@@ -9,18 +9,11 @@
 <!--    <link rel="stylesheet" th:href="@{/css/lunch/register.css}">-->
 <!--    <link rel="stylesheet" th:href="@{/css/enter/create.css}">-->
 
-    <!-- ✅ 공통 기초 스타일 -->
-    <link rel="stylesheet" th:href="@{/css/reset.css}">
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-    <link rel="stylesheet" th:href="@{/css/components.css}">
-    <!-- 대시보드 / toc 는 안 써도 됨 -->
+        <link rel="stylesheet" th:href="@{/css/user/form.css}">
 
-    <!-- ✅ 레이아웃 & 헤더 -->
-    <link rel="stylesheet" th:href="@{/css/cmm/main.css}">
-    <link rel="stylesheet" th:href="@{/css/cmm/header.css}">
-
-        <link rel="stylesheet" th:href="@{/css/account/form.css}">
-
+    <style>
+        .field-error{color: red;}
+    </style>
 </head>
 <body>
 
@@ -39,9 +32,17 @@
                 <div class="form-container">
 
                     <form class="profile-form"
-                          th:action="@{/enter/create}"
+                          th:action="@{/enter/create.do}"
                           th:object="${enter}"
                           method="post">
+
+                        <div class="form-group">
+                            <label>출입번호</label>
+                            <input id="enterId" name="enterId" type="text" pattern="\d{4}" maxlength="4" placeholder="4자리입력(0000)" required>
+                            <div class="field-error"
+                                 th:if="${#fields.hasErrors('enterId')}"
+                                 th:errors="*{enterId}"></div>
+                        </div>
 
                         <!-- 1) 유형 선택 -->
                         <div class="form-group">
@@ -70,6 +71,7 @@
                             <select th:field="*{method}">
                                 <option value="CARD">카드</option>
                                 <option value="FINGER">지문</option>
+                                <option value="PW">비밀번호</option>
                             </select>
                         </div>
 
@@ -88,10 +90,17 @@
                                 <input id="guest-email" th:field="*{guestEmail}" type="email">
                             </div>
 
+                            <div class="form-group">
+                                <label for="guest-start">게스트 시작일</label>
+                                <input id="guest-start" th:field="*{startGuestDt}" type="date">
+                            </div>
                             <!-- ★ 게스트 마감일 -->
                             <div class="form-group">
                                 <label for="guest-end">게스트 마감일</label>
                                 <input id="guest-end" th:field="*{endGuestDt}" type="date">
+                                <div class="field-error"
+                                     th:if="${#fields.hasErrors('endGuestDt')}"
+                                     th:errors="*{endGuestDt}"></div>
                             </div>
                         </div>
 
@@ -108,7 +117,7 @@
                                 </select>
                             </div>
 
-                            <!-- (선택) 이름/전화/이메일은 자동으로 들어오는 값이라면 readonly 로 둘 수도 있음 -->
+
                             <div class="form-group hidden">
                                 <label for="emp-name">이름</label>
                                 <input id="emp-name" th:field="*{name}" type="text" readonly>
@@ -139,7 +148,7 @@
                             <div class="btn-area">
                                 <button type="submit" class="submit-btn">등록</button>
                                 <button type="button" class="cancel-btn btn btn-cancel"
-                                        onclick="location.href='/enter/manage'">취소</button>
+                                        onclick="location.href='/enter/manage.do'">취소</button>
                             </div>
                         </div>
 
@@ -151,28 +160,7 @@
     </div>
 </div>
 
-<script>
-    function toggleTypeSection() {
-        const type = document.querySelector('input[name="type"]:checked')?.value;
-        const guest = document.getElementById('guest-section');
-        const emp = document.getElementById('emp-section');
-
-        if (type === 'GUEST') {
-            guest.classList.remove('hidden');
-            emp.classList.add('hidden');
-        } else {
-            guest.classList.add('hidden');
-            emp.classList.remove('hidden');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('input[name="type"]').forEach(radio => {
-            radio.addEventListener('change', toggleTypeSection);
-        });
-        toggleTypeSection(); // 처음 로딩 시에도 맞춰주기
-    });
-</script>
+<script th:src="@{/js/enter/new/create.js}"></script>
 
 </body>
 </html>

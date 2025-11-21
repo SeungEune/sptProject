@@ -11,7 +11,7 @@ public class UserVO {
     @NotBlank @Size(min = 4, max = 20)
     private String userId;
 
-    @NotBlank @Size(min = 8, max = 100)
+    @Size(min = 8, max = 100)
     private String password;
 
     // 비밀번호 확인(서버에서만 검증용, DB 칼럼 아님)

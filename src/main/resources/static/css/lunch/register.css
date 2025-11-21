@@ -1,6 +1,3 @@
-
-
-
 .content-body.lunch-layout {
     display: grid;
     grid-template-columns: 1fr 1fr; /* 왼쪽 폼: 최소300~최대420, 오른쪽: 남는공간 */
@@ -394,65 +391,43 @@
         border-radius: 0;
     }
 }
-/* 1. SweetAlert2 팝업 레이아웃 (기존 유지) */
-div:where(.swal2-container) div:where(.swal2-popup) {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    justify-items: center !important;
-    width: 45em !important;
-    max-width: 90% !important;
-    padding: 2.5rem !important;
-    border-radius: 0.75rem !important;
-    background-color: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
+
+/* 금액 패널 헤더 (제목 + 버튼 배치) */
+.amount-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
-/* 2. 아이콘, 제목, 내용 스타일 (기존 유지) */
-div:where(.swal2-icon) {
-    font-size: 3.5rem !important;
-    width: auto !important;
-    height: auto !important;
-    margin: 0 auto 1.5rem auto !important;
-    display: flex !important;
-}
-div:where(.swal2-icon).swal2-question::before,
-div:where(.swal2-icon).swal2-warning::before {
-    font-size: 3.5rem !important;
-}
-div:where(.swal2-title) {
-    display: block !important;
-    text-align: center !important;
-    margin-bottom: 1rem !important;
-    font-size: 2.25rem !important;
-    font-weight: 700 !important;
-    color: #1f2937 !important;
-}
-div:where(.swal2-html-container) {
-    display: block !important;
-    text-align: center !important;
-    margin: 0 0 2rem 0 !important;
-    font-size: 1.3rem !important;
-    line-height: 1.6 !important;
-    color: #4b5563 !important;
+/* 헤더 내부 제목 여백 제거 */
+.amount-header .amount-panel-title {
+    margin-bottom: 0;
 }
 
-/* 3. 버튼 공통 스타일 (모양만 잡음) */
-div:where(.swal2-actions) {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 1.25rem !important;
-    width: 100% !important;
-    margin: 0 !important;
-}
-div:where(.swal2-actions) button {
-    padding: 0.75rem 1.75rem !important;
-    font-size: 1.1rem !important;
-    border-radius: 0.5rem !important;
-    min-width: 8em !important;
-    border: none !important; /* 테두리 제거 */
-    color: white !important; /* 글자 흰색 */
+/* 1/N 계산 버튼 스타일 */
+.btn-calc {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-white);         /* #ffffff 대신 변수 사용 */
+    background-color: var(--color-primary); /* #2563eb 대신 메인 컬러 변수 사용 */
+    border: 1px solid var(--color-primary); /* 테두리도 메인 컬러로 통일 (선택사항) */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease; /* 배경색뿐만 아니라 모든 속성 부드럽게 전환 */
 }
 
+.btn-calc:hover {
+    background-color: #1d4ed8; /* 호버 시 약간 어둡게 */
+}
+
+.btn-calc i {
+    font-size: 12px; /* 아이콘 크기 미세 조정 */
+}
 /* 색상별 전용 클래스 추가 */
 .btn-blue { background-color: #2563eb !important; } /* 수정용 파랑 */
 .btn-red { background-color: #dc2626 !important; }   /* 삭제용 빨강 */

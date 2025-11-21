@@ -10,31 +10,31 @@ import java.util.Map;
 
 @Repository("enterDAO")
 public class EnterDAO extends EgovAbstractMapper {
-    public List<EnterVO> selectEnterList(int offset, int size) {
+    public List<EnterVO> selectEnterList(int offset, int size)  throws Exception {
         Map<String, Object> param = new HashMap<>();
         param.put("offset", offset);
         param.put("size", size);
         return selectList("EnterDAO.selectEnterList", param);
     }
 
-    public int selectEnterCount() {
+    public int selectEnterCount() throws Exception {
         return selectOne("EnterDAO.selectEnterCount");
     }
 
 
-    public void insertEnter(EnterVO enter) {
+    public void insertEnter(EnterVO enter) throws Exception {
         insert("EnterDAO.insertEnter",enter);
     }
 
-    public EnterVO selectEnter(Long enterId) {
+    public EnterVO selectEnter(String enterId) throws Exception {
         return selectOne("EnterDAO.selectEnter", enterId);
     }
 
-    public void updateEnter(EnterVO vo) {
+    public void updateEnter(EnterVO vo) throws Exception {
         update("EnterDAO.updateEnter", vo);
     }
 
-    public void deleteEnter(Long enterId) {
+    public void deleteEnter(String enterId) throws Exception {
         delete("EnterDAO.deleteEnter", enterId);
     }
 }

@@ -18,6 +18,7 @@
             e.status_cd    AS status,
             e.type_cd      AS type,
             e.regist_dt    AS registDt,
+            e.start_guest_dt AS startGuestDt,
             e.end_guest_dt AS endGuestDt
         FROM tb_enter e
                  LEFT JOIN tb_user u ON e.user_id = u.user_id
@@ -33,9 +34,11 @@
 
     <insert id="insertEnter" parameterType="biz.enter.vo.EnterVO">
         INSERT INTO tb_enter (
+        enter_id,
         method_cd,
         status_cd,
         type_cd,
+        start_guest_dt,
         end_guest_dt,
         regist_dt
         <if test="type == 'EMP'">
@@ -46,9 +49,11 @@
         </if>
         )
         VALUES (
+        #{enterId},
         #{method},
         #{status},
         #{type},
+        #{startGuestDt, jdbcType=DATE},
         #{endGuestDt, jdbcType=DATE},
         NOW()
         <if test="type == 'EMP'">
@@ -76,6 +81,7 @@
             e.status_cd    AS status,
             e.type_cd      AS type,
             e.regist_dt    AS registDt,
+            e.start_guest_dt AS startGuestDt,
             e.end_guest_dt AS endGuestDt
         FROM tb_enter e
                  LEFT JOIN tb_user u ON e.user_id = u.user_id
@@ -96,6 +102,9 @@
         method_cd    = #{method},
         status_cd    = #{status},
         type_cd      = #{type}
+        <if test="startGuestDt != null">
+         , start_guest_dt = #{startGuestDt, jdbcType=DATE}
+        </if>
         <if test="endGuestDt != null">
          , end_guest_dt = #{endGuestDt, jdbcType=DATE}
         </if>
@@ -103,7 +112,7 @@
     </update>
 
 
-    <delete id="deleteEnter" parameterType="Long">
+    <delete id="deleteEnter" parameterType="String">
         DELETE FROM tb_enter
         WHERE enter_id = #{enterId}
     </delete>
